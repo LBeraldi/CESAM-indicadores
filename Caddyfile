@@ -1,0 +1,9 @@
+{$DOMAIN}, www.{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy frontend:3000
+}
+
+api.{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy backend:8000
+}

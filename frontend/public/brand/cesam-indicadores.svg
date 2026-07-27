@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 118" role="img" aria-labelledby="title desc">
+  <title id="title">CESAM Indicadores</title>
+  <desc id="desc">Marca CESAM Indicadores, plataforma de saneamento e infraestrutura municipal.</desc>
+  <defs>
+    <linearGradient id="leaf" x1="22" x2="66" y1="24" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0a8f45"/>
+      <stop offset="1" stop-color="#19a35a"/>
+    </linearGradient>
+    <linearGradient id="water" x1="56" x2="112" y1="16" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3488f4"/>
+      <stop offset="1" stop-color="#075fd3"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(4 4) scale(.98)">
+    <path
+      d="M66 119h-17l-3-14a45 45 0 0 1-10-4l-12 8-12-12 8-12a45 45 0 0 1-4-10L2 72V55l14-3a45 45 0 0 1 4-10l-8-12 12-12 12 8a45 45 0 0 1 10-4l3-14h17l3 14a45 45 0 0 1 10 4l12-8 12 12-8 12a45 45 0 0 1 4 10l14 3v17l-14 3a45 45 0 0 1-4 10l8 12-12 12-12-8a45 45 0 0 1-10 4l-3 14Z"
+      fill="#f8fbff"
+      stroke="#0c2d57"
+      stroke-linejoin="round"
+      stroke-width="5"
+    />
+    <circle cx="58" cy="64" r="39" fill="#fff"/>
+    <path d="M55 17C31 22 18 40 18 64c0 23 16 40 35 45 0 0-10-14-7-32 2-19 15-37 9-60Z" fill="url(#leaf)"/>
+    <path d="M27 90c7-27 16-47 31-65" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="6"/>
+    <path d="M74 10c-9 21-26 36-26 61 0 25 19 43 43 43 23 0 38-17 38-39 0-25-36-43-55-65Z" fill="url(#water)" transform="translate(-9 0)"/>
+    <path d="M27 87c17 18 47 25 76 11" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="5"/>
+    <rect x="52" y="74" width="9" height="21" rx="1.5" fill="#fff"/>
+    <rect x="68" y="66" width="9" height="29" rx="1.5" fill="#fff"/>
+    <rect x="84" y="55" width="9" height="40" rx="1.5" fill="#fff"/>
+    <path d="M44 78 62 61l18-12 14 15" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"/>
+    <circle cx="62" cy="61" r="5" fill="#1f73df" stroke="#fff" stroke-width="4"/>
+    <circle cx="80" cy="49" r="5" fill="#1f73df" stroke="#fff" stroke-width="4"/>
+    <circle cx="94" cy="64" r="5" fill="#1f73df" stroke="#fff" stroke-width="4"/>
+  </g>
+
+  <line x1="144" x2="144" y1="18" y2="118" stroke="#d8e1eb" stroke-width="2"/>
+  <text x="170" y="58" fill="#102033" font-family="Arial, Helvetica, sans-serif" font-size="45" font-weight="800" letter-spacing="1">CESAM</text>
+  <text x="171" y="96" fill="#1f5f9f" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" letter-spacing="3">INDICADORES</text>
+  <line x1="172" x2="425" y1="108" y2="108" stroke="#18765a" stroke-width="4"/>
+  <line x1="282" x2="425" y1="108" y2="108" stroke="#1f5f9f" stroke-width="4"/>
+</svg>
