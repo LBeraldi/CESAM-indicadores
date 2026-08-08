@@ -1,15 +1,17 @@
+name: observatorio-saneamento
+
 services:
   db:
     image: postgis/postgis:16-3.4
-    container_name: infra-ms-db
+    container_name: observatorio-saneamento-db
     environment:
-      POSTGRES_DB: infra_ms
-      POSTGRES_USER: infra_ms
-      POSTGRES_PASSWORD: infra_ms
+      POSTGRES_DB: observatorio_saneamento
+      POSTGRES_USER: observatorio_saneamento
+      POSTGRES_PASSWORD: observatorio_saneamento
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U infra_ms -d infra_ms"]
+      test: ["CMD-SHELL", "pg_isready -U observatorio_saneamento -d observatorio_saneamento"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -17,10 +19,10 @@ services:
   backend:
     build:
       context: ./backend
-    container_name: infra-ms-api
+    container_name: observatorio-saneamento-api
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     environment:
-      DATABASE_URL: postgresql+psycopg://infra_ms:infra_ms@db:5432/infra_ms
+      DATABASE_URL: postgresql+psycopg://observatorio_saneamento:observatorio_saneamento@db:5432/observatorio_saneamento
       DATA_DIR: /app/data
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
     ports:
@@ -36,7 +38,7 @@ services:
     build:
       context: ./frontend
       target: development
-    container_name: infra-ms-web
+    container_name: observatorio-saneamento-web
     command: npm run dev -- --hostname 0.0.0.0
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}

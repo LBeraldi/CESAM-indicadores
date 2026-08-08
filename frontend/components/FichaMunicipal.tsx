@@ -130,7 +130,7 @@ function baixarCsv(municipio: Municipio, valores: ValorIndicador[]) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `infra-ms_${municipio.codigo_ibge}_${municipio.nome.replaceAll(" ", "_")}.csv`;
+  link.download = `observatorio-saneamento_${municipio.codigo_ibge}_${municipio.nome.replaceAll(" ", "_")}.csv`;
   document.body.appendChild(link);
   link.click();
   link.remove();

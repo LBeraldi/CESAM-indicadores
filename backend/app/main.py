@@ -17,7 +17,7 @@ def _cors_origins() -> list[str]:
 
 
 app = FastAPI(
-    title="infra-ms API",
+    title="Observatório de Saneamento API",
     description="API inicial de indicadores municipais de saneamento e infraestrutura de Mato Grosso do Sul.",
     version="0.1.0",
 )
@@ -50,4 +50,4 @@ def health() -> schemas.HealthResponse:
     except Exception:
         database_status = "erro"
 
-    return schemas.HealthResponse(status="ok", service="infra-ms-api", database=database_status)
+    return schemas.HealthResponse(status="ok", service="observatorio-saneamento-api", database=database_status)

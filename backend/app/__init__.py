@@ -1,1 +1,1 @@
-"""Backend package for infra-ms."""
+"""Backend package for Observatório de Saneamento."""

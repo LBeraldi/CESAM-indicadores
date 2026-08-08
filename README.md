@@ -1,4 +1,4 @@
-# infra-ms
+# Observatório de Saneamento
 
 MVP técnico para uma plataforma pública de indicadores municipais de saneamento e infraestrutura dos municípios de Mato Grosso do Sul.
 
@@ -85,7 +85,7 @@ Exemplo de backup manual:
 
 ```bash
 docker compose -f docker-compose.prod.yml exec -T db \
-  pg_dump -U infra_ms -d infra_ms -Fc > infra_ms_$(date +%F).dump
+  pg_dump -U observatorio_saneamento -d observatorio_saneamento -Fc > observatorio_saneamento_$(date +%F).dump
 ```
 
 Guarde cópias fora da VPS e teste periodicamente a restauração.

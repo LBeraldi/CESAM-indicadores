@@ -25,7 +25,7 @@ class MetadadosMunicipioIbge:
 
 
 def _get_json(url: str) -> object:
-    request = Request(url, headers={"User-Agent": "infra-ms/0.1"})
+    request = Request(url, headers={"User-Agent": "observatorio-saneamento/0.1"})
     with urlopen(request, timeout=TIMEOUT_SECONDS) as response:
         content = response.read()
         if response.headers.get("Content-Encoding") == "gzip" or content.startswith(b"\x1f\x8b"):

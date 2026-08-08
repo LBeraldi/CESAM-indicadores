@@ -1,1 +1,1 @@
-"""API routes for infra-ms."""
+"""API routes for Observatório de Saneamento."""

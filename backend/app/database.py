@@ -11,7 +11,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+psycopg://infra_ms:infra_ms@localhost:5432/infra_ms",
+    "postgresql+psycopg://observatorio_saneamento:observatorio_saneamento@localhost:5432/observatorio_saneamento",
 )
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
