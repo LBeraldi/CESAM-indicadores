@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, Database, Droplets, MapPinned } from "lucide-react";
+import { ArrowLeft, CalendarDays, Database, Droplets, ExternalLink, Globe2, MapPinned, Navigation } from "lucide-react";
 import { FichaMunicipal } from "@/components/FichaMunicipal";
+import { MiniMapaMunicipio } from "@/components/MiniMapaMunicipio";
 import { fetchApi, type IndicadoresMunicipio } from "@/lib/api";
 import { getPrestadorAgua } from "@/lib/prestadoresAgua";
+import { getAtendimentoPrestador } from "@/lib/atendimentoPrestadores";
 
 type Props = {
   params: Promise<{ codigo_ibge: string }>;
@@ -27,6 +29,7 @@ export default async function MunicipioDetalhePage({ params }: Props) {
   const prestadorAguaNome = prestadorAgua
     ? `${prestadorAgua.nome}${prestadorAgua.sigla ? ` (${prestadorAgua.sigla})` : ""}`
     : "Não informado";
+  const atendimentoPrestador = getAtendimentoPrestador(municipio.codigo_ibge, municipio.nome, prestadorAgua);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -52,37 +55,71 @@ export default async function MunicipioDetalhePage({ params }: Props) {
 
       <section className="mt-6 border-b border-ms-line pb-6">
         <p className="text-sm font-semibold uppercase tracking-wide text-ms-green">{municipio.uf}</p>
-        <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="mt-2 grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div>
             <h1 className="text-4xl font-semibold tracking-normal text-ms-ink">{municipio.nome}</h1>
-            <div className="mt-3 max-w-3xl rounded-md border border-ms-line bg-white p-4 shadow-sm">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="mt-3 max-w-4xl rounded-md border border-ms-line bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="flex min-w-0 gap-3">
                   <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-ms-sky text-ms-blue">
                     <Droplets className="h-5 w-5" />
                   </span>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-ms-muted">Concessionária de distribuição de água</p>
+                    <p className="text-sm font-medium text-ms-muted">Atendimento de água no município</p>
                     <p className="mt-1 break-words text-base font-semibold text-ms-ink">{prestadorAguaNome}</p>
-                    <p className="mt-1 text-xs text-ms-muted">
-                      Fonte: {prestadorAgua?.fonte ?? "Não informada"}
-                    </p>
+                    <div className="mt-2 flex items-start gap-2 text-sm text-ms-muted">
+                      <MapPinned className="mt-0.5 h-4 w-4 shrink-0 text-ms-green" />
+                      <span>
+                        {atendimentoPrestador?.endereco
+                          ? `${atendimentoPrestador.endereco}, ${municipio.nome} - MS`
+                          : "Endereço local não confirmado em fonte institucional."}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-xs text-ms-muted">Prestador: {prestadorAgua?.fonte ?? "Fonte não informada"}</p>
                   </div>
                 </div>
-                {prestadorAgua?.areaAtuacao ? (
-                  <span className="w-fit rounded-md bg-ms-bg px-3 py-2 text-xs font-medium text-ms-muted">
-                    {prestadorAgua.areaAtuacao}
-                  </span>
-                ) : null}
+                <div className="flex shrink-0 flex-wrap gap-2 lg:max-w-72 lg:justify-end">
+                  {atendimentoPrestador ? (
+                    <>
+                      <a
+                        href={atendimentoPrestador.siteUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex h-10 items-center gap-2 rounded-md border border-ms-line bg-white px-3 text-sm font-semibold text-ms-blue hover:border-ms-blue hover:bg-ms-sky"
+                      >
+                        <Globe2 className="h-4 w-4" />
+                        Site do prestador
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                      <a
+                        href={atendimentoPrestador.mapsUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex h-10 items-center gap-2 rounded-md bg-ms-blue px-3 text-sm font-semibold text-white hover:bg-ms-navy"
+                      >
+                        <Navigation className="h-4 w-4" />
+                        Abrir no Google Maps
+                      </a>
+                    </>
+                  ) : null}
+                  {prestadorAgua?.areaAtuacao ? (
+                    <span className="w-fit rounded-md bg-ms-bg px-3 py-2 text-xs font-medium text-ms-muted">
+                      {prestadorAgua.areaAtuacao}
+                    </span>
+                  ) : null}
+                </div>
               </div>
             </div>
             <p className="mt-2 text-sm text-ms-muted">
               Código IBGE {municipio.codigo_ibge}
             </p>
           </div>
-          <div className="inline-flex w-fit items-center gap-2 rounded-md bg-ms-sky px-3 py-2 text-sm font-medium text-ms-blue">
-            <Database className="h-4 w-4" />
-            {indicadores.length} registros disponíveis
+          <div className="grid gap-3">
+            <MiniMapaMunicipio codigoIbge={municipio.codigo_ibge} municipio={municipio.nome} />
+            <div className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ms-sky px-3 py-2 text-sm font-medium text-ms-blue">
+              <Database className="h-4 w-4" />
+              {indicadores.length} registros disponíveis
+            </div>
           </div>
         </div>
       </section>

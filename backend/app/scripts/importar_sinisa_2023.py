@@ -75,6 +75,11 @@ MAPEAMENTO_ESGOTO = [
     ),
 ]
 
+MAPEAMENTO_INFORMACOES_REDE = [
+    ("agua_extensao_rede", "GTA1102", "Extensão da rede de distribuição de água"),
+    ("esgoto_extensao_rede", "GTE1001", "Extensão da rede pública de esgotamento sanitário"),
+]
+
 MAPEAMENTO_RESIDUOS = [
     ("residuos_cobertura_coleta_domiciliar", "IRS0001"),
     ("residuos_cobertura_coleta_seletiva", "IRS0005"),
@@ -207,6 +212,62 @@ def _importar_planilha_indicadores(
                 importados += 1
             else:
                 erros += 1
+
+    return importados, erros, avisos
+
+
+def _importar_informacao_rede(
+    db: Session,
+    arquivo: Path,
+    indicador_codigo: str,
+    codigo_sinisa: str,
+    descricao: str,
+    fonte: models.FonteDados,
+    municipios: dict[str, models.Municipio],
+    indicadores: dict[str, models.Indicador],
+) -> tuple[int, int, list[str]]:
+    """Importa uma informação estrutural cuja planilha usa códigos SINISA como cabeçalho."""
+    previa = pd.read_excel(arquivo, sheet_name=0, header=None, nrows=15)
+    linha_codigo = next(
+        (
+            indice
+            for indice in previa.index
+            if codigo_sinisa in previa.loc[indice].astype(str).str.strip().tolist()
+        ),
+        None,
+    )
+    if linha_codigo is None:
+        return 0, 0, [f"{arquivo.name}: código SINISA ausente: {codigo_sinisa}"]
+
+    df = pd.read_excel(arquivo, sheet_name=0, header=linha_codigo)
+    colunas_obrigatorias = {"cod_IBGE", "UF", codigo_sinisa}
+    faltantes = colunas_obrigatorias.difference(df.columns)
+    if faltantes:
+        return 0, 0, [f"{arquivo.name}: colunas ausentes: {', '.join(sorted(faltantes))}"]
+
+    df = df[df["UF"].astype(str).str.strip().eq("MS")].copy()
+    importados = 0
+    erros = 0
+    avisos: list[str] = []
+    indicador = indicadores[indicador_codigo]
+
+    for _, row in df.iterrows():
+        codigo = _normalizar_codigo(row["cod_IBGE"])
+        municipio = municipios.get(codigo)
+        if not municipio:
+            erros += 1
+            avisos.append(f"{arquivo.name}: município MS não cadastrado: {codigo}")
+            continue
+        ok = _registrar_valor(
+            db,
+            municipio,
+            indicador,
+            fonte,
+            row[codigo_sinisa],
+            f"SINISA {codigo_sinisa} - {descricao}",
+        )
+        importados += int(ok)
+        erros += int(not ok)
 
     return importados, erros, avisos
 
@@ -389,6 +450,16 @@ def main() -> None:
                 "ESGOTO_Indicadores_Base Municipal",
                 temp_dir,
             )
+            agua_informacoes = _extrair_primeiro(
+                raw_dir / "SINISA_Resultados_Ref2023.zip",
+                "AGUA_Informacoes_Gestao Tecnica Agua_Base Municipal",
+                temp_dir,
+            )
+            esgoto_informacoes = _extrair_primeiro(
+                raw_dir / "SINISA_ESGOTO_Planilhas_2023_v2.zip",
+                "ESGOTO_Informacoes_Gestao Tecnica Esgoto_Base Municipal",
+                temp_dir,
+            )
             aguas_pluviais = _extrair_primeiro(
                 raw_dir / "SINISA_AGUASPLUVIAIS_Indicadores_2023_v2.zip",
                 "Indicadores_2023",
@@ -401,6 +472,24 @@ def main() -> None:
             ]:
                 importados, erros, novos_avisos = _importar_planilha_indicadores(
                     db, arquivo, mapeamento, fonte, municipios, indicadores, tema
+                )
+                total_importados += importados
+                total_erros += erros
+                avisos.extend(novos_avisos)
+
+            for arquivo, (indicador_codigo, codigo_sinisa, descricao) in [
+                (agua_informacoes, MAPEAMENTO_INFORMACOES_REDE[0]),
+                (esgoto_informacoes, MAPEAMENTO_INFORMACOES_REDE[1]),
+            ]:
+                importados, erros, novos_avisos = _importar_informacao_rede(
+                    db,
+                    arquivo,
+                    indicador_codigo,
+                    codigo_sinisa,
+                    descricao,
+                    fonte,
+                    municipios,
+                    indicadores,
                 )
                 total_importados += importados
                 total_erros += erros
