@@ -374,8 +374,12 @@ function HistoricoFlutuante({
     <span
       role="dialog"
       aria-label={`Série histórica detalhada de ${valor.indicador.nome}`}
-      onMouseEnter={abrir}
-      onMouseLeave={agendarFechamento}
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") abrir();
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === "mouse") agendarFechamento();
+      }}
       onClick={(event) => event.stopPropagation()}
       className={`historico-popover ${aberto ? "is-open" : "is-closing"} fixed z-[100] block max-h-[calc(100vh-24px)] overflow-y-auto rounded-lg border border-ms-line bg-white p-5 text-left text-ms-ink shadow-2xl`}
       style={posicao}
@@ -462,9 +466,15 @@ function HistoricoFlutuante({
       role="button"
       tabIndex={0}
       aria-expanded={aberto}
-      onMouseEnter={agendarAbertura}
-      onMouseLeave={agendarFechamento}
-      onFocus={abrir}
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") agendarAbertura();
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === "mouse") agendarFechamento();
+      }}
+      onFocus={(event) => {
+        if (event.currentTarget.matches(":focus-visible")) abrir();
+      }}
       onBlur={agendarFechamento}
       onClick={(event) => {
         event.stopPropagation();
