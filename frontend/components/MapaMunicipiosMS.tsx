@@ -76,9 +76,11 @@ const METRICAS: Metrica[] = [
   { codigo: "nota_saneamento", nome: "Nota geral de saneamento", unidade: "pontos de 0 a 100", composta: true },
   { codigo: "agua_atendimento_total", nome: "Água — atendimento total", unidade: "%" },
   { codigo: "agua_perdas_distribuicao", nome: "Água — perdas na distribuição", unidade: "%" },
+  { codigo: "agua_extensao_rede", nome: "Água — extensão da rede", unidade: "km" },
   { codigo: "esgoto_atendimento_total", nome: "Esgoto — atendimento total", unidade: "%" },
   { codigo: "esgoto_coleta", nome: "Esgoto — coleta", unidade: "%" },
-  { codigo: "esgoto_tratamento", nome: "Esgoto — tratamento", unidade: "%" }
+  { codigo: "esgoto_tratamento", nome: "Esgoto — tratamento", unidade: "%" },
+  { codigo: "esgoto_extensao_rede", nome: "Esgoto — extensão da rede", unidade: "km" }
 ];
 
 const TEXT = {

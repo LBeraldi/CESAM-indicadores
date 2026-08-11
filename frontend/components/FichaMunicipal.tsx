@@ -5,17 +5,23 @@ import {
   CloudRain,
   Download,
   Droplets,
+  ExternalLink,
+  FileDown,
   Filter,
   Leaf,
   Printer,
   RotateCcw,
   ShieldCheck,
+  TrendingDown,
+  TrendingUp,
   Trash2,
   Waves
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import type { Municipio, ValorIndicador } from "@/lib/api";
+import { getRecursosGestaoMunicipal } from "@/lib/documentosGestaoMunicipal";
 import { formatValorIndicador, valorParaPlanilha } from "@/lib/formatters";
 
 type Props = {
@@ -42,8 +48,8 @@ const TODOS = "todos";
 const TEMA_ORDEM = ["Água", "Esgoto", "Resíduos sólidos", "Águas pluviais", "Gestão municipal"];
 
 // Paleta das dimensões derivada dos mesmos tokens institucionais do resto do
-// site (ms-teal/navy/green/blue/amber em tailwind.config.ts), variando por
-// matiz e não por saturação, para não destoar do header, mapa e ranking.
+// site, com marrom terroso para resíduos sólidos, variando por matiz e não
+// por saturação para não destoar do header, mapa e ranking.
 const TEMA_CONFIG: Record<string, TemaConfig> = {
   Água: {
     icon: Droplets,
@@ -59,9 +65,9 @@ const TEMA_CONFIG: Record<string, TemaConfig> = {
   },
   "Resíduos sólidos": {
     icon: Trash2,
-    bgClass: "bg-[#18765a]",
-    accentClass: "bg-[#18765a]",
-    panelClass: "bg-[#e5f3ec] text-[#125f48]"
+    bgClass: "bg-[#7a4e2d]",
+    accentClass: "bg-[#7a4e2d]",
+    panelClass: "bg-[#f3e9df] text-[#6b3f24]"
   },
   "Águas pluviais": {
     icon: CloudRain,
@@ -130,7 +136,7 @@ function baixarCsv(municipio: Municipio, valores: ValorIndicador[]) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `infra-ms_${municipio.codigo_ibge}_${municipio.nome.replaceAll(" ", "_")}.csv`;
+  link.download = `observatorio-saneamento_${municipio.codigo_ibge}_${municipio.nome.replaceAll(" ", "_")}.csv`;
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -226,6 +232,282 @@ function Sparkline({ pontos }: { pontos: PontoHistorico[] }) {
   );
 }
 
+function formatNumeroHistorico(valor: number, unidade?: string | null): string {
+  const numero = valor.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+  if (!unidade) return numero;
+  return unidade === "%" ? `${numero}%` : `${numero} ${unidade}`;
+}
+
+function GraficoHistoricoDetalhado({ pontos, unidade }: { pontos: PontoHistorico[]; unidade?: string | null }) {
+  const width = 600;
+  const height = 230;
+  const margem = { top: 18, right: 18, bottom: 38, left: 58 };
+  const areaWidth = width - margem.left - margem.right;
+  const areaHeight = height - margem.top - margem.bottom;
+  const valores = pontos.map((ponto) => ponto.valor);
+  const minOriginal = Math.min(...valores);
+  const maxOriginal = Math.max(...valores);
+  const folga = (maxOriginal - minOriginal || Math.max(Math.abs(maxOriginal), 1)) * 0.12;
+  const min = minOriginal - folga;
+  const max = maxOriginal + folga;
+  const amplitude = max - min || 1;
+  const x = (indice: number) => margem.left + (indice / Math.max(1, pontos.length - 1)) * areaWidth;
+  const y = (valor: number) => margem.top + ((max - valor) / amplitude) * areaHeight;
+  const linha = pontos.map((ponto, indice) => `${indice === 0 ? "M" : "L"} ${x(indice)} ${y(ponto.valor)}`).join(" ");
+  const area = `${linha} L ${x(pontos.length - 1)} ${margem.top + areaHeight} L ${margem.left} ${margem.top + areaHeight} Z`;
+  const ticksY = Array.from({ length: 5 }, (_, indice) => max - (indice / 4) * amplitude);
+  const intervaloAno = Math.max(1, Math.ceil(pontos.length / 7));
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full" role="img" aria-label="Gráfico detalhado da série histórica">
+      {ticksY.map((tick) => (
+        <g key={tick}>
+          <line x1={margem.left} x2={width - margem.right} y1={y(tick)} y2={y(tick)} stroke="#d8e1eb" strokeDasharray="4 4" />
+          <text x={margem.left - 9} y={y(tick) + 4} textAnchor="end" className="fill-ms-muted text-[10px]">
+            {tick.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}
+          </text>
+        </g>
+      ))}
+      <path d={area} fill="#1f5f9f" opacity={0.1} />
+      <path d={linha} fill="none" stroke="#1f5f9f" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      {pontos.map((ponto, indice) => (
+        <g key={`${ponto.ano}-${ponto.valor}`}>
+          <circle cx={x(indice)} cy={y(ponto.valor)} r={4} fill="white" stroke="#1f5f9f" strokeWidth={2.5} />
+          <title>{`${ponto.ano}: ${formatNumeroHistorico(ponto.valor, unidade)}`}</title>
+          {(indice % intervaloAno === 0 || indice === pontos.length - 1) && (
+            <text x={x(indice)} y={height - 13} textAnchor="middle" className="fill-ms-muted text-[10px]">
+              {ponto.ano}
+            </text>
+          )}
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+type PosicaoFlutuante = { left: number; top: number; width: number };
+
+function HistoricoFlutuante({
+  valor,
+  pontos,
+  className,
+  children
+}: {
+  valor: ValorIndicador;
+  pontos: PontoHistorico[];
+  className: string;
+  children: ReactNode;
+}) {
+  const [aberto, setAberto] = useState(false);
+  const [renderizado, setRenderizado] = useState(false);
+  const [posicao, setPosicao] = useState<PosicaoFlutuante | null>(null);
+  const gatilhoRef = useRef<HTMLSpanElement>(null);
+  const abrirRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fecharRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const desmontarRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const primeiro = pontos[0];
+  const ultimo = pontos[pontos.length - 1];
+  const variacao = ultimo.valor - primeiro.valor;
+  const variacaoPercentual = primeiro.valor === 0 ? null : (variacao / Math.abs(primeiro.valor)) * 100;
+  const minimo = pontos.reduce((menor, ponto) => (ponto.valor < menor.valor ? ponto : menor), primeiro);
+  const maximo = pontos.reduce((maior, ponto) => (ponto.valor > maior.valor ? ponto : maior), primeiro);
+  const TrendIcon = variacao >= 0 ? TrendingUp : TrendingDown;
+
+  function atualizarPosicao() {
+    const elemento = gatilhoRef.current;
+    if (!elemento) return;
+    const rect = elemento.getBoundingClientRect();
+    const width = Math.min(660, window.innerWidth - 24);
+    const left = Math.max(12, Math.min(rect.right - width, window.innerWidth - width - 12));
+    const alturaEstimada = Math.min(620, window.innerHeight - 24);
+    const abaixo = rect.bottom + 10;
+    const top = abaixo + alturaEstimada <= window.innerHeight ? abaixo : Math.max(12, rect.top - alturaEstimada - 10);
+    setPosicao({ left, top, width });
+  }
+
+  function abrir() {
+    if (abrirRef.current) clearTimeout(abrirRef.current);
+    if (fecharRef.current) clearTimeout(fecharRef.current);
+    if (desmontarRef.current) clearTimeout(desmontarRef.current);
+    atualizarPosicao();
+    setRenderizado(true);
+    setAberto(true);
+  }
+
+  function agendarAbertura() {
+    if (abrirRef.current) clearTimeout(abrirRef.current);
+    if (fecharRef.current) clearTimeout(fecharRef.current);
+    abrirRef.current = setTimeout(abrir, 800);
+  }
+
+  function fechar() {
+    setAberto(false);
+    if (desmontarRef.current) clearTimeout(desmontarRef.current);
+    desmontarRef.current = setTimeout(() => setRenderizado(false), 200);
+  }
+
+  function agendarFechamento() {
+    if (abrirRef.current) clearTimeout(abrirRef.current);
+    if (fecharRef.current) clearTimeout(fecharRef.current);
+    if (renderizado) fecharRef.current = setTimeout(fechar, 140);
+  }
+
+  useEffect(() => {
+    if (!renderizado) return;
+    const reposicionar = () => atualizarPosicao();
+    window.addEventListener("resize", reposicionar);
+    window.addEventListener("scroll", reposicionar, true);
+    return () => {
+      window.removeEventListener("resize", reposicionar);
+      window.removeEventListener("scroll", reposicionar, true);
+    };
+  }, [renderizado]);
+
+  useEffect(() => () => {
+    if (abrirRef.current) clearTimeout(abrirRef.current);
+    if (fecharRef.current) clearTimeout(fecharRef.current);
+    if (desmontarRef.current) clearTimeout(desmontarRef.current);
+  }, []);
+
+  const painel = renderizado && posicao ? (
+    <span
+      role="dialog"
+      aria-label={`Série histórica detalhada de ${valor.indicador.nome}`}
+      onMouseEnter={abrir}
+      onMouseLeave={agendarFechamento}
+      onClick={(event) => event.stopPropagation()}
+      className={`historico-popover ${aberto ? "is-open" : "is-closing"} fixed z-[100] block max-h-[calc(100vh-24px)] overflow-y-auto rounded-lg border border-ms-line bg-white p-5 text-left text-ms-ink shadow-2xl`}
+      style={posicao}
+    >
+      <span className="flex items-start justify-between gap-4">
+        <span>
+          <span className="block text-xs font-semibold uppercase tracking-wide text-ms-blue">Série histórica detalhada</span>
+          <span className="mt-1 block text-lg font-semibold leading-snug">{valor.indicador.nome}</span>
+          <span className="mt-1 block text-xs text-ms-muted">
+            {primeiro.ano}–{ultimo.ano} · {pontos.length} anos com dados · {valor.fonte ?? valor.indicador.fonte ?? "Fonte não informada"}
+          </span>
+        </span>
+        <span className="rounded-md bg-ms-sky px-2.5 py-1 text-xs font-semibold text-ms-blue">{valor.indicador.unidade || "valor"}</span>
+      </span>
+
+      <span className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <span className="rounded-md bg-ms-bg p-3">
+          <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Primeiro valor</span>
+          <span className="mt-1 block font-semibold">{formatNumeroHistorico(primeiro.valor, valor.indicador.unidade)}</span>
+          <span className="block text-xs text-ms-muted">{primeiro.ano}</span>
+        </span>
+        <span className="rounded-md bg-ms-bg p-3">
+          <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Último valor</span>
+          <span className="mt-1 block font-semibold">{formatNumeroHistorico(ultimo.valor, valor.indicador.unidade)}</span>
+          <span className="block text-xs text-ms-muted">{ultimo.ano}</span>
+        </span>
+        <span className="rounded-md bg-ms-bg p-3">
+          <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Variação</span>
+          <span className={`mt-1 flex items-center gap-1 font-semibold ${variacao >= 0 ? "text-ms-green" : "text-red-700"}`}>
+            <TrendIcon className="h-4 w-4" />
+            {variacao >= 0 ? "+" : ""}{formatNumeroHistorico(variacao, valor.indicador.unidade)}
+          </span>
+          <span className="block text-xs text-ms-muted">
+            {variacaoPercentual === null ? "base inicial zero" : `${variacaoPercentual >= 0 ? "+" : ""}${variacaoPercentual.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`}
+          </span>
+        </span>
+        <span className="rounded-md bg-ms-bg p-3">
+          <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Amplitude</span>
+          <span className="mt-1 block font-semibold">{formatNumeroHistorico(maximo.valor - minimo.valor, valor.indicador.unidade)}</span>
+          <span className="block text-xs text-ms-muted">mín. a máx.</span>
+        </span>
+      </span>
+
+      <span className="mt-4 block rounded-md border border-ms-line bg-white p-2">
+        <GraficoHistoricoDetalhado pontos={pontos} unidade={valor.indicador.unidade} />
+      </span>
+
+      <span className="mt-4 grid gap-3 sm:grid-cols-[1fr_1.35fr]">
+        <span className="grid grid-cols-2 gap-2 text-xs">
+          <span className="rounded-md border border-ms-line p-3">
+            <span className="block text-ms-muted">Menor registro</span>
+            <span className="mt-1 block font-semibold text-ms-ink">{formatNumeroHistorico(minimo.valor, valor.indicador.unidade)}</span>
+            <span className="text-ms-muted">em {minimo.ano}</span>
+          </span>
+          <span className="rounded-md border border-ms-line p-3">
+            <span className="block text-ms-muted">Maior registro</span>
+            <span className="mt-1 block font-semibold text-ms-ink">{formatNumeroHistorico(maximo.valor, valor.indicador.unidade)}</span>
+            <span className="text-ms-muted">em {maximo.ano}</span>
+          </span>
+        </span>
+        <span className="max-h-32 overflow-y-auto rounded-md border border-ms-line">
+          <span className="grid grid-cols-2 bg-ms-bg px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-wide text-ms-muted">
+            <span>Ano</span><span className="text-right">Valor</span>
+          </span>
+          {[...pontos].reverse().map((ponto) => (
+            <span key={`tabela-${ponto.ano}`} className="grid grid-cols-2 border-t border-ms-line px-3 py-1.5 text-xs">
+              <span>{ponto.ano}</span>
+              <span className="text-right font-semibold">{formatNumeroHistorico(ponto.valor, valor.indicador.unidade)}</span>
+            </span>
+          ))}
+        </span>
+      </span>
+      {valor.indicador.sentido === "menor_melhor" ? (
+        <span className="mt-3 block rounded-md bg-[#fbf1de] px-3 py-2 text-xs text-[#8f5f0d]">
+          Neste indicador, valores menores representam melhor desempenho.
+        </span>
+      ) : null}
+    </span>
+  ) : null;
+
+  return (
+    <span
+      ref={gatilhoRef}
+      role="button"
+      tabIndex={0}
+      aria-expanded={aberto}
+      onMouseEnter={agendarAbertura}
+      onMouseLeave={agendarFechamento}
+      onFocus={abrir}
+      onBlur={agendarFechamento}
+      onClick={(event) => {
+        event.stopPropagation();
+        aberto ? fechar() : abrir();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          aberto ? fechar() : abrir();
+        }
+        if (event.key === "Escape") fechar();
+      }}
+      className={`${className} cursor-pointer outline-none ring-inset ring-ms-blue/30 transition-shadow hover:ring-2 focus-visible:ring-2`}
+      title="Mantenha o mouse sobre o indicador para ver a série histórica detalhada"
+    >
+      {children}
+      {typeof document !== "undefined" && painel ? createPortal(painel, document.body) : null}
+    </span>
+  );
+}
+
+function CartaoIndicador({
+  valor,
+  pontos,
+  className,
+  children
+}: {
+  valor: ValorIndicador;
+  pontos: PontoHistorico[];
+  className: string;
+  children: ReactNode;
+}) {
+  if (pontos.length < 2) {
+    return <span className={className}>{children}</span>;
+  }
+
+  return (
+    <HistoricoFlutuante valor={valor} pontos={pontos} className={className}>
+      {children}
+    </HistoricoFlutuante>
+  );
+}
+
 function formatScore(score: number | null, quantidade: number): string {
   if (score === null) {
     return `${quantidade}`;
@@ -235,6 +517,39 @@ function formatScore(score: number | null, quantidade: number): string {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   });
+}
+
+function RecursoGestao({ valor, municipio }: { valor: ValorIndicador; municipio: Municipio }) {
+  if (valor.valor === null || Number(valor.valor) <= 0) return null;
+
+  const recursos = getRecursosGestaoMunicipal(municipio.codigo_ibge, municipio.nome);
+  const ehConselho = valor.indicador.codigo === "gestao_conselho_municipal";
+  const ehPlano = valor.indicador.codigo === "gestao_plano_municipal_saneamento";
+  if (!ehConselho && !ehPlano) return null;
+
+  const recurso = ehConselho ? recursos.conselho : recursos.plano;
+  const Icon = ehPlano && recurso.direto ? FileDown : ExternalLink;
+  const rotulo = ehConselho
+    ? recurso.direto
+      ? "Acessar conselho"
+      : "Consultar controle social"
+    : recurso.direto
+      ? "Baixar plano municipal"
+      : "Buscar documento oficial";
+
+  return (
+    <a
+      href={recurso.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(event) => event.stopPropagation()}
+      className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-current/25 bg-white/65 px-2.5 py-1.5 text-xs font-semibold transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-current/30"
+      aria-label={`${rotulo} de ${municipio.nome}`}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {rotulo}
+    </a>
+  );
 }
 
 export function FichaMunicipal({ municipio, indicadores }: Props) {
@@ -498,12 +813,20 @@ export function FichaMunicipal({ municipio, indicadores }: Props) {
               {dimensoes.map((dimensao) => {
                 const aberta = temaExpandido === dimensao.tema;
                 const Icon = dimensao.config.icon;
+                const valoresExibidos = dimensao.valores.slice(0, 8);
 
                 return (
-                  <button
+                  <div
                     key={dimensao.tema}
-                    type="button"
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setTemaAberto(dimensao.tema)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        setTemaAberto(dimensao.tema);
+                      }
+                    }}
                     className={`dimension-card ${aberta ? "is-open" : "is-closed"} group relative overflow-hidden rounded-md p-5 text-left text-white shadow-sm hover:-translate-y-0.5 hover:shadow-soft ${
                       dimensao.config.bgClass
                     }`}
@@ -539,12 +862,18 @@ export function FichaMunicipal({ municipio, indicadores }: Props) {
                       className="dimension-card-content relative z-10 block overflow-hidden rounded-md bg-white text-ms-ink"
                     >
                         <span className="grid gap-3 md:grid-cols-2">
-                          {dimensao.valores.slice(0, 8).map((valor) => {
+                          {valoresExibidos.map((valor, indice) => {
                             const pontos = historico.get(valor.indicador.codigo) ?? [];
                             const invertido = valor.indicador.sentido === "menor_melhor";
+                            const ultimoImpar = valoresExibidos.length % 2 === 1 && indice === valoresExibidos.length - 1;
 
                             return (
-                              <span key={valor.id} className={`block rounded-md p-3 ${dimensao.config.panelClass}`}>
+                              <CartaoIndicador
+                                key={valor.id}
+                                valor={valor}
+                                pontos={pontos}
+                                className={`block rounded-md p-3 ${ultimoImpar ? "md:col-span-2" : ""} ${dimensao.config.panelClass}`}
+                              >
                                 <span className="flex items-start justify-between gap-2">
                                   <span className="block text-xs font-semibold uppercase tracking-wide">{valor.ano}</span>
                                   {invertido ? (
@@ -558,7 +887,12 @@ export function FichaMunicipal({ municipio, indicadores }: Props) {
                                   <span className="block text-2xl font-semibold tracking-normal">
                                     {formatValorIndicador(valor)}
                                   </span>
-                                  {pontos.length > 1 ? <Sparkline pontos={pontos} /> : null}
+                                  {pontos.length > 1 ? (
+                                    <span className="inline-flex flex-col items-end px-1 py-0.5">
+                                      <Sparkline pontos={pontos} />
+                                      <span className="mt-0.5 text-[0.62rem] font-semibold opacity-70">ver detalhes</span>
+                                    </span>
+                                  ) : null}
                                 </span>
                                 {pontos.length > 1 ? (
                                   <span className="mt-1 block text-[0.7rem] opacity-70">
@@ -568,7 +902,8 @@ export function FichaMunicipal({ municipio, indicadores }: Props) {
                                 <span className="mt-2 block text-xs opacity-80">
                                   {valor.fonte ?? valor.indicador.fonte ?? "Fonte não informada"}
                                 </span>
-                              </span>
+                                <RecursoGestao valor={valor} municipio={municipio} />
+                              </CartaoIndicador>
                             );
                           })}
                         </span>
@@ -578,7 +913,7 @@ export function FichaMunicipal({ municipio, indicadores }: Props) {
                           </span>
                         ) : null}
                     </span>
-                  </button>
+                  </div>
                 );
               })}
             </div>

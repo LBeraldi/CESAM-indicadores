@@ -1,6 +1,6 @@
 # Classificação de Dados
 
-Esta matriz orienta a publicação e o tratamento das informações no infra-ms.
+Esta matriz orienta a publicação e o tratamento das informações no Observatório de Saneamento.
 
 | Classe | Descrição | Publicação |
 | --- | --- | --- |

@@ -1,6 +1,6 @@
 # Metodologia
 
-O infra-ms é um MVP técnico para organizar indicadores municipais de saneamento e infraestrutura dos municípios de Mato Grosso do Sul. A primeira etapa prioriza estrutura, banco de dados, importação, API e visualização simples.
+O Observatório de Saneamento é uma plataforma para organizar indicadores municipais de saneamento e infraestrutura dos municípios de Mato Grosso do Sul. A primeira etapa prioriza estrutura, banco de dados, importação, API e visualização simples.
 
 ## Dados oficiais
 
@@ -19,6 +19,14 @@ Indicador tratado é a informação padronizada para consulta, com município, a
 ## Rastreabilidade
 
 Cada importação deve registrar fonte, ano de referência, nome do arquivo, data de importação, total de linhas, linhas importadas, erros e avisos. Esse registro ajuda a revisar divergências e atualizar os dados quando a fonte publicar uma nova versão.
+
+## Ranking municipal — referência PNQS/ABES
+
+O ranking municipal é um cálculo próprio do Observatório, inspirado no sistema de indicadores do Guia de Referência para Medição do Desempenho (GRMD) do PNQS/ABES. Ele não é uma classificação, nota, certificação ou premiação oficial da ABES. O PNQS avalia organizações de saneamento por metodologia própria; aqui, a referência foi adaptada à unidade municipal e aos dados públicos disponíveis no SINISA/SNIS.
+
+A nota varia de 0 a 100 e reúne 16 indicadores do ano de 2023 em cinco módulos: água (25%), esgoto (25%), resíduos sólidos (20%), águas pluviais (20%) e gestão municipal (10%). Dentro de cada módulo, os indicadores disponíveis têm o mesmo peso. Percentuais são limitados ao intervalo de 0 a 100; a massa recuperada de resíduos é convertida em posição percentílica entre os municípios do estado; e perdas de água, domicílios sujeitos a inundação e população impactada por eventos hidrológicos têm sentido invertido, pois valores menores representam melhor desempenho.
+
+Indicadores ausentes não são estimados e recebem contribuição zero, mantendo o peso originalmente reservado a eles. A tela informa a cobertura de dados de cada município. Em caso de empate na nota, prevalece a maior cobertura e, depois, a ordem alfabética. As fontes de referência são o [PNQS](https://pnqs.com.br/), o [GRMD 2026](https://pnqs.com.br/wp-content/uploads/2026/02/GRMD-2026-v1.0.pdf) e o [Regulamento PNQS 2026](https://pnqs.com.br/wp-content/uploads/2026/02/Regulamento-PNQS-2026-v1.2.pdf).
 
 ## Limitações da primeira versão
 

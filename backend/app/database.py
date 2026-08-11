@@ -3,6 +3,7 @@ import os
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.pool import NullPool
 from dotenv import load_dotenv
 
 
@@ -11,10 +12,29 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+psycopg://infra_ms:infra_ms@localhost:5432/infra_ms",
+    "postgresql+psycopg://observatorio_saneamento:observatorio_saneamento@localhost:5432/observatorio_saneamento",
 )
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+# O painel do Supabase fornece URLs com postgresql://. O projeto usa o
+# driver psycopg 3, então explicitamos o driver sem obrigar o operador a
+# editar a credencial copiada do painel.
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
+
+serverless = os.getenv("DB_POOL_MODE", "").lower() == "serverless" or bool(os.getenv("VERCEL"))
+engine_options: dict = {
+    "pool_pre_ping": True,
+    # O Supavisor em modo transacional não suporta prepared statements.
+    "connect_args": {"prepare_threshold": None},
+}
+if serverless:
+    # Cada invocação serverless devolve imediatamente a conexão ao
+    # Supavisor, evitando pools ociosos em várias instâncias da função.
+    engine_options["poolclass"] = NullPool
+
+engine = create_engine(DATABASE_URL, **engine_options)
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 

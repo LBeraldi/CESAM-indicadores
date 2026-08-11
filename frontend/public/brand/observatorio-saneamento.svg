@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 118" role="img" aria-labelledby="title desc">
-  <title id="title">CESAM Indicadores</title>
-  <desc id="desc">Marca CESAM Indicadores, plataforma de saneamento e infraestrutura municipal.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 118" role="img" aria-labelledby="title desc">
+  <title id="title">Observatório de Saneamento</title>
+  <desc id="desc">Marca do Observatório de Saneamento, plataforma de indicadores municipais.</desc>
   <defs>
     <linearGradient id="leaf" x1="22" x2="66" y1="24" y2="100" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#0a8f45"/>
@@ -35,8 +35,8 @@
   </g>
 
   <line x1="144" x2="144" y1="18" y2="118" stroke="#d8e1eb" stroke-width="2"/>
-  <text x="170" y="58" fill="#102033" font-family="Arial, Helvetica, sans-serif" font-size="45" font-weight="800" letter-spacing="1">CESAM</text>
-  <text x="171" y="96" fill="#1f5f9f" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" letter-spacing="3">INDICADORES</text>
-  <line x1="172" x2="425" y1="108" y2="108" stroke="#18765a" stroke-width="4"/>
-  <line x1="282" x2="425" y1="108" y2="108" stroke="#1f5f9f" stroke-width="4"/>
+  <text x="170" y="52" fill="#102033" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="800" letter-spacing="1">OBSERVATÓRIO</text>
+  <text x="171" y="88" fill="#1f5f9f" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" letter-spacing="2">DE SANEAMENTO</text>
+  <line x1="172" x2="455" y1="104" y2="104" stroke="#18765a" stroke-width="4"/>
+  <line x1="315" x2="455" y1="104" y2="104" stroke="#1f5f9f" stroke-width="4"/>
 </svg>

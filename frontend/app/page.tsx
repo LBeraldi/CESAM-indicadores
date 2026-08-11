@@ -48,7 +48,7 @@ export default async function Home() {
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-md border border-ms-line bg-ms-bg px-3 py-2 text-sm font-semibold text-ms-green">
               <img src="/brand/cesam-symbol.svg" alt="" className="h-6 w-6" aria-hidden="true" />
-              Plataforma CESAM / UEMS
+              Observatório de Saneamento
             </div>
             <h1 className="mt-3 text-4xl font-semibold tracking-normal text-ms-ink md:text-5xl">
               Dados municipais de saneamento e infraestrutura de Mato Grosso do Sul

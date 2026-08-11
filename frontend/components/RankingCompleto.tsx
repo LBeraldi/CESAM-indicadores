@@ -128,7 +128,7 @@ export function RankingCompleto({ indicadores, rankingSaneamento }: Props) {
         municipio: item.municipio,
         uf: item.uf,
         valorTexto: formatNumero(item.nota),
-        detalhe: `Água ${formatNumero(item.agua)} · Esgoto ${formatNumero(item.esgoto)}`
+        detalhe: `Água ${formatNumero(item.agua)} · Esgoto ${formatNumero(item.esgoto)} · Resíduos ${formatNumero(item.residuos)} · Pluviais ${formatNumero(item.aguasPluviais)} · Dados ${formatNumero(item.cobertura)}%`
       }));
     }
 
@@ -158,12 +158,12 @@ export function RankingCompleto({ indicadores, rankingSaneamento }: Props) {
       <div className="rounded-md border border-ms-line bg-white p-5 shadow-sm">
         <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-ms-green">
           <Trophy className="h-4 w-4" />
-          Ranking
+          Ranking PNQS/ABES
         </div>
-        <h1 className="mt-1 text-3xl font-semibold text-ms-ink">Ranking de saneamento dos municípios de MS</h1>
+        <h1 className="mt-1 text-3xl font-semibold text-ms-ink">Ranking municipal de saneamento</h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-ms-muted">
-          Escolha a nota composta de saneamento ou qualquer indicador oficial isolado para ver os municípios de MS
-          ordenados por desempenho. {filtradas.length} {filtradas.length === 1 ? "município listado" : "municípios listados"}
+          Compare os municípios de MS pela nota do Observatório, inspirada no referencial de indicadores do PNQS/ABES,
+          ou por qualquer indicador oficial isolado. São {filtradas.length} {filtradas.length === 1 ? "município listado" : "municípios listados"}
           {busca ? ` para "${busca}"` : ""}.
         </p>
 
@@ -173,14 +173,19 @@ export function RankingCompleto({ indicadores, rankingSaneamento }: Props) {
             <div className="mt-2 grid gap-1 rounded-md bg-ms-bg p-3 leading-6">
               <p>
                 Água {Math.round(PESOS_RANKING_SANEAMENTO.agua * 100)}% · Esgoto{" "}
-                {Math.round(PESOS_RANKING_SANEAMENTO.esgoto * 100)}% · Gestão municipal{" "}
-                {Math.round(PESOS_RANKING_SANEAMENTO.gestao * 100)}% · Completude dos dados{" "}
-                {Math.round(PESOS_RANKING_SANEAMENTO.dados * 100)}%.
+                {Math.round(PESOS_RANKING_SANEAMENTO.esgoto * 100)}% · Resíduos sólidos{" "}
+                {Math.round(PESOS_RANKING_SANEAMENTO.residuos * 100)}% · Águas pluviais{" "}
+                {Math.round(PESOS_RANKING_SANEAMENTO.aguasPluviais * 100)}% · Gestão municipal{" "}
+                {Math.round(PESOS_RANKING_SANEAMENTO.gestao * 100)}%.
               </p>
               <p>
-                Água combina atendimento total, atendimento urbano e perdas na distribuição (indicador invertido:
-                quanto menor a perda, maior a contribuição). Esgoto combina atendimento, coleta e tratamento
-                efetivo (coleta × tratamento). Gestão soma plano municipal de saneamento e conselho municipal.
+                A nota usa 16 indicadores oficiais de 2023. Perdas de água, domicílios em risco e população afetada
+                são invertidos; nos demais, o maior resultado pontua melhor. Dado ausente vale zero no respectivo
+                módulo e a cobertura é exibida em cada linha.
+              </p>
+              <p>
+                Esta é uma adaptação analítica do Observatório. Não representa nota, certificação ou premiação oficial
+                concedida pela ABES/PNQS, que avalia organizações por metodologia própria.
               </p>
             </div>
           </details>
@@ -199,7 +204,7 @@ export function RankingCompleto({ indicadores, rankingSaneamento }: Props) {
               onChange={(event) => setMetrica(event.target.value)}
               className="h-11 w-full rounded-md border border-ms-line bg-ms-bg px-3 text-base outline-none ring-ms-blue/20 focus:border-ms-blue focus:bg-white focus:ring-4 md:text-sm"
             >
-              <option value={COMPOSTA}>Nota geral de saneamento (composta)</option>
+              <option value={COMPOSTA}>Nota PNQS/ABES adaptada (Observatório)</option>
               {temasAgrupados.map(([temaNome, itens]) => (
                 <optgroup key={temaNome} label={temaNome}>
                   {itens.map((item) => (

@@ -31,21 +31,19 @@ export function RankingSaneamento({ ranking }: Props) {
           <div className="p-5 md:p-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-wide text-ms-green">Ranking proporcional</p>
-                <h2 className="mt-1 text-2xl font-semibold text-ms-ink">Melhores desempenhos em saneamento</h2>
+                <p className="text-sm font-semibold uppercase tracking-wide text-ms-green">Referência PNQS/ABES</p>
+                <h2 className="mt-1 text-2xl font-semibold text-ms-ink">Ranking municipal de saneamento</h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-ms-muted">
-                  A nota compara cobertura e eficiência em escala percentual. Assim, o tamanho da população não pesa
-                  sozinho: municípios menores também sobem quando entregam melhor atendimento proporcional.
+                  Nota calculada pelo Observatório a partir de 16 indicadores dos cinco módulos do SINISA, em escala
+                  comparável de 0 a 100. Não representa certificação ou premiação oficial da ABES.
                 </p>
                 <details className="mt-3 max-w-3xl text-sm text-ms-muted">
                   <summary className="cursor-pointer font-medium text-ms-blue">Como calculamos essa nota</summary>
                   <div className="mt-2 grid gap-1 rounded-md bg-ms-bg p-3 leading-6">
-                    <p>Água {Math.round(PESOS_RANKING_SANEAMENTO.agua * 100)}% · Esgoto {Math.round(PESOS_RANKING_SANEAMENTO.esgoto * 100)}% · Gestão municipal {Math.round(PESOS_RANKING_SANEAMENTO.gestao * 100)}% · Completude dos dados {Math.round(PESOS_RANKING_SANEAMENTO.dados * 100)}%.</p>
+                    <p>Água {Math.round(PESOS_RANKING_SANEAMENTO.agua * 100)}% · Esgoto {Math.round(PESOS_RANKING_SANEAMENTO.esgoto * 100)}% · Resíduos {Math.round(PESOS_RANKING_SANEAMENTO.residuos * 100)}% · Águas pluviais {Math.round(PESOS_RANKING_SANEAMENTO.aguasPluviais * 100)}% · Gestão {Math.round(PESOS_RANKING_SANEAMENTO.gestao * 100)}%.</p>
                     <p>
-                      Água combina atendimento total, atendimento urbano e perdas na distribuição (indicador
-                      invertido: quanto menor a perda, maior a contribuição). Esgoto combina atendimento, coleta e
-                      tratamento efetivo (coleta × tratamento). Gestão soma plano municipal de saneamento e conselho
-                      municipal.
+                      Indicadores de perdas, risco e impacto hidrológico são invertidos. Dados ausentes não são
+                      estimados e reduzem a contribuição do módulo correspondente.
                     </p>
                   </div>
                 </details>
@@ -71,6 +69,8 @@ export function RankingSaneamento({ ranking }: Props) {
                     <th className="pb-3 pr-4">Nota</th>
                     <th className="pb-3 pr-4">Água</th>
                     <th className="pb-3 pr-4">Esgoto</th>
+                    <th className="pb-3 pr-4">Resíduos</th>
+                    <th className="pb-3 pr-4">Pluviais</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-ms-line">
@@ -104,6 +104,12 @@ export function RankingSaneamento({ ranking }: Props) {
                       <td className="min-w-28 py-4 pr-4">
                         <span className="font-semibold text-ms-blue">{formatNota(item.esgoto)}</span>
                       </td>
+                      <td className="min-w-28 py-4 pr-4">
+                        <span className="font-semibold text-ms-green">{formatNota(item.residuos)}</span>
+                      </td>
+                      <td className="min-w-28 py-4 pr-4">
+                        <span className="font-semibold text-ms-blue">{formatNota(item.aguasPluviais)}</span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -123,7 +129,7 @@ export function RankingSaneamento({ ranking }: Props) {
                 </div>
               </div>
               <p className="mt-4 text-3xl font-semibold tracking-normal text-ms-blue">{formatNota(lider.nota)}</p>
-              <p className="mt-1 text-xs text-ms-muted">Nota composta de saneamento</p>
+              <p className="mt-1 text-xs text-ms-muted">Nota PNQS/ABES adaptada</p>
             </div>
 
             <div className="mt-4 grid gap-3 text-sm">
@@ -142,7 +148,7 @@ export function RankingSaneamento({ ranking }: Props) {
                   Esgoto
                 </div>
                 <p className="mt-2 leading-6 text-ms-muted">
-                  Cobertura, coleta e tratamento efetivo, calculado pela relação entre coleta e tratamento.
+                  Atendimento, coleta e tratamento informados na base oficial.
                 </p>
               </div>
             </div>

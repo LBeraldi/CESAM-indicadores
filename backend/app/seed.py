@@ -21,10 +21,12 @@ INDICADORES_INICIAIS = [
     ("agua_atendimento_urbano", "Índice de atendimento urbano de água", "Água", "%", "SINISA/SNIS", MAIOR_MELHOR),
     ("agua_perdas_distribuicao", "Índice de perdas na distribuição", "Água", "%", "SINISA/SNIS", MENOR_MELHOR),
     ("agua_consumo_per_capita", "Consumo médio per capita", "Água", "L/hab.dia", "SINISA/SNIS", NEUTRO),
+    ("agua_extensao_rede", "Extensão da rede de distribuição de água", "Água", "km", "SINISA/SNIS", NEUTRO),
     ("esgoto_atendimento_total", "Índice de atendimento total de esgoto", "Esgoto", "%", "SINISA/SNIS", MAIOR_MELHOR),
     ("esgoto_atendimento_urbano", "Índice de atendimento urbano de esgoto", "Esgoto", "%", "SINISA/SNIS", MAIOR_MELHOR),
     ("esgoto_coleta", "Índice de coleta de esgoto", "Esgoto", "%", "SINISA/SNIS", MAIOR_MELHOR),
     ("esgoto_tratamento", "Índice de tratamento de esgoto", "Esgoto", "%", "SINISA/SNIS", MAIOR_MELHOR),
+    ("esgoto_extensao_rede", "Extensão da rede pública de esgotamento sanitário", "Esgoto", "km", "SINISA/SNIS", NEUTRO),
     (
         "residuos_cobertura_coleta_domiciliar",
         "Cobertura de coleta domiciliar",

@@ -23,6 +23,16 @@ DOWNLOAD_URL = (
 
 MAPEAMENTO = [
     (
+        "extensao_rede_agua",
+        "agua_extensao_rede",
+        "AG005 - Extensao da rede de agua",
+    ),
+    (
+        "extensao_rede_esgoto",
+        "esgoto_extensao_rede",
+        "ES004 - Extensao da rede de esgotos",
+    ),
+    (
         "indice_consumo_agua_per_capita",
         "agua_consumo_per_capita",
         "IN022_AE - Consumo medio per capita de agua",

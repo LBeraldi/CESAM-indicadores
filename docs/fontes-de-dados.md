@@ -1,6 +1,6 @@
 # Fontes de Dados
 
-As fontes previstas para o infra-ms são:
+As fontes previstas para o Observatório de Saneamento são:
 
 - SINISA;
 - SNIS Série Histórica;

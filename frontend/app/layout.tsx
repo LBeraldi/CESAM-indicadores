@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BarChart3, Database, Trophy } from "lucide-react";
 import "./globals.css";
 
-const TITULO = "CESAM Indicadores";
+const TITULO = "Observatório de Saneamento";
 const DESCRICAO =
   "Plataforma do Centro de Estudos em Saneamento Ambiental para consulta, comparação e exportação de indicadores municipais de saneamento de Mato Grosso do Sul.";
 
@@ -20,13 +20,13 @@ export const metadata: Metadata = {
     description: DESCRICAO,
     locale: "pt_BR",
     type: "website",
-    images: ["/brand/cesam-indicadores.svg"]
+    images: ["/brand/observatorio-saneamento.svg"]
   },
   twitter: {
     card: "summary_large_image",
     title: TITULO,
     description: DESCRICAO,
-    images: ["/brand/cesam-indicadores.svg"]
+    images: ["/brand/observatorio-saneamento.svg"]
   }
 };
 
@@ -50,10 +50,10 @@ export default function RootLayout({
             </div>
 
             <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between">
-              <Link href="/" className="flex items-center" aria-label="CESAM Indicadores, pagina inicial">
+              <Link href="/" className="flex items-center" aria-label="Observatório de Saneamento, página inicial">
                 <img
-                  src="/brand/cesam-indicadores.svg"
-                  alt="CESAM Indicadores"
+                  src="/brand/observatorio-saneamento.svg"
+                  alt="Observatório de Saneamento"
                   className="h-10 w-auto max-w-[13rem] sm:h-14 sm:max-w-[17rem]"
                 />
               </Link>
@@ -99,12 +99,12 @@ export default function RootLayout({
             <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:grid-cols-[1.4fr_1fr_1fr]">
               <div>
                 <img
-                  src="/brand/cesam-indicadores.svg"
-                  alt="CESAM Indicadores"
+                  src="/brand/observatorio-saneamento.svg"
+                  alt="Observatório de Saneamento"
                   className="h-12 w-auto max-w-[14rem] sm:h-16 sm:max-w-[18rem]"
                 />
                 <p className="mt-3 max-w-xl text-sm leading-6 text-ms-muted">
-                  Plataforma do CESAM para consulta, comparacao e exportacao de indicadores municipais de saneamento.
+                  Plataforma para consulta, comparação e exportação de indicadores municipais de saneamento.
                 </p>
               </div>
 
