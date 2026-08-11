@@ -14,6 +14,7 @@ venv/
 
 node_modules/
 .next/
+.vercel/
 *.tsbuildinfo
 out/
 dist/
@@ -25,6 +26,7 @@ data/processed/*
 
 *.log
 tunnel*.log
+*.dump
 NUL
 .DS_Store
 Thumbs.db

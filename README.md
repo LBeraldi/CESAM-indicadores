@@ -157,6 +157,8 @@ GET /ranking?indicador=agua_atendimento_total&ano=2024
 
 ## Próximas etapas
 
+Para uma publicação provisória com frontend e API na Vercel e PostgreSQL no Supabase, consulte [docs/deploy-vercel-supabase.md](docs/deploy-vercel-supabase.md).
+
 - mapear layouts específicos de SINISA/SNIS;
 - importar população e área por fonte oficial;
 - adicionar validações por indicador;
