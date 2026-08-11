@@ -25,6 +25,7 @@ services:
       DATABASE_URL: postgresql+psycopg://observatorio_saneamento:observatorio_saneamento@db:5432/observatorio_saneamento
       DATA_DIR: /app/data
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-120}
     ports:
       - "8000:8000"
     volumes:

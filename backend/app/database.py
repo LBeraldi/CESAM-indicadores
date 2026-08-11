@@ -2,6 +2,7 @@ from collections.abc import Generator
 import os
 
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from sqlalchemy.pool import NullPool
 from dotenv import load_dotenv
@@ -23,11 +24,16 @@ if DATABASE_URL.startswith("postgres://"):
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
+database_url = make_url(DATABASE_URL)
+if "supabase" in (database_url.host or "") and "sslmode" not in database_url.query:
+    database_url = database_url.update_query_dict({"sslmode": "require"})
+DATABASE_URL = database_url.render_as_string(hide_password=False)
+
 serverless = os.getenv("DB_POOL_MODE", "").lower() == "serverless" or bool(os.getenv("VERCEL"))
 engine_options: dict = {
     "pool_pre_ping": True,
     # O Supavisor em modo transacional não suporta prepared statements.
-    "connect_args": {"prepare_threshold": None},
+    "connect_args": {"prepare_threshold": None, "connect_timeout": 10},
 }
 if serverless:
     # Cada invocação serverless devolve imediatamente a conexão ao

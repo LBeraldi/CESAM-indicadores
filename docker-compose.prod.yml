@@ -25,6 +25,7 @@ services:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-observatorio_saneamento}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-observatorio_saneamento}
       DATA_DIR: /app/data
       CORS_ORIGINS: https://${DOMAIN},https://www.${DOMAIN}
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-120}
     volumes:
       - ./data:/app/data
     depends_on:

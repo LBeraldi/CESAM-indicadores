@@ -7,6 +7,25 @@ from app.database import get_db
 
 router = APIRouter(tags=["indicadores"])
 
+INDICADORES_RANKING_SANEAMENTO = [
+    "agua_atendimento_total",
+    "agua_atendimento_urbano",
+    "agua_perdas_distribuicao",
+    "esgoto_atendimento_total",
+    "esgoto_atendimento_urbano",
+    "esgoto_coleta",
+    "esgoto_tratamento",
+    "residuos_cobertura_coleta_domiciliar",
+    "residuos_cobertura_coleta_seletiva",
+    "residuos_massa_recuperada_per_capita",
+    "aguas_pluviais_vias_pavimentadas",
+    "aguas_pluviais_rede_subterranea",
+    "aguas_pluviais_domicilios_risco_inundacao",
+    "aguas_pluviais_populacao_impactada",
+    "gestao_plano_municipal_saneamento",
+    "gestao_conselho_municipal",
+]
+
 
 @router.get("/indicadores", response_model=list[schemas.IndicadorRead])
 def listar_indicadores(
@@ -41,6 +60,29 @@ def ranking_indicador(
             sentido=indicador_model.sentido,
         )
         for index, valor in enumerate(valores)
+    ]
+
+
+@router.get("/ranking/saneamento", response_model=list[schemas.RankingSaneamentoValor])
+def ranking_saneamento(
+    ano: int = Query(default=2023, ge=1900, le=2100),
+    db: Session = Depends(get_db),
+) -> list[schemas.RankingSaneamentoValor]:
+    valores = crud.get_ranking_saneamento(db, INDICADORES_RANKING_SANEAMENTO, ano)
+    return [
+        schemas.RankingSaneamentoValor(
+            codigo_ibge=valor.municipio.codigo_ibge,
+            municipio=valor.municipio.nome,
+            uf=valor.municipio.uf,
+            ano=valor.ano,
+            valor=float(valor.valor),
+            indicador=valor.indicador.codigo,
+            unidade=valor.indicador.unidade,
+            fonte=valor.fonte_dados.nome if valor.fonte_dados else None,
+            sentido=valor.indicador.sentido,
+        )
+        for valor in valores
+        if valor.valor is not None
     ]
 
 
