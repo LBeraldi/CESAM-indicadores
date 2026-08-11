@@ -1,5 +1,4 @@
 from logging.config import fileConfig
-import os
 from pathlib import Path
 import sys
 
@@ -8,7 +7,7 @@ from sqlalchemy import engine_from_config, pool
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from app.database import Base  # noqa: E402
+from app.database import Base, DATABASE_URL as app_database_url  # noqa: E402
 from app import models  # noqa: F401,E402
 
 
@@ -27,7 +26,7 @@ def include_name(name: str | None, type_: str, _parent_names: dict[str, str | No
 
 
 def get_url() -> str:
-    return os.getenv("DATABASE_URL", config.get_main_option("sqlalchemy.url"))
+    return app_database_url or config.get_main_option("sqlalchemy.url")
 
 
 def run_migrations_offline() -> None:
