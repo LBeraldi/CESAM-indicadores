@@ -112,6 +112,42 @@ def get_ranking(
     return indicador, valores
 
 
+def get_ranking_saneamento(
+    db: Session, indicadores_codigos: list[str], ano: int
+) -> list[models.ValorIndicador]:
+    """Retorna, em uma consulta, o melhor registro oficial por município e indicador."""
+    ordem_preferencia = func.row_number().over(
+        partition_by=(models.ValorIndicador.municipio_id, models.ValorIndicador.indicador_id),
+        order_by=(_preferencia_fonte(), models.ValorIndicador.id.desc()),
+    )
+    candidatos = (
+        select(models.ValorIndicador.id.label("valor_id"), ordem_preferencia.label("ordem"))
+        .join(models.ValorIndicador.indicador)
+        .where(
+            models.Indicador.codigo.in_(indicadores_codigos),
+            models.ValorIndicador.ano == ano,
+            models.ValorIndicador.valor.is_not(None),
+            models.ValorIndicador.status_validacao.like("oficial%"),
+        )
+        .subquery()
+    )
+    ids_preferidos = select(candidatos.c.valor_id).where(candidatos.c.ordem == 1)
+
+    return list(
+        db.scalars(
+            select(models.ValorIndicador)
+            .options(
+                joinedload(models.ValorIndicador.municipio),
+                joinedload(models.ValorIndicador.indicador),
+                joinedload(models.ValorIndicador.fonte_dados),
+            )
+            .where(models.ValorIndicador.id.in_(ids_preferidos))
+            .order_by(models.Indicador.codigo, models.ValorIndicador.municipio_id)
+            .join(models.ValorIndicador.indicador)
+        ).all()
+    )
+
+
 def get_anos_disponiveis(db: Session, indicador_codigo: str) -> list[int]:
     indicador = get_indicador_by_codigo(db, indicador_codigo)
     if not indicador:

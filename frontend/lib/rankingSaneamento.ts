@@ -1,4 +1,4 @@
-import { fetchApiSafe, type RankingItem } from "@/lib/api";
+import { fetchApiSafe, type RankingSaneamentoValor } from "@/lib/api";
 
 export const ANO_RANKING_SANEAMENTO = 2023;
 
@@ -146,14 +146,14 @@ function pontuar(
 export const INDICADORES_RANKING_SANEAMENTO = INDICADORES_RANKING.map((item) => item.codigo);
 
 export async function obterRankingSaneamento(limit = 79): Promise<RankingSaneamentoItem[]> {
-  const rankings = await Promise.all(
-    INDICADORES_RANKING.map((indicador) =>
-      fetchApiSafe<RankingItem[]>(
-        `/ranking?indicador=${indicador.codigo}&ano=${ANO_RANKING_SANEAMENTO}&limit=100`,
-        []
-      ).then((itens) => ({ indicador: indicador.codigo, itens }))
-    )
+  const valores = await fetchApiSafe<RankingSaneamentoValor[]>(
+    `/ranking/saneamento?ano=${ANO_RANKING_SANEAMENTO}`,
+    []
   );
+  const rankings = INDICADORES_RANKING.map((indicador) => ({
+    indicador: indicador.codigo,
+    itens: valores.filter((item) => item.indicador === indicador.codigo)
+  }));
 
   const municipios = new Map<string, MunicipioRankingBase>();
   const universos = new Map<string, number[]>();

@@ -13,12 +13,18 @@ DATABASE_URL=postgresql://postgres.REF:SENHA@HOST.pooler.supabase.com:6543/postg
 DB_POOL_MODE=serverless
 AUTO_INIT_DB=false
 CORS_ORIGINS=https://URL-DO-FRONTEND.vercel.app
-CORS_ORIGIN_REGEX=https://.*\.vercel\.app
+RATE_LIMIT_PER_MINUTE=120
 ```
 
 Use a URL **Transaction pooler** do Supabase, porta `6543`. `DATABASE_URL` é secreta e nunca deve ser adicionada ao Git.
 
 Depois do deploy, valide `https://URL-DA-API.vercel.app/health` e confirme que `database` é `ok`.
+
+Antes de publicar uma versão que contenha migrations, execute no diretório `backend`:
+
+```bash
+vercel env run -e production -- python -m app.scripts.migrar
+```
 
 ## 2. Frontend Next.js
 

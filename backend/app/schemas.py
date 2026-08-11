@@ -63,6 +63,18 @@ class RankingItem(BaseModel):
     sentido: str
 
 
+class RankingSaneamentoValor(BaseModel):
+    codigo_ibge: str
+    municipio: str
+    uf: str
+    ano: int
+    valor: float
+    indicador: str
+    unidade: str | None = None
+    fonte: str | None = None
+    sentido: str
+
+
 class HealthResponse(BaseModel):
     status: str
     service: str

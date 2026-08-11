@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -77,6 +77,8 @@ class ValorIndicador(TimestampMixin, Base):
             "fonte_dados_id",
             name="uq_valor_municipio_indicador_ano_fonte",
         ),
+        Index("ix_valores_indicador_ano_municipio", "indicador_id", "ano", "municipio_id"),
+        Index("ix_valores_municipio_ano", "municipio_id", "ano"),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)

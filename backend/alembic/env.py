@@ -17,6 +17,13 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 target_metadata = Base.metadata
+TABELAS_APLICACAO = set(target_metadata.tables)
+
+
+def include_name(name: str | None, type_: str, _parent_names: dict[str, str | None]) -> bool:
+    if type_ == "table":
+        return bool(name in TABELAS_APLICACAO)
+    return True
 
 
 def get_url() -> str:
@@ -29,6 +36,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_name=include_name,
     )
 
     with context.begin_transaction():
@@ -41,7 +49,7 @@ def run_migrations_online() -> None:
     connectable = engine_from_config(configuration, prefix="sqlalchemy.", poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(connection=connection, target_metadata=target_metadata, include_name=include_name)
         with context.begin_transaction():
             context.run_migrations()
 

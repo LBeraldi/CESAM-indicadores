@@ -153,7 +153,27 @@ GET /indicadores?tema=agua
 GET /municipios/{codigo_ibge}/indicadores
 GET /municipios/{codigo_ibge}/indicadores?ano=2024
 GET /ranking?indicador=agua_atendimento_total&ano=2024
+GET /ranking/saneamento?ano=2023
 ```
+
+## Operação e qualidade
+
+Antes de publicar uma alteração de banco:
+
+```bash
+cd backend
+python -m app.scripts.migrar
+alembic check
+```
+
+Atualize população e área do IBGE fora das requisições públicas:
+
+```bash
+python -m app.scripts.atualizar_ibge
+```
+
+Testes e decisões de cache, pool, carga e SSE estão documentados em
+[`docs/arquitetura-operacional.md`](docs/arquitetura-operacional.md).
 
 ## Próximas etapas
 

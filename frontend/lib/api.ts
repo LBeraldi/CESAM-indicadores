@@ -60,8 +60,10 @@ export type RankingItem = {
   sentido: SentidoIndicador;
 };
 
+export type RankingSaneamentoValor = Omit<RankingItem, "posicao">;
+
 export async function fetchApi<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
+  const response = await fetch(`${API_BASE_URL}${path}`, { next: { revalidate: 3600 } });
   if (!response.ok) {
     throw new Error(`Falha ao consultar ${path}: ${response.status}`);
   }
