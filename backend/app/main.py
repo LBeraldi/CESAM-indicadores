@@ -29,8 +29,16 @@ def _auto_init_db() -> bool:
     return os.getenv("AUTO_INIT_DB", default).strip().lower() in {"1", "true", "yes", "sim"}
 
 
+def _run_migrations() -> bool:
+    return os.getenv("RUN_DB_MIGRATIONS", "false").strip().lower() in {"1", "true", "yes", "sim"}
+
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    if _run_migrations():
+        from app.scripts.migrar import main as migrar
+
+        migrar()
     if _auto_init_db():
         init_db()
         with SessionLocal() as db:

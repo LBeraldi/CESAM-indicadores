@@ -20,6 +20,7 @@ Respostas públicas bem-sucedidas recebem cache de uma hora na CDN e tolerância
 - Supabase deve usar Transaction Pooler com `sslmode=require`.
 - Toda alteração de schema deve gerar uma migration Alembic.
 - Antes de publicar o backend, execute `python -m app.scripts.migrar` contra o banco de produção. O comando também adota com segurança bancos legados criados antes do Alembic.
+- Quando a credencial for somente gravação na plataforma, `RUN_DB_MIGRATIONS=true` pode ser usada em um único deploy. O processo utiliza advisory lock; remova a variável e republique após o health confirmar sucesso.
 - A CI executa todas as migrations em um PostgreSQL/PostGIS descartável e usa `alembic check` para detectar mudanças de modelo sem migration.
 
 ## SSE
