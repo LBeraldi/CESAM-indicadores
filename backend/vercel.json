@@ -3,7 +3,7 @@
   "functions": {
     "api/index.py": {
       "maxDuration": 60,
-      "excludeFiles": "{alembic/**,app/scripts/**,tests/**,**/__pycache__/**}"
+      "excludeFiles": "{tests/**,**/__pycache__/**}"
     }
   },
   "rewrites": [
