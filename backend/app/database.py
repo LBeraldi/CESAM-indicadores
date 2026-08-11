@@ -24,12 +24,14 @@ if DATABASE_URL.startswith("postgres://"):
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
+serverless = os.getenv("DB_POOL_MODE", "").lower() == "serverless" or bool(os.getenv("VERCEL"))
 database_url = make_url(DATABASE_URL)
 if "supabase" in (database_url.host or "") and "sslmode" not in database_url.query:
     database_url = database_url.update_query_dict({"sslmode": "require"})
+if serverless and "pooler.supabase.com" in (database_url.host or "") and database_url.port == 5432:
+    database_url = database_url.set(port=6543)
 DATABASE_URL = database_url.render_as_string(hide_password=False)
 
-serverless = os.getenv("DB_POOL_MODE", "").lower() == "serverless" or bool(os.getenv("VERCEL"))
 engine_options: dict = {
     "pool_pre_ping": True,
     # O Supavisor em modo transacional não suporta prepared statements.
