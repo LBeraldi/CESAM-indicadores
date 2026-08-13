@@ -5,46 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CLIENT_API_BASE_URL, type Municipio, type RankingItem, type SentidoIndicador } from "@/lib/api";
+import { createProjector, geometryToPath, getBounds, type GeoJsonCollection } from "@/lib/geo";
 import type { RankingSaneamentoItem } from "@/lib/rankingSaneamento";
 
 type Props = {
   municipios: Municipio[];
   notaSaneamento: RankingSaneamentoItem[];
-};
-
-type Position = [number, number];
-type LinearRing = Position[];
-type PolygonCoordinates = LinearRing[];
-type MultiPolygonCoordinates = PolygonCoordinates[];
-
-type GeoJsonGeometry =
-  | {
-      type: "Polygon";
-      coordinates: PolygonCoordinates;
-    }
-  | {
-      type: "MultiPolygon";
-      coordinates: MultiPolygonCoordinates;
-    };
-
-type GeoJsonFeature = {
-  type: "Feature";
-  properties: {
-    codarea?: string;
-  };
-  geometry: GeoJsonGeometry;
-};
-
-type GeoJsonCollection = {
-  type: "FeatureCollection";
-  features: GeoJsonFeature[];
-};
-
-type Bounds = {
-  minLon: number;
-  maxLon: number;
-  minLat: number;
-  maxLat: number;
 };
 
 type MapPath = {
@@ -94,76 +60,6 @@ const TEXT = {
   error: "Não foi possível carregar o mapa.",
   noData: "Nenhum município encontrado na API."
 };
-
-function featureCoordinates(geometry: GeoJsonGeometry): Position[] {
-  const polygons = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
-
-  return polygons.flatMap((polygon) => polygon.flatMap((ring) => ring));
-}
-
-function getBounds(features: GeoJsonFeature[]): Bounds | null {
-  const coordinates = features.flatMap((feature) => featureCoordinates(feature.geometry));
-
-  if (coordinates.length === 0) {
-    return null;
-  }
-
-  return coordinates.reduce<Bounds>(
-    (bounds, [lon, lat]) => ({
-      minLon: Math.min(bounds.minLon, lon),
-      maxLon: Math.max(bounds.maxLon, lon),
-      minLat: Math.min(bounds.minLat, lat),
-      maxLat: Math.max(bounds.maxLat, lat)
-    }),
-    {
-      minLon: Number.POSITIVE_INFINITY,
-      maxLon: Number.NEGATIVE_INFINITY,
-      minLat: Number.POSITIVE_INFINITY,
-      maxLat: Number.NEGATIVE_INFINITY
-    }
-  );
-}
-
-function createProjector(bounds: Bounds) {
-  const lonSpan = Math.max(bounds.maxLon - bounds.minLon, 0.000001);
-  const latSpan = Math.max(bounds.maxLat - bounds.minLat, 0.000001);
-  const scale = Math.min((SVG_WIDTH - MAP_PADDING * 2) / lonSpan, (SVG_HEIGHT - MAP_PADDING * 2) / latSpan);
-  const mapWidth = lonSpan * scale;
-  const mapHeight = latSpan * scale;
-  const offsetX = (SVG_WIDTH - mapWidth) / 2;
-  const offsetY = (SVG_HEIGHT - mapHeight) / 2;
-
-  return ([lon, lat]: Position) => {
-    const x = offsetX + (lon - bounds.minLon) * scale;
-    const y = offsetY + (bounds.maxLat - lat) * scale;
-
-    return [x, y] as const;
-  };
-}
-
-function formatCoordinate(value: number): string {
-  return Number.isFinite(value) ? value.toFixed(2) : "0";
-}
-
-function ringToPath(ring: LinearRing, project: ReturnType<typeof createProjector>): string {
-  const points = ring.map(project);
-  const [firstPoint, ...nextPoints] = points;
-
-  if (!firstPoint) {
-    return "";
-  }
-
-  const start = `M ${formatCoordinate(firstPoint[0])} ${formatCoordinate(firstPoint[1])}`;
-  const lines = nextPoints.map(([x, y]) => `L ${formatCoordinate(x)} ${formatCoordinate(y)}`);
-
-  return `${start} ${lines.join(" ")} Z`;
-}
-
-function geometryToPath(geometry: GeoJsonGeometry, project: ReturnType<typeof createProjector>): string {
-  const polygons = geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
-
-  return polygons.flatMap((polygon) => polygon.map((ring) => ringToPath(ring, project))).join(" ");
-}
 
 function hexParaRgb(hex: string): [number, number, number] {
   const valor = hex.replace("#", "");
@@ -333,7 +229,7 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
       return [];
     }
 
-    const project = createProjector(bounds);
+    const project = createProjector(bounds, SVG_WIDTH, SVG_HEIGHT, MAP_PADDING);
 
     return geoJson.features
       .map((feature) => {

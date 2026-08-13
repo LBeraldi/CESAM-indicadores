@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Database, FileCheck2, History, MapPinned, ShieldCheck } from "lucide-react";
 import { AvisoIndisponivel } from "@/components/AvisoIndisponivel";
 import { MapaMunicipiosMS } from "@/components/MapaMunicipiosMS";
@@ -47,7 +48,7 @@ export default async function Home() {
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 lg:grid-cols-[1fr_22rem] lg:items-end">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-md border border-ms-line bg-ms-bg px-3 py-2 text-sm font-semibold text-ms-green">
-              <img src="/brand/cesam-symbol.svg" alt="" className="h-6 w-6" aria-hidden="true" />
+              <Image src="/brand/cesam-symbol.svg" alt="" width={24} height={24} aria-hidden="true" />
               Observatório de Saneamento
             </div>
             <h1 className="mt-3 text-4xl font-semibold tracking-normal text-ms-ink md:text-5xl">

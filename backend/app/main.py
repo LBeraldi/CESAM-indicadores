@@ -1,17 +1,15 @@
-from contextlib import asynccontextmanager
 import os
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.gzip import GZipMiddleware
 from sqlalchemy import text
+from starlette.middleware.gzip import GZipMiddleware
 
-from app import models, schemas
+from app import schemas
 from app.api.routes_indicadores import router as indicadores_router
 from app.api.routes_municipios import router as municipios_router
-from app.database import SessionLocal, engine, init_db
+from app.database import engine
 from app.middleware import observability_middleware
-from app.seed import seed_all
 
 
 def _cors_origins() -> list[str]:
@@ -24,33 +22,10 @@ def _cors_origins() -> list[str]:
     return [origin.strip() for origin in raw.split(",") if origin.strip()]
 
 
-def _auto_init_db() -> bool:
-    default = "false" if os.getenv("VERCEL") else "true"
-    return os.getenv("AUTO_INIT_DB", default).strip().lower() in {"1", "true", "yes", "sim"}
-
-
-def _run_migrations() -> bool:
-    return os.getenv("RUN_DB_MIGRATIONS", "false").strip().lower() in {"1", "true", "yes", "sim"}
-
-
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    if _run_migrations():
-        from app.scripts.migrar import main as migrar
-
-        migrar()
-    if _auto_init_db():
-        init_db()
-        with SessionLocal() as db:
-            seed_all(db)
-    yield
-
-
 app = FastAPI(
     title="Observatório de Saneamento API",
     description="API inicial de indicadores municipais de saneamento e infraestrutura de Mato Grosso do Sul.",
     version="0.1.0",
-    lifespan=lifespan,
 )
 
 app.middleware("http")(observability_middleware)

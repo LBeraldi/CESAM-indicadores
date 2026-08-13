@@ -2,75 +2,26 @@
 
 import { MapPin } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-
-type Position = [number, number];
-type Polygon = Position[][];
-type Geometry =
-  | { type: "Polygon"; coordinates: Polygon }
-  | { type: "MultiPolygon"; coordinates: Polygon[] };
-type Feature = {
-  properties: { codarea?: string };
-  geometry: Geometry;
-};
-type Collection = { features: Feature[] };
-type Bounds = { minLon: number; maxLon: number; minLat: number; maxLat: number };
+import {
+  createProjector,
+  featureCoordinates,
+  geometryToPath,
+  getBounds,
+  type GeoJsonCollection,
+  type GeoJsonFeature,
+} from "@/lib/geo";
 
 const WIDTH = 360;
 const HEIGHT = 270;
 const PADDING = 16;
 
-function posicoes(feature: Feature): Position[] {
-  const polygons = feature.geometry.type === "Polygon" ? [feature.geometry.coordinates] : feature.geometry.coordinates;
-  return polygons.flatMap((polygon) => polygon.flatMap((ring) => ring));
-}
-
-function limites(features: Feature[]): Bounds | null {
-  const pontos = features.flatMap(posicoes);
-  if (!pontos.length) return null;
-  return pontos.reduce<Bounds>(
-    (acc, [lon, lat]) => ({
-      minLon: Math.min(acc.minLon, lon),
-      maxLon: Math.max(acc.maxLon, lon),
-      minLat: Math.min(acc.minLat, lat),
-      maxLat: Math.max(acc.maxLat, lat)
-    }),
-    { minLon: Infinity, maxLon: -Infinity, minLat: Infinity, maxLat: -Infinity }
-  );
-}
-
-function projetor(bounds: Bounds) {
-  const lonSpan = Math.max(bounds.maxLon - bounds.minLon, 0.000001);
-  const latSpan = Math.max(bounds.maxLat - bounds.minLat, 0.000001);
-  const scale = Math.min((WIDTH - PADDING * 2) / lonSpan, (HEIGHT - PADDING * 2) / latSpan);
-  const offsetX = (WIDTH - lonSpan * scale) / 2;
-  const offsetY = (HEIGHT - latSpan * scale) / 2;
-  return ([lon, lat]: Position): Position => [
-    offsetX + (lon - bounds.minLon) * scale,
-    offsetY + (bounds.maxLat - lat) * scale
-  ];
-}
-
-function caminho(feature: Feature, project: (position: Position) => Position): string {
-  const polygons = feature.geometry.type === "Polygon" ? [feature.geometry.coordinates] : feature.geometry.coordinates;
-  return polygons
-    .flatMap((polygon) =>
-      polygon.map((ring) =>
-        ring.map((position, index) => {
-          const [x, y] = project(position);
-          return `${index === 0 ? "M" : "L"}${x.toFixed(2)},${y.toFixed(2)}`;
-        }).join(" ") + " Z"
-      )
-    )
-    .join(" ");
-}
-
 export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: string; municipio: string }) {
-  const [features, setFeatures] = useState<Feature[]>([]);
+  const [features, setFeatures] = useState<GeoJsonFeature[]>([]);
 
   useEffect(() => {
     let ativo = true;
     fetch("/data/ms-municipios.geojson")
-      .then((response) => (response.ok ? (response.json() as Promise<Collection>) : Promise.reject()))
+      .then((response) => (response.ok ? (response.json() as Promise<GeoJsonCollection>) : Promise.reject()))
       .then((collection) => {
         if (ativo) setFeatures(collection.features);
       })
@@ -83,12 +34,12 @@ export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: strin
   }, []);
 
   const desenho = useMemo(() => {
-    const bounds = limites(features);
+    const bounds = getBounds(features);
     if (!bounds) return null;
-    const project = projetor(bounds);
+    const project = createProjector(bounds, WIDTH, HEIGHT, PADDING);
     const selecionada = features.find((feature) => String(feature.properties.codarea) === codigoIbge) ?? null;
-    const pontosSelecionados = selecionada ? posicoes(selecionada) : [];
-    const boundsSelecionado = selecionada ? limites([selecionada]) : null;
+    const pontosSelecionados = selecionada ? featureCoordinates(selecionada.geometry) : [];
+    const boundsSelecionado = selecionada ? getBounds([selecionada]) : null;
     const centro = boundsSelecionado
       ? project([
           (boundsSelecionado.minLon + boundsSelecionado.maxLon) / 2,
@@ -98,7 +49,7 @@ export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: strin
     return {
       paths: features.map((feature) => ({
         codigo: String(feature.properties.codarea ?? ""),
-        d: caminho(feature, project)
+        d: geometryToPath(feature.geometry, project)
       })),
       centro,
       possuiMunicipio: pontosSelecionados.length > 0
@@ -106,7 +57,7 @@ export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: strin
   }, [codigoIbge, features]);
 
   return (
-    <div className="overflow-hidden rounded-md border border-ms-line bg-white shadow-sm">
+    <div className="flex h-full min-h-[17rem] flex-col overflow-hidden rounded-md border border-ms-line bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-ms-line px-4 py-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-ms-green">Localização no estado</p>
@@ -114,9 +65,9 @@ export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: strin
         </div>
         <MapPin className="h-5 w-5 text-ms-blue" />
       </div>
-      <div className="relative bg-gradient-to-br from-ms-sky to-white p-2">
+      <div className="relative flex min-h-0 flex-1 items-center bg-gradient-to-br from-ms-sky to-white p-2">
         {desenho ? (
-          <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="mx-auto block h-52 w-full" role="img" aria-label={`Mapa de Mato Grosso do Sul com ${municipio} destacado`}>
+          <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="mx-auto block h-48 w-full" role="img" aria-label={`Mapa de Mato Grosso do Sul com ${municipio} destacado`}>
             {desenho.paths.map((path) => {
               const selecionado = path.codigo === codigoIbge;
               return (
@@ -138,7 +89,7 @@ export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: strin
             ) : null}
           </svg>
         ) : (
-          <div className="flex h-52 items-center justify-center text-sm text-ms-muted">Carregando localização...</div>
+          <div className="flex h-48 w-full items-center justify-center text-sm text-ms-muted">Carregando localização...</div>
         )}
         <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-md border border-ms-line bg-white/95 px-2.5 py-1.5 text-xs font-medium text-ms-muted shadow-sm">
           <span className="h-3 w-3 rounded-sm bg-ms-green" />

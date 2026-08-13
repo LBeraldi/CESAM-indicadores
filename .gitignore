@@ -6,6 +6,8 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.coverage
+coverage.xml
 .mypy_cache/
 .ruff_cache/
 .venv/
@@ -16,6 +18,8 @@ node_modules/
 .next/
 .vercel/
 *.tsbuildinfo
+playwright-report/
+test-results/
 out/
 dist/
 

@@ -11,7 +11,6 @@ Variáveis para Production e Preview:
 ```text
 DATABASE_URL=postgresql://postgres.REF:SENHA@HOST.pooler.supabase.com:6543/postgres?sslmode=require
 DB_POOL_MODE=serverless
-AUTO_INIT_DB=false
 CORS_ORIGINS=https://URL-DO-FRONTEND.vercel.app
 RATE_LIMIT_PER_MINUTE=120
 ```
@@ -23,8 +22,10 @@ Depois do deploy, valide `https://URL-DA-API.vercel.app/health` e confirme que `
 Antes de publicar uma versão que contenha migrations, execute no diretório `backend`:
 
 ```bash
-vercel env run -e production -- python -m app.scripts.migrar
+vercel env run -e production -- python -m app.scripts.preparar_banco --seed
 ```
+
+Migrations e seed nunca são executados pelos workers HTTP. Essa etapa deve terminar antes de promover a nova API.
 
 ## 2. Frontend Next.js
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { BarChart3, Database, Trophy } from "lucide-react";
 import "./globals.css";
@@ -8,7 +9,7 @@ const DESCRICAO =
   "Plataforma do Centro de Estudos em Saneamento Ambiental para consulta, comparação e exportação de indicadores municipais de saneamento de Mato Grosso do Sul.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3002"),
   title: TITULO,
   description: DESCRICAO,
   icons: {
@@ -51,40 +52,43 @@ export default function RootLayout({
 
             <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between">
               <Link href="/" className="flex items-center" aria-label="Observatório de Saneamento, página inicial">
-                <img
+                <Image
                   src="/brand/observatorio-saneamento.svg"
                   alt="Observatório de Saneamento"
+                  width={272}
+                  height={56}
+                  priority
                   className="h-10 w-auto max-w-[13rem] sm:h-14 sm:max-w-[17rem]"
                 />
               </Link>
 
               <nav
-                className="-mx-4 flex flex-nowrap items-center gap-2 overflow-x-auto px-4 text-sm font-medium text-ms-muted [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
+                className="-mx-4 flex flex-nowrap items-center justify-between gap-0 overflow-x-auto px-4 text-sm font-medium text-ms-muted [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:justify-start sm:gap-2 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
                 aria-label="Navegacao principal"
               >
                 <Link
                   href="/"
-                  className="inline-flex h-10 shrink-0 items-center rounded-md px-3 hover:bg-ms-sky hover:text-ms-blue"
+                  className="inline-flex h-10 shrink-0 items-center rounded-md px-1.5 hover:bg-ms-sky hover:text-ms-blue sm:px-3"
                 >
                   Visao geral
                 </Link>
                 <Link
                   href="/municipios"
-                  className="inline-flex h-10 shrink-0 items-center gap-2 rounded-md px-3 hover:bg-ms-sky hover:text-ms-blue"
+                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md px-1.5 hover:bg-ms-sky hover:text-ms-blue sm:gap-2 sm:px-3"
                 >
                   <BarChart3 className="h-4 w-4" />
                   Municipios
                 </Link>
                 <Link
                   href="/ranking"
-                  className="inline-flex h-10 shrink-0 items-center gap-2 rounded-md px-3 hover:bg-ms-sky hover:text-ms-blue"
+                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md px-1.5 hover:bg-ms-sky hover:text-ms-blue sm:gap-2 sm:px-3"
                 >
                   <Trophy className="h-4 w-4" />
                   Ranking
                 </Link>
                 <a
                   href={`${apiUrl}/docs`}
-                  className="inline-flex h-10 shrink-0 items-center gap-2 rounded-md border border-ms-line bg-white px-3 text-ms-ink hover:border-ms-blue hover:text-ms-blue"
+                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md border border-ms-line bg-white px-1.5 text-ms-ink hover:border-ms-blue hover:text-ms-blue sm:gap-2 sm:px-3"
                 >
                   <Database className="h-4 w-4" />
                   API
@@ -98,9 +102,11 @@ export default function RootLayout({
           <footer className="no-print border-t border-ms-line bg-white">
             <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:grid-cols-[1.4fr_1fr_1fr]">
               <div>
-                <img
+                <Image
                   src="/brand/observatorio-saneamento.svg"
                   alt="Observatório de Saneamento"
+                  width={288}
+                  height={64}
                   className="h-12 w-auto max-w-[14rem] sm:h-16 sm:max-w-[18rem]"
                 />
                 <p className="mt-3 max-w-xl text-sm leading-6 text-ms-muted">

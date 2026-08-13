@@ -21,7 +21,7 @@ def _preferencia_fonte():
 def _slug(value: str) -> str:
     normalized = unicodedata.normalize("NFKD", value or "")
     ascii_text = normalized.encode("ascii", "ignore").decode("ascii")
-    return ascii_text.lower().strip().replace(" ", "_")
+    return ascii_text.lower().strip().replace("-", "_").replace(" ", "_")
 
 
 def tema_matches(actual: str, requested: str) -> bool:
@@ -36,8 +36,24 @@ def get_municipio_by_codigo(db: Session, codigo_ibge: str) -> models.Municipio |
     return db.scalar(select(models.Municipio).where(models.Municipio.codigo_ibge == codigo_ibge))
 
 
+def get_institucional_municipio(
+    db: Session, municipio_id: int
+) -> tuple[models.AtendimentoAgua | None, list[models.RecursoMunicipal]]:
+    atendimento = db.scalar(select(models.AtendimentoAgua).where(models.AtendimentoAgua.municipio_id == municipio_id))
+    recursos = list(
+        db.scalars(
+            select(models.RecursoMunicipal)
+            .where(models.RecursoMunicipal.municipio_id == municipio_id)
+            .order_by(models.RecursoMunicipal.tipo)
+        ).all()
+    )
+    return atendimento, recursos
+
+
 def get_indicadores(db: Session, tema: str | None = None) -> list[models.Indicador]:
-    indicadores = list(db.scalars(select(models.Indicador).order_by(models.Indicador.tema, models.Indicador.nome)).all())
+    indicadores = list(
+        db.scalars(select(models.Indicador).order_by(models.Indicador.tema, models.Indicador.nome)).all()
+    )
     if tema:
         return [indicador for indicador in indicadores if tema_matches(indicador.tema, tema)]
     return indicadores
@@ -47,9 +63,7 @@ def get_indicador_by_codigo(db: Session, codigo: str) -> models.Indicador | None
     return db.scalar(select(models.Indicador).where(models.Indicador.codigo == codigo))
 
 
-def get_valores_municipio(
-    db: Session, municipio_id: int, ano: int | None = None
-) -> list[models.ValorIndicador]:
+def get_valores_municipio(db: Session, municipio_id: int, ano: int | None = None) -> list[models.ValorIndicador]:
     query: Select[tuple[models.ValorIndicador]] = (
         select(models.ValorIndicador)
         .join(models.ValorIndicador.indicador)
@@ -90,9 +104,7 @@ def get_ranking(
     # 2) Ordena pelo sentido do indicador: "menor_melhor" sobe do menor
     # valor; "maior_melhor" e "neutro" mantem o desc historico.
     ordenacao = (
-        models.ValorIndicador.valor.asc()
-        if indicador.sentido == "menor_melhor"
-        else models.ValorIndicador.valor.desc()
+        models.ValorIndicador.valor.asc() if indicador.sentido == "menor_melhor" else models.ValorIndicador.valor.desc()
     )
 
     valores = list(
@@ -112,9 +124,7 @@ def get_ranking(
     return indicador, valores
 
 
-def get_ranking_saneamento(
-    db: Session, indicadores_codigos: list[str], ano: int
-) -> list[models.ValorIndicador]:
+def get_ranking_saneamento(db: Session, indicadores_codigos: list[str], ano: int) -> list[models.ValorIndicador]:
     """Retorna, em uma consulta, o melhor registro oficial por município e indicador."""
     ordem_preferencia = func.row_number().over(
         partition_by=(models.ValorIndicador.municipio_id, models.ValorIndicador.indicador_id),

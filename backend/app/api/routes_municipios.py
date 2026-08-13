@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.database import get_db
 
-
 router = APIRouter(tags=["municipios"])
 
 
@@ -48,3 +47,17 @@ def listar_indicadores_municipio(
         municipio=municipio,
         indicadores=[_valor_to_schema(valor) for valor in valores],
     )
+
+
+@router.get(
+    "/municipios/{codigo_ibge}/institucional",
+    response_model=schemas.InstitucionalMunicipioResponse,
+)
+def obter_dados_institucionais(
+    codigo_ibge: str, db: Session = Depends(get_db)
+) -> schemas.InstitucionalMunicipioResponse:
+    municipio = crud.get_municipio_by_codigo(db, codigo_ibge)
+    if not municipio:
+        raise HTTPException(status_code=404, detail="Municipio nao encontrado pelo codigo IBGE informado.")
+    atendimento, recursos = crud.get_institucional_municipio(db, municipio.id)
+    return schemas.InstitucionalMunicipioResponse(atendimento_agua=atendimento, recursos=recursos)

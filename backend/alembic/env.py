@@ -1,15 +1,16 @@
+import sys
 from logging.config import fileConfig
 from pathlib import Path
-import sys
+
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
 
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from app.database import Base, DATABASE_URL as app_database_url  # noqa: E402
 from app import models  # noqa: F401,E402
-
+from app.database import DATABASE_URL as app_database_url
+from app.database import Base  # noqa: E402
 
 config = context.config
 if config.config_file_name is not None:

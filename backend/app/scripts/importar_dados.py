@@ -1,10 +1,10 @@
 import argparse
 from pathlib import Path
 
-from app.database import SessionLocal, init_db
+from app.database import SessionLocal
+from app.scripts.migrar import migrar
 from app.seed import DATA_DIR, seed_all
 from app.services.ingestao import EXTENSOES_SUPORTADAS, listar_arquivos, processar_arquivo, processar_zip
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
@@ -22,16 +22,20 @@ def resolver_caminho_input(raw: str) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Importa arquivos oficiais colocados manualmente em data/raw.")
-    parser.add_argument("--input", default=str(DATA_DIR / "raw"), help="Arquivo ou diretorio com CSV, XLSX, XLS ou ZIP.")
+    parser.add_argument(
+        "--input", default=str(DATA_DIR / "raw"), help="Arquivo ou diretorio com CSV, XLSX, XLS ou ZIP."
+    )
     parser.add_argument("--fonte", required=True, help="Nome da fonte, por exemplo SINISA, SNIS ou IBGE.")
-    parser.add_argument("--ano", type=int, default=None, help="Ano de referencia usado quando o arquivo nao trouxer ano.")
+    parser.add_argument(
+        "--ano", type=int, default=None, help="Ano de referencia usado quando o arquivo nao trouxer ano."
+    )
     args = parser.parse_args()
 
     entrada = resolver_caminho_input(args.input)
     if not entrada.exists():
         raise SystemExit(f"Entrada nao encontrada: {entrada}")
 
-    init_db()
+    migrar()
     with SessionLocal() as db:
         seed_all(db)
         arquivos = listar_arquivos(entrada)

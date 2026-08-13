@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import gzip
 import json
+from dataclasses import dataclass
 from urllib.parse import quote
 from urllib.request import Request, urlopen
-
 
 IBGE_AGREGADOS_URL = "https://servicodados.ibge.gov.br/api/v3/agregados"
 TIMEOUT_SECONDS = 8

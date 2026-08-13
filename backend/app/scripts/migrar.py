@@ -1,11 +1,10 @@
 from pathlib import Path
 
-from alembic import command
-from alembic.config import Config
 from sqlalchemy import inspect, text
 
+from alembic import command
+from alembic.config import Config
 from app.database import engine
-
 
 BASE_LEGADA = "202607100001"
 MIGRATION_LOCK_ID = 594_020_826

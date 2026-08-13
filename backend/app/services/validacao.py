@@ -3,7 +3,6 @@ import re
 
 import pandas as pd
 
-
 SIM = {"sim", "s", "yes", "y", "true", "verdadeiro", "1"}
 NAO = {"nao", "não", "n", "no", "false", "falso", "0"}
 

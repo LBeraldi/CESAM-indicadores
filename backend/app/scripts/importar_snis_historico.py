@@ -2,14 +2,14 @@ from pathlib import Path
 
 import pandas as pd
 from sqlalchemy import delete, select
-from sqlalchemy.sql import text
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 
 from app import models
-from app.database import SessionLocal, init_db
+from app.database import SessionLocal
+from app.scripts.migrar import migrar
 from app.seed import DATA_DIR, seed_all
 from app.services.validacao import converter_valor
-
 
 FONTE_NOME = "SNIS Serie Historica 1995-2022"
 FONTE_ORIGEM = "Ministerio das Cidades / SNIS Serie Historica"
@@ -183,13 +183,11 @@ def _salvar_resumo_processado(db: Session, fonte_id: int) -> None:
 def main() -> None:
     arquivo = DATA_DIR / "raw" / ARQUIVO_CSV
     if not arquivo.exists():
-        raise SystemExit(
-            f"Arquivo ausente em {arquivo}. Baixe a tabela com: curl -L '{DOWNLOAD_URL}' -o {arquivo}"
-        )
+        raise SystemExit(f"Arquivo ausente em {arquivo}. Baixe a tabela com: curl -L '{DOWNLOAD_URL}' -o {arquivo}")
 
     df = _ler_csv_historico(arquivo)
 
-    init_db()
+    migrar()
     with SessionLocal() as db:
         seed_all(db)
         _limpar_importacao_anterior(db)

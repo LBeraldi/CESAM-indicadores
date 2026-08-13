@@ -50,6 +50,38 @@ class IndicadoresMunicipioResponse(BaseModel):
     indicadores: list[ValorIndicadorRead]
 
 
+class AtendimentoAguaRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    prestador_nome: str
+    sigla: str | None
+    natureza_juridica: str | None
+    area_atuacao: str | None
+    forma_prestacao: str | None
+    instrumento_delegacao: str | None
+    fonte: str
+    ano_referencia: int
+    endereco: str | None
+    site_url: str
+    site_label: str
+    maps_url: str
+    fonte_endereco: str | None
+
+
+class RecursoMunicipalRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    tipo: str
+    url: str
+    direto: bool
+    fonte: str | None
+
+
+class InstitucionalMunicipioResponse(BaseModel):
+    atendimento_agua: AtendimentoAguaRead | None
+    recursos: list[RecursoMunicipalRead]
+
+
 class RankingItem(BaseModel):
     posicao: int
     codigo_ibge: str

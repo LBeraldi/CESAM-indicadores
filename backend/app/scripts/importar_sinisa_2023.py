@@ -4,21 +4,20 @@ from zipfile import ZipFile
 
 import pandas as pd
 from sqlalchemy import delete, select
-from sqlalchemy.sql import text
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import text
 
 from app import models
-from app.database import SessionLocal, init_db
+from app.database import SessionLocal
+from app.scripts.migrar import migrar
 from app.seed import DATA_DIR, seed_all
 from app.services.validacao import converter_valor
-
 
 ANO_REFERENCIA = 2023
 FONTE_NOME = "SINISA 2023"
 FONTE_ORIGEM = "Ministério das Cidades / SINISA"
 URL_RESULTADOS = (
-    "https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/"
-    "saneamento/sinisa/resultados-sinisa"
+    "https://www.gov.br/cidades/pt-br/acesso-a-informacao/acoes-e-programas/saneamento/sinisa/resultados-sinisa"
 )
 
 ARQUIVOS_OBRIGATORIOS = [
@@ -163,9 +162,7 @@ def _registrar_valor(
 def _extrair_primeiro(zip_path: Path, marcador: str, destino: Path) -> Path:
     with ZipFile(zip_path) as zip_file:
         nome = next(
-            entrada
-            for entrada in zip_file.namelist()
-            if marcador in entrada and entrada.lower().endswith(".xlsx")
+            entrada for entrada in zip_file.namelist() if marcador in entrada and entrada.lower().endswith(".xlsx")
         )
         zip_file.extract(nome, destino)
         return destino / nome
@@ -229,11 +226,7 @@ def _importar_informacao_rede(
     """Importa uma informação estrutural cuja planilha usa códigos SINISA como cabeçalho."""
     previa = pd.read_excel(arquivo, sheet_name=0, header=None, nrows=15)
     linha_codigo = next(
-        (
-            indice
-            for indice in previa.index
-            if codigo_sinisa in previa.loc[indice].astype(str).str.strip().tolist()
-        ),
+        (indice for indice in previa.index if codigo_sinisa in previa.loc[indice].astype(str).str.strip().tolist()),
         None,
     )
     if linha_codigo is None:
@@ -430,7 +423,7 @@ def main() -> None:
     if faltantes:
         raise SystemExit(f"Arquivos oficiais ausentes em data/raw: {', '.join(faltantes)}")
 
-    init_db()
+    migrar()
     with SessionLocal() as db:
         seed_all(db)
         _limpar_importacao_anterior(db)
@@ -444,7 +437,9 @@ def main() -> None:
 
         with TemporaryDirectory() as tmp:
             temp_dir = Path(tmp)
-            agua = _extrair_primeiro(raw_dir / "SINISA_Resultados_Ref2023.zip", "AGUA_Indicadores_Base Municipal", temp_dir)
+            agua = _extrair_primeiro(
+                raw_dir / "SINISA_Resultados_Ref2023.zip", "AGUA_Indicadores_Base Municipal", temp_dir
+            )
             esgoto = _extrair_primeiro(
                 raw_dir / "SINISA_ESGOTO_Planilhas_2023_v2.zip",
                 "ESGOTO_Indicadores_Base Municipal",
