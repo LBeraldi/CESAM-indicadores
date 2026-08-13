@@ -1,32 +1,18 @@
 "use client";
 
-import {
-  ChevronDown,
-  CloudRain,
-  Download,
-  Droplets,
-  ExternalLink,
-  FileDown,
-  Filter,
-  Leaf,
-  Printer,
-  RotateCcw,
-  ShieldCheck,
-  TrendingDown,
-  TrendingUp,
-  Trash2,
-  Waves
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { ChevronDown, Download, Filter, Printer, RotateCcw, TrendingDown, TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import type { Municipio, ValorIndicador } from "@/lib/api";
-import { getRecursosGestaoMunicipal } from "@/lib/documentosGestaoMunicipal";
-import { formatValorIndicador, valorParaPlanilha } from "@/lib/formatters";
+import type { Municipio, RecursoMunicipal, ValorIndicador } from "@/lib/api";
+import { formatValorIndicador } from "@/lib/formatters";
+import { baixarCsvMunicipal } from "@/lib/exportarCsv";
+import { RecursoGestao } from "@/components/municipio/RecursoGestao";
+import { calcularScore, ordenarTexto, ordemTema, temaConfig, type TemaConfig } from "@/components/municipio/fichaConfig";
 
 type Props = {
   municipio: Municipio;
   indicadores: ValorIndicador[];
+  recursos?: RecursoMunicipal[];
 };
 
 type Dimensao = {
@@ -36,142 +22,7 @@ type Dimensao = {
   config: TemaConfig;
 };
 
-type TemaConfig = {
-  icon: LucideIcon;
-  bgClass: string;
-  accentClass: string;
-  panelClass: string;
-};
-
 const TODOS = "todos";
-
-const TEMA_ORDEM = ["Água", "Esgoto", "Resíduos sólidos", "Águas pluviais", "Gestão municipal"];
-
-// Paleta das dimensões derivada dos mesmos tokens institucionais do resto do
-// site, com marrom terroso para resíduos sólidos, variando por matiz e não
-// por saturação para não destoar do header, mapa e ranking.
-const TEMA_CONFIG: Record<string, TemaConfig> = {
-  Água: {
-    icon: Droplets,
-    bgClass: "bg-[#0f766e]",
-    accentClass: "bg-[#0f766e]",
-    panelClass: "bg-[#e5f4f1] text-[#0f6f62]"
-  },
-  Esgoto: {
-    icon: Waves,
-    bgClass: "bg-[#0c2d57]",
-    accentClass: "bg-[#0c2d57]",
-    panelClass: "bg-[#e7edf5] text-[#0c2d57]"
-  },
-  "Resíduos sólidos": {
-    icon: Trash2,
-    bgClass: "bg-[#7a4e2d]",
-    accentClass: "bg-[#7a4e2d]",
-    panelClass: "bg-[#f3e9df] text-[#6b3f24]"
-  },
-  "Águas pluviais": {
-    icon: CloudRain,
-    bgClass: "bg-[#1f5f9f]",
-    accentClass: "bg-[#1f5f9f]",
-    panelClass: "bg-[#e7f0f8] text-[#1f5f9f]"
-  },
-  "Gestão municipal": {
-    icon: ShieldCheck,
-    bgClass: "bg-[#b7791f]",
-    accentClass: "bg-[#b7791f]",
-    panelClass: "bg-[#fbf1de] text-[#8f5f0d]"
-  }
-};
-
-const TEMA_FALLBACK: TemaConfig = {
-  icon: Leaf,
-  bgClass: "bg-ms-navy",
-  accentClass: "bg-ms-navy",
-  panelClass: "bg-ms-sky text-ms-navy"
-};
-
-function ordenarTexto(a: string, b: string) {
-  return a.localeCompare(b, "pt-BR", { sensitivity: "base" });
-}
-
-function csvEscape(value: string | number | null | undefined): string {
-  const texto = value === null || value === undefined ? "" : String(value);
-  return `"${texto.replaceAll('"', '""')}"`;
-}
-
-function baixarCsv(municipio: Municipio, valores: ValorIndicador[]) {
-  const linhas = [
-    [
-      "codigo_ibge",
-      "municipio",
-      "uf",
-      "ano_referencia",
-      "tema",
-      "indicador_codigo",
-      "indicador_nome",
-      "valor",
-      "unidade",
-      "fonte",
-      "status_validacao",
-      "observacoes"
-    ],
-    ...valores.map((valor) => [
-      municipio.codigo_ibge,
-      municipio.nome,
-      municipio.uf,
-      valor.ano,
-      valor.indicador.tema,
-      valor.indicador.codigo,
-      valor.indicador.nome,
-      valorParaPlanilha(valor),
-      valor.indicador.unidade ?? "",
-      valor.fonte ?? valor.indicador.fonte ?? "",
-      valor.status_validacao,
-      valor.observacoes ?? ""
-    ])
-  ];
-
-  const csv = linhas.map((linha) => linha.map(csvEscape).join(";")).join("\n");
-  const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `observatorio-saneamento_${municipio.codigo_ibge}_${municipio.nome.replaceAll(" ", "_")}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-}
-
-function temaConfig(tema: string): TemaConfig {
-  return TEMA_CONFIG[tema] ?? TEMA_FALLBACK;
-}
-
-function ordemTema(tema: string): number {
-  const index = TEMA_ORDEM.indexOf(tema);
-  return index === -1 ? TEMA_ORDEM.length : index;
-}
-
-function unidadePercentual(valor: ValorIndicador): boolean {
-  return valor.indicador.unidade?.trim() === "%";
-}
-
-function valorNormalizadoPercentual(valor: ValorIndicador): number {
-  const numero = Number(valor.valor);
-  return valor.indicador.sentido === "menor_melhor" ? 100 - numero : numero;
-}
-
-function calcularScore(valores: ValorIndicador[]): number | null {
-  const percentuais = valores
-    .filter((valor) => valor.valor !== null && unidadePercentual(valor) && valor.indicador.sentido !== "neutro")
-    .map(valorNormalizadoPercentual);
-
-  if (percentuais.length === 0) {
-    return null;
-  }
-
-  return percentuais.reduce((soma, valor) => soma + valor, 0) / percentuais.length;
-}
 
 type PontoHistorico = { ano: number; valor: number };
 
@@ -478,12 +329,14 @@ function HistoricoFlutuante({
       onBlur={agendarFechamento}
       onClick={(event) => {
         event.stopPropagation();
-        aberto ? fechar() : abrir();
+        if (aberto) fechar();
+        else abrir();
       }}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          aberto ? fechar() : abrir();
+          if (aberto) fechar();
+          else abrir();
         }
         if (event.key === "Escape") fechar();
       }}
@@ -529,40 +382,7 @@ function formatScore(score: number | null, quantidade: number): string {
   });
 }
 
-function RecursoGestao({ valor, municipio }: { valor: ValorIndicador; municipio: Municipio }) {
-  if (valor.valor === null || Number(valor.valor) <= 0) return null;
-
-  const recursos = getRecursosGestaoMunicipal(municipio.codigo_ibge, municipio.nome);
-  const ehConselho = valor.indicador.codigo === "gestao_conselho_municipal";
-  const ehPlano = valor.indicador.codigo === "gestao_plano_municipal_saneamento";
-  if (!ehConselho && !ehPlano) return null;
-
-  const recurso = ehConselho ? recursos.conselho : recursos.plano;
-  const Icon = ehPlano && recurso.direto ? FileDown : ExternalLink;
-  const rotulo = ehConselho
-    ? recurso.direto
-      ? "Acessar conselho"
-      : "Consultar controle social"
-    : recurso.direto
-      ? "Baixar plano municipal"
-      : "Buscar documento oficial";
-
-  return (
-    <a
-      href={recurso.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={(event) => event.stopPropagation()}
-      className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-current/25 bg-white/65 px-2.5 py-1.5 text-xs font-semibold transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-current/30"
-      aria-label={`${rotulo} de ${municipio.nome}`}
-    >
-      <Icon className="h-3.5 w-3.5" />
-      {rotulo}
-    </a>
-  );
-}
-
-export function FichaMunicipal({ municipio, indicadores }: Props) {
+export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props) {
   const anos = useMemo(
     () => Array.from(new Set(indicadores.map((valor) => valor.ano))).sort((a, b) => b - a),
     [indicadores]
@@ -691,7 +511,7 @@ export function FichaMunicipal({ municipio, indicadores }: Props) {
             </button>
             <button
               type="button"
-              onClick={() => baixarCsv(municipio, filtrados)}
+              onClick={() => baixarCsvMunicipal(municipio, filtrados)}
               disabled={filtrados.length === 0}
               className="inline-flex h-10 items-center gap-2 rounded-md bg-ms-blue px-3 text-sm font-medium text-white hover:bg-ms-navy disabled:cursor-not-allowed disabled:bg-slate-300"
             >
@@ -912,7 +732,7 @@ export function FichaMunicipal({ municipio, indicadores }: Props) {
                                 <span className="mt-2 block text-xs opacity-80">
                                   {valor.fonte ?? valor.indicador.fonte ?? "Fonte não informada"}
                                 </span>
-                                <RecursoGestao valor={valor} municipio={municipio} />
+                                <RecursoGestao valor={valor} municipio={municipio} recursos={recursos} />
                               </CartaoIndicador>
                             );
                           })}

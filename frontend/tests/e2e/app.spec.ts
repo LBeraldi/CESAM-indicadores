@@ -1,16 +1,20 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const consoleErrors: string[] = [];
+const pageErrors: string[] = [];
 
 test.beforeEach(async ({ page }) => {
   consoleErrors.length = 0;
+  pageErrors.length = 0;
   page.on("console", (message) => {
     if (message.type() === "error") consoleErrors.push(message.text());
   });
+  page.on("pageerror", (error) => pageErrors.push(error.message));
 });
 
 test.afterEach(() => {
   expect(consoleErrors, "A página não deve emitir erros no console").toEqual([]);
+  expect(pageErrors, "A página não deve emitir erros JavaScript").toEqual([]);
 });
 
 async function expectNoHorizontalOverflow(page: Page) {
@@ -106,6 +110,10 @@ test.describe("celular com toque", () => {
   test("ficha e lista não possuem rolagem horizontal", async ({ page }) => {
     await abrirPagina(page, "/municipios");
     await expectNoHorizontalOverflow(page);
+    const apiLink = page.getByRole("link", { name: "API", exact: true });
+    const apiBox = await apiLink.boundingBox();
+    expect(apiBox?.x ?? 0).toBeGreaterThanOrEqual(0);
+    expect((apiBox?.x ?? 0) + (apiBox?.width ?? 0)).toBeLessThanOrEqual(390);
     await abrirPagina(page, "/municipios/5003702");
     await expectNoHorizontalOverflow(page);
   });

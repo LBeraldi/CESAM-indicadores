@@ -1,9 +1,10 @@
 import argparse
 
+from sqlalchemy import select
+
 from app import models
 from app.database import SessionLocal
 from app.services.ibge import buscar_metadados_municipios_ms
-from sqlalchemy import select
 
 
 def atualizar(somente_ausentes: bool = False) -> tuple[int, int]:

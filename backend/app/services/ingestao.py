@@ -19,7 +19,6 @@ from app.services.normalizacao import (
 )
 from app.services.validacao import converter_ano, converter_valor
 
-
 EXTENSOES_SUPORTADAS = {".csv", ".xlsx", ".xls"}
 
 

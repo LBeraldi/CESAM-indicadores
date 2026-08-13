@@ -3,7 +3,6 @@ import unicodedata
 
 import pandas as pd
 
-
 COLUNAS_CODIGO_IBGE = {
     "codigo_ibge",
     "cod_ibge",
@@ -86,7 +85,10 @@ def detectar_colunas_indicadores(df: pd.DataFrame, colunas_base: dict[str, str |
 def normalizar_codigo_ibge(valor: object) -> str | None:
     if pd.isna(valor):
         return None
-    apenas_digitos = re.sub(r"\D", "", str(valor))
+    texto = str(valor).strip()
+    if re.fullmatch(r"\d+\.0+", texto):
+        texto = texto.split(".", 1)[0]
+    apenas_digitos = re.sub(r"\D", "", texto)
     if len(apenas_digitos) == 6:
         apenas_digitos = f"0{apenas_digitos}"
     if len(apenas_digitos) != 7:

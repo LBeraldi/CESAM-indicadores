@@ -1,0 +1,14 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=app.api --cov=app.crud --cov=app.main --cov=app.middleware --cov=app.models --cov=app.schemas --cov=app.services.normalizacao --cov=app.services.validacao --cov-report=term-missing --cov-fail-under=80"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"] # Depends()/Query() em defaults é o padrão declarativo do FastAPI.
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/versions/*.py" = ["E501"]

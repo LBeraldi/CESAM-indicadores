@@ -60,6 +60,22 @@ def test_indicadores_por_municipio_e_filtro_de_ano(client: TestClient, sample_da
     assert client.get("/municipios/0000000/indicadores").status_code == 404
 
 
+def test_dados_institucionais_do_municipio(client: TestClient, sample_data: dict[str, object]) -> None:
+    response = client.get("/municipios/5099991/institucional")
+    assert response.status_code == 200
+    assert response.json()["atendimento_agua"]["prestador_nome"] == "Prestador Teste"
+    assert response.json()["atendimento_agua"]["endereco"] == "Rua de Teste, 100"
+    assert response.json()["recursos"] == [
+        {
+            "tipo": "plano_saneamento",
+            "url": "https://example.com/plano.pdf",
+            "direto": True,
+            "fonte": None,
+        }
+    ]
+    assert client.get("/municipios/0000000/institucional").status_code == 404
+
+
 def test_catalogo_filtra_tema_com_slug_ou_texto(client: TestClient, sample_data: dict[str, object]) -> None:
     por_texto = client.get("/indicadores?tema=Agua%20Teste")
     por_slug = client.get("/indicadores?tema=agua-teste")

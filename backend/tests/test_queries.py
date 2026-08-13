@@ -1,9 +1,8 @@
 from sqlalchemy import event
+from sqlalchemy.orm import Session
 
 from app.api.routes_indicadores import INDICADORES_RANKING_SANEAMENTO
 from app.crud import get_ranking_saneamento
-from sqlalchemy.orm import Session
-
 from app.database import engine
 
 

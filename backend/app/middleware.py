@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 import asyncio
-from collections import defaultdict, deque
 import json
 import logging
 import os
 import time
+from collections import defaultdict, deque
 from uuid import uuid4
 
 from fastapi import Request
 from starlette.responses import JSONResponse, Response
-
 
 logger = logging.getLogger("observatorio.http")
 _janelas: dict[str, deque[float]] = defaultdict(deque)

@@ -47,6 +47,34 @@ export type IndicadoresMunicipio = {
   indicadores: ValorIndicador[];
 };
 
+export type AtendimentoAgua = {
+  prestador_nome: string;
+  sigla: string | null;
+  natureza_juridica: string | null;
+  area_atuacao: string | null;
+  forma_prestacao: string | null;
+  instrumento_delegacao: string | null;
+  fonte: string;
+  ano_referencia: number;
+  endereco: string | null;
+  site_url: string;
+  site_label: string;
+  maps_url: string;
+  fonte_endereco: string | null;
+};
+
+export type RecursoMunicipal = {
+  tipo: "conselho" | "plano_saneamento" | string;
+  url: string;
+  direto: boolean;
+  fonte: string | null;
+};
+
+export type InstitucionalMunicipio = {
+  atendimento_agua: AtendimentoAgua | null;
+  recursos: RecursoMunicipal[];
+};
+
 export type RankingItem = {
   posicao: number;
   codigo_ibge: string;

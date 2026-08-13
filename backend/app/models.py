@@ -1,15 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
 
 class TimestampMixin:
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -29,6 +27,50 @@ class Municipio(TimestampMixin, Base):
     area_km2: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     valores: Mapped[list["ValorIndicador"]] = relationship(back_populates="municipio")
+    atendimento_agua: Mapped["AtendimentoAgua | None"] = relationship(
+        back_populates="municipio", cascade="all, delete-orphan", uselist=False
+    )
+    recursos: Mapped[list["RecursoMunicipal"]] = relationship(back_populates="municipio", cascade="all, delete-orphan")
+
+
+class AtendimentoAgua(TimestampMixin, Base):
+    __tablename__ = "atendimentos_agua"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    municipio_id: Mapped[int] = mapped_column(
+        ForeignKey("municipios.id", ondelete="CASCADE"), unique=True, index=True, nullable=False
+    )
+    prestador_nome: Mapped[str] = mapped_column(String(255), nullable=False)
+    sigla: Mapped[str | None] = mapped_column(String(40))
+    natureza_juridica: Mapped[str | None] = mapped_column(String(160))
+    area_atuacao: Mapped[str | None] = mapped_column(Text)
+    forma_prestacao: Mapped[str | None] = mapped_column(Text)
+    instrumento_delegacao: Mapped[str | None] = mapped_column(String(160))
+    fonte: Mapped[str] = mapped_column(String(255), nullable=False)
+    ano_referencia: Mapped[int] = mapped_column(Integer, index=True, nullable=False)
+    endereco: Mapped[str | None] = mapped_column(Text)
+    site_url: Mapped[str] = mapped_column(Text, nullable=False)
+    site_label: Mapped[str] = mapped_column(String(160), nullable=False)
+    maps_url: Mapped[str] = mapped_column(Text, nullable=False)
+    fonte_endereco: Mapped[str | None] = mapped_column(Text)
+
+    municipio: Mapped[Municipio] = relationship(back_populates="atendimento_agua")
+
+
+class RecursoMunicipal(TimestampMixin, Base):
+    __tablename__ = "recursos_municipais"
+    __table_args__ = (UniqueConstraint("municipio_id", "tipo", name="uq_recurso_municipio_tipo"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    municipio_id: Mapped[int] = mapped_column(
+        ForeignKey("municipios.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    tipo: Mapped[str] = mapped_column(String(40), index=True, nullable=False)
+    url: Mapped[str] = mapped_column(Text, nullable=False)
+    direto: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false", nullable=False)
+    fonte: Mapped[str | None] = mapped_column(Text)
+
+    municipio: Mapped[Municipio] = relationship(back_populates="recursos")
 
 
 class FonteDados(Base):
@@ -62,7 +104,9 @@ class Indicador(TimestampMixin, Base):
     # "maior_melhor" | "menor_melhor" | "neutro". Fonte unica de verdade para
     # direcao de comparacao: usado no ORDER BY de /ranking para nao depender
     # de listas hardcoded duplicadas no frontend.
-    sentido: Mapped[str] = mapped_column(String(20), default="maior_melhor", server_default="maior_melhor", nullable=False)
+    sentido: Mapped[str] = mapped_column(
+        String(20), default="maior_melhor", server_default="maior_melhor", nullable=False
+    )
 
     valores: Mapped[list["ValorIndicador"]] = relationship(back_populates="indicador")
 
@@ -106,6 +150,4 @@ class LogImportacao(Base):
     linhas_importadas: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     linhas_com_erro: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     mensagem: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

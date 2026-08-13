@@ -1,0 +1,1598 @@
+{
+  "atendimentos": [
+    {
+      "codigo_ibge": "5000203",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Nove de Julho, 14, Jardim Paulista",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Nove%20de%20Julho%2C%2014%2C%20Jardim%20Paulista%2C%20%C3%81gua%20Clara%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5000252",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Darlindo José Carneiro, 919, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Darlindo%20Jos%C3%A9%20Carneiro%2C%20919%2C%20Centro%2C%20Alcin%C3%B3polis%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5000609",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua José Luiz Sampaio, 1891, Vila Vilarinho",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Jos%C3%A9%20Luiz%20Sampaio%2C%201891%2C%20Vila%20Vilarinho%2C%20Amambai%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5000708",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua João Leite Ribeiro, s/n, Vila Flor",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Jo%C3%A3o%20Leite%20Ribeiro%2C%20s%2Fn%2C%20Vila%20Flor%2C%20Anast%C3%A1cio%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5000807",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Floriano Peixoto, 1179, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Floriano%20Peixoto%2C%201179%2C%20Centro%2C%20Anauril%C3%A2ndia%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5000856",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Antônio Basílio de Lima, 325, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Ant%C3%B4nio%20Bas%C3%ADlio%20de%20Lima%2C%20325%2C%20Centro%2C%20Ang%C3%A9lica%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5000906",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Juraci Pereira, 144, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Juraci%20Pereira%2C%20144%2C%20Centro%2C%20Ant%C3%B4nio%20Jo%C3%A3o%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5001003",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Sem delegação atendendo Sede - SDS",
+        "forma_prestacao": null,
+        "instrumento_delegacao": null,
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Orlando Mascarenhas, 2060, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Orlando%20Mascarenhas%2C%202060%2C%20Centro%2C%20Aparecida%20do%20Taboado%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5001102",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Pândia Calógeras, 372, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20P%C3%A2ndia%20Cal%C3%B3geras%2C%20372%2C%20Centro%2C%20Aquidauana%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5001243",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Dom Pedro II, 474, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Dom%20Pedro%20II%2C%20474%2C%20Centro%2C%20Aral%20Moreira%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5001508",
+      "prestador": {
+        "nome": "Serviço Autônomo de Água e Esgoto",
+        "sigla": "SAAE",
+        "natureza_juridica": "Autarquia",
+        "area_atuacao": "Sede e localidades",
+        "forma_prestacao": "Prestação direta por entidade da administração pública indireta",
+        "instrumento_delegacao": null,
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Tiradentes, 2005, Centro",
+        "siteUrl": "https://www.saaebandeirantes.ms.gov.br/",
+        "siteLabel": "Site do SAAE de Bandeirantes",
+        "fonteEndereco": "https://bandeirantes.ms.gov.br/v2/saae/",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Tiradentes%2C%202005%2C%20Centro%2C%20Bandeirantes%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5001904",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua José Vicente Vitiriti, 87, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Jos%C3%A9%20Vicente%20Vitiriti%2C%2087%2C%20Centro%2C%20Bataguassu%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002001",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Elpídio Lucas Arantes, 1025, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Elp%C3%ADdio%20Lucas%20Arantes%2C%201025%2C%20Centro%2C%20Bataypor%C3%A3%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002100",
+      "prestador": {
+        "nome": "Serviço Autônomo de Água e Esgoto",
+        "sigla": "SAAE",
+        "natureza_juridica": "Autarquia",
+        "area_atuacao": "Sede",
+        "forma_prestacao": "Prestação direta por entidade da administração pública indireta",
+        "instrumento_delegacao": null,
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Peri de Almeida Melo, 571, Centro",
+        "siteUrl": "https://saaebelavista.ms.gov.br/",
+        "siteLabel": "Site do SAAE de Bela Vista",
+        "fonteEndereco": "https://saaebelavista.ms.gov.br/contato",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Peri%20de%20Almeida%20Melo%2C%20571%2C%20Centro%2C%20Bela%20Vista%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002159",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Sebastião Raimundo de Barros, s/n, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Sebasti%C3%A3o%20Raimundo%20de%20Barros%2C%20s%2Fn%2C%20Centro%2C%20Bodoquena%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002209",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Coronel Pilad Rebuá, 1009, Vila Donária",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Coronel%20Pilad%20Rebu%C3%A1%2C%201009%2C%20Vila%20Don%C3%A1ria%2C%20Bonito%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002308",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida José Estevan da Silva, 1000, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Jos%C3%A9%20Estevan%20da%20Silva%2C%201000%2C%20Centro%2C%20Brasil%C3%A2ndia%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002407",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Presidente Vargas, 551, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Presidente%20Vargas%2C%20551%2C%20Centro%2C%20Caarap%C3%B3%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002605",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Cândido Mariano, 639, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20C%C3%A2ndido%20Mariano%2C%20639%2C%20Centro%2C%20Camapu%C3%A3%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002704",
+      "prestador": {
+        "nome": "Águas Guariroba S/A",
+        "sigla": "AG",
+        "natureza_juridica": "Empresa privada",
+        "area_atuacao": "Sem delegação atendendo Sede e Localidades - SDSL",
+        "forma_prestacao": null,
+        "instrumento_delegacao": "Contrato de Concessão",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Marechal Cândido Mariano Rondon, 1808, Centro",
+        "siteUrl": "https://www.aguasguariroba.com.br/",
+        "siteLabel": "Site da Águas Guariroba",
+        "fonteEndereco": "https://www.aguasguariroba.com.br/contato/",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Marechal%20C%C3%A2ndido%20Mariano%20Rondon%2C%201808%2C%20Centro%2C%20Campo%20Grande%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002803",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua João Loureiro, 871, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Jo%C3%A3o%20Loureiro%2C%20871%2C%20Centro%2C%20Caracol%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002902",
+      "prestador": {
+        "nome": "Prefeitura Municipal de Cassilandia",
+        "sigla": "PMC",
+        "natureza_juridica": "Municipio",
+        "area_atuacao": "Sede e localidades",
+        "forma_prestacao": null,
+        "instrumento_delegacao": null,
+        "fonte": "Instituto Agua e Saneamento / SINISA 2024",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": null,
+        "siteUrl": "https://www.cassilandia.ms.gov.br/",
+        "siteLabel": "Site da Prefeitura de Cassilândia",
+        "fonteEndereco": null,
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Prefeitura%20Municipal%20de%20Cassilandia%2C%20Cassil%C3%A2ndia%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5002951",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Dez, 816, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Dez%2C%20816%2C%20Centro%2C%20Chapad%C3%A3o%20do%20Sul%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003108",
+      "prestador": {
+        "nome": "Serviço Autônomo de Água e Esgoto de Corguinho",
+        "sigla": "SAAE",
+        "natureza_juridica": "Autarquia",
+        "area_atuacao": "Sede e localidades",
+        "forma_prestacao": "Prestação direta por entidade da administração pública indireta",
+        "instrumento_delegacao": null,
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Barão do Rio Branco, 176, Centro",
+        "siteUrl": "https://corguinho.ms.gov.br/carta-de-servicos/estrutura-organizacional",
+        "siteLabel": "Página do SAAE de Corguinho",
+        "fonteEndereco": "https://corguinho.ms.gov.br/carta-de-servicos/estrutura-organizacional",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Bar%C3%A3o%20do%20Rio%20Branco%2C%20176%2C%20Centro%2C%20Corguinho%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003157",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Flávio Derzi, 1837, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Fl%C3%A1vio%20Derzi%2C%201837%2C%20Centro%2C%20Coronel%20Sapucaia%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003207",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Cabral, 1018, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Cabral%2C%201018%2C%20Centro%2C%20Corumb%C3%A1%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003256",
+      "prestador": {
+        "nome": "Serviço Municipal de Águas e Esgotos",
+        "sigla": "SAAE",
+        "natureza_juridica": "Autarquia",
+        "area_atuacao": "Sede e localidades",
+        "forma_prestacao": "Prestação direta por entidade da administração pública indireta",
+        "instrumento_delegacao": null,
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua José Narciso Totó, 414, Centro",
+        "siteUrl": "https://www.costarica.ms.gov.br/",
+        "siteLabel": "Site da Prefeitura de Costa Rica",
+        "fonteEndereco": "https://www.costarica.ms.gov.br/portal/noticias/0/3/4424/exservidora-vera-alice-garcia-da-nome-ao-atual-predio-sede-do-saae-de-costa-rica",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Jos%C3%A9%20Narciso%20Tot%C3%B3%2C%20414%2C%20Centro%2C%20Costa%20Rica%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003306",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Antônio de Albuquerque, 531, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Ant%C3%B4nio%20de%20Albuquerque%2C%20531%2C%20Centro%2C%20Coxim%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003454",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Padre Amadeu Amadori, 915, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Padre%20Amadeu%20Amadori%2C%20915%2C%20Centro%2C%20Deod%C3%A1polis%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003488",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Reginaldo Lemes da Silva, 91, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Reginaldo%20Lemes%20da%20Silva%2C%2091%2C%20Centro%2C%20Dois%20Irm%C3%A3os%20do%20Buriti%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003504",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Áurea Barbosa Serqueira, 57, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20%C3%81urea%20Barbosa%20Serqueira%2C%2057%2C%20Centro%2C%20Douradina%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003702",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Onofre Pereira de Matos, 1330, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Onofre%20Pereira%20de%20Matos%2C%201330%2C%20Centro%2C%20Dourados%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003751",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Venceslau Onório da Silva, 405, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Venceslau%20On%C3%B3rio%20da%20Silva%2C%20405%2C%20Centro%2C%20Eldorado%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003801",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Ataulfo de Matos, 1349, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Ataulfo%20de%20Matos%2C%201349%2C%20Centro%2C%20F%C3%A1tima%20do%20Sul%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5003900",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Castro Alves, s/n, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Castro%20Alves%2C%20s%2Fn%2C%20Centro%2C%20Figueir%C3%A3o%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5004007",
+      "prestador": {
+        "nome": "Prefeitura Municipal de Glória de Dourados",
+        "sigla": "PMGD",
+        "natureza_juridica": "Município",
+        "area_atuacao": "Sede e localidades",
+        "forma_prestacao": "Prestação direta por órgão da administração pública direta",
+        "instrumento_delegacao": null,
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": null,
+        "siteUrl": "https://www.gloriadedourados.ms.gov.br/",
+        "siteLabel": "Site da Prefeitura de Glória de Dourados",
+        "fonteEndereco": null,
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Prefeitura%20Municipal%20de%20Gl%C3%B3ria%20de%20Dourados%2C%20Gl%C3%B3ria%20de%20Dourados%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5004106",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Juscelino Kubitschek, 2034, Vila São Miguel",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Juscelino%20Kubitschek%2C%202034%2C%20Vila%20S%C3%A3o%20Miguel%2C%20Guia%20Lopes%20da%20Laguna%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5004304",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Presidente Vargas, 1726, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Presidente%20Vargas%2C%201726%2C%20Centro%2C%20Iguatemi%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5004403",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Albertina Garcia Dias, 599, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Albertina%20Garcia%20Dias%2C%20599%2C%20Centro%2C%20Inoc%C3%AAncia%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5004502",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Antônio João Ribeiro, 575, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Ant%C3%B4nio%20Jo%C3%A3o%20Ribeiro%2C%20575%2C%20Centro%2C%20Itapor%C3%A3%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5004601",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Dourados, 1441, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Dourados%2C%201441%2C%20Centro%2C%20Itaquira%C3%AD%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5004700",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Yolanda M. Mauger, 497, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Yolanda%20M.%20Mauger%2C%20497%2C%20Centro%2C%20Ivinhema%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5004809",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Aquidauana, 188, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Aquidauana%2C%20188%2C%20Centro%2C%20Japor%C3%A3%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5004908",
+      "prestador": {
+        "nome": "Serviço Autônomo de Água e Esgoto",
+        "sigla": "SAAE",
+        "natureza_juridica": "Autarquia",
+        "area_atuacao": "Sede",
+        "forma_prestacao": "Prestação direta por entidade da administração pública indireta",
+        "instrumento_delegacao": null,
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": null,
+        "siteUrl": "https://www.jaraguari.ms.gov.br/",
+        "siteLabel": "Site da Prefeitura de Jaraguari",
+        "fonteEndereco": null,
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Servi%C3%A7o%20Aut%C3%B4nomo%20de%20%C3%81gua%20e%20Esgoto%2C%20Jaraguari%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5005004",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida 11 de Dezembro, 1280, Vila Angélica II",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%2011%20de%20Dezembro%2C%201280%2C%20Vila%20Ang%C3%A9lica%20II%2C%20Jardim%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5005103",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Miguel Lopes Falheiros, 321, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Miguel%20Lopes%20Falheiros%2C%20321%2C%20Centro%2C%20Jate%C3%AD%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5005152",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Duque de Caxias, s/n, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Duque%20de%20Caxias%2C%20s%2Fn%2C%20Centro%2C%20Juti%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5005202",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Comandante Souza Lobo, 479, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Comandante%20Souza%20Lobo%2C%20479%2C%20Centro%2C%20Lad%C3%A1rio%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5005251",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Manoel Ribeiro da Rocha, s/n, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Manoel%20Ribeiro%20da%20Rocha%2C%20s%2Fn%2C%20Centro%2C%20Laguna%20Carap%C3%A3%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5005400",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Santa Maria, 360, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Santa%20Maria%2C%20360%2C%20Centro%2C%20Maracaju%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5005608",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Benjamim Constant, 741, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Benjamim%20Constant%2C%20741%2C%20Centro%2C%20Miranda%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5005681",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Campo Grande, 1096, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Campo%20Grande%2C%201096%2C%20Centro%2C%20Mundo%20Novo%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5005707",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Praça Prefeito Euclides Antônio Fabris, 211, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Pra%C3%A7a%20Prefeito%20Euclides%20Ant%C3%B4nio%20Fabris%2C%20211%2C%20Centro%2C%20Navira%C3%AD%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5005806",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Princesa Isabel, 913, Jardim Ouro Verde",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Princesa%20Isabel%2C%20913%2C%20Jardim%20Ouro%20Verde%2C%20Nioaque%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5006002",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Irineu de Souza Araújo, 983, Jardim Eldorado",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Irineu%20de%20Souza%20Ara%C3%BAjo%2C%20983%2C%20Jardim%20Eldorado%2C%20Nova%20Alvorada%20do%20Sul%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5006200",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua São José, 25, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20S%C3%A3o%20Jos%C3%A9%2C%2025%2C%20Centro%2C%20Nova%20Andradina%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5006259",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua José Yamashita, s/n, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Jos%C3%A9%20Yamashita%2C%20s%2Fn%2C%20Centro%2C%20Novo%20Horizonte%20do%20Sul%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5006275",
+      "prestador": {
+        "nome": "Serviço Autônomo de Água e Esgoto de Paraíso das Águas",
+        "sigla": "SAAE",
+        "natureza_juridica": "Autarquia",
+        "area_atuacao": "Sede",
+        "forma_prestacao": "Prestação direta por entidade da administração pública indireta",
+        "instrumento_delegacao": null,
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": null,
+        "siteUrl": "https://www.paraisodasaguas.ms.gov.br/",
+        "siteLabel": "Site da Prefeitura de Paraíso das Águas",
+        "fonteEndereco": null,
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Servi%C3%A7o%20Aut%C3%B4nomo%20de%20%C3%81gua%20e%20Esgoto%20de%20Para%C3%ADso%20das%20%C3%81guas%2C%20Para%C3%ADso%20das%20%C3%81guas%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5006309",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Autogamis Rodrigues da Silva, 835, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Autogamis%20Rodrigues%20da%20Silva%2C%20835%2C%20Centro%2C%20Parana%C3%ADba%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5006358",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Airton Senna da Silva, 2064, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Airton%20Senna%20da%20Silva%2C%202064%2C%20Centro%2C%20Paranhos%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5006408",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Pernambuco, 561, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Pernambuco%2C%20561%2C%20Centro%2C%20Pedro%20Gomes%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5006606",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua General Osório, 32, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20General%20Os%C3%B3rio%2C%2032%2C%20Centro%2C%20Ponta%20Por%C3%A3%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5006903",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Dr. Corrêa, 230, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Dr.%20Corr%C3%AAa%2C%20230%2C%20Centro%2C%20Porto%20Murtinho%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007109",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Argeu Silveira Lima, 1775, Santos Dumont",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Argeu%20Silveira%20Lima%2C%201775%2C%20Santos%20Dumont%2C%20Ribas%20do%20Rio%20Pardo%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007208",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Sidney Coelho Nogueira, 1285, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Sidney%20Coelho%20Nogueira%2C%201285%2C%20Centro%2C%20Rio%20Brilhante%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007307",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Cantareira, 270, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Cantareira%2C%20270%2C%20Centro%2C%20Rio%20Negro%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007406",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Marechal Mascarenhas, 100, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Marechal%20Mascarenhas%2C%20100%2C%20Centro%2C%20Rio%20Verde%20de%20Mato%20Grosso%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007505",
+      "prestador": {
+        "nome": "Prefeitura Municipal de Rochedo",
+        "sigla": "PMR",
+        "natureza_juridica": "Municipio",
+        "area_atuacao": "Sede",
+        "forma_prestacao": null,
+        "instrumento_delegacao": null,
+        "fonte": "Instituto Agua e Saneamento / SINISA 2024",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": null,
+        "siteUrl": "https://www.rochedo.ms.gov.br/",
+        "siteLabel": "Site da Prefeitura de Rochedo",
+        "fonteEndereco": null,
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Prefeitura%20Municipal%20de%20Rochedo%2C%20Rochedo%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007554",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua João Ferreira da Silva, 1715, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Jo%C3%A3o%20Ferreira%20da%20Silva%2C%201715%2C%20Centro%2C%20Santa%20Rita%20do%20Pardo%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007695",
+      "prestador": {
+        "nome": "Serviço Autônomo de Água e Esgoto",
+        "sigla": "SAAE",
+        "natureza_juridica": "Autarquia",
+        "area_atuacao": "Sede e localidades",
+        "forma_prestacao": "Prestação direta por entidade da administração pública indireta",
+        "instrumento_delegacao": null,
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Minas Gerais, 855, Centro",
+        "siteUrl": "https://www.saogabriel.ms.gov.br/secretaria/inicio/saae/8",
+        "siteLabel": "Página do SAAE de São Gabriel do Oeste",
+        "fonteEndereco": "https://www.saogabriel.ms.gov.br/secretaria/inicio/saae/8",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Minas%20Gerais%2C%20855%2C%20Centro%2C%20S%C3%A3o%20Gabriel%20do%20Oeste%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007703",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Érico Veríssimo, 1296, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20%C3%89rico%20Ver%C3%ADssimo%2C%201296%2C%20Centro%2C%20Sete%20Quedas%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007802",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua João Selvírio de Souza, 1527, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Jo%C3%A3o%20Selv%C3%ADrio%20de%20Souza%2C%201527%2C%20Centro%2C%20Selv%C3%ADria%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007901",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Dorvalino dos Santos, 11, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Dorvalino%20dos%20Santos%2C%2011%2C%20Centro%2C%20Sidrol%C3%A2ndia%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007935",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua do Governo, 536, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20do%20Governo%2C%20536%2C%20Centro%2C%20Sonora%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007950",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo apenas Sede - DS",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Antônio Tomás de Paiva, 561, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Ant%C3%B4nio%20Tom%C3%A1s%20de%20Paiva%2C%20561%2C%20Centro%2C%20Tacuru%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5007976",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Felinto Müller, 1658, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Felinto%20M%C3%BCller%2C%201658%2C%20Centro%2C%20Taquarussu%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5008008",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Dom Aquino, 260, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Dom%20Aquino%2C%20260%2C%20Centro%2C%20Terenos%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5008305",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Avenida Antônio Trajano dos Santos, 511, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Avenida%20Ant%C3%B4nio%20Trajano%20dos%20Santos%2C%20511%2C%20Centro%2C%20Tr%C3%AAs%20Lagoas%2C%20MS"
+      }
+    },
+    {
+      "codigo_ibge": "5008404",
+      "prestador": {
+        "nome": "Empresa de Saneamento de Mato Grosso do Sul S/A",
+        "sigla": "SANESUL",
+        "natureza_juridica": "Sociedade de economia mista",
+        "area_atuacao": "Com delegação atendendo Sede e Localidades - DSL",
+        "forma_prestacao": "Prestação indireta delegada mediante contrato de programa",
+        "instrumento_delegacao": "Contrato de Programa",
+        "fonte": "SINISA 2024 - Abastecimento de Agua, base municipal (ano de referencia 2023)",
+        "ano_referencia": 2023
+      },
+      "atendimento": {
+        "endereco": "Rua Rainha dos Apóstolos, 975, Centro",
+        "siteUrl": "https://www.sanesul.ms.gov.br/",
+        "siteLabel": "Site da Sanesul",
+        "fonteEndereco": "https://www.sanesul.ms.gov.br/Content/upload/telefones.pdf",
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Rua%20Rainha%20dos%20Ap%C3%B3stolos%2C%20975%2C%20Centro%2C%20Vicentina%2C%20MS"
+      }
+    }
+  ],
+  "documentos": [
+    {
+      "codigo_ibge": "5003702",
+      "tipo": "conselho",
+      "url": "https://www.camaradourados.ms.gov.br/portal/noticias/0/3/7774/camara-de-dourados-aprova-mudancas-na-reurb-e-vincula-conselho-de-saneamento-a-semsur/",
+      "direto": true
+    },
+    {
+      "codigo_ibge": "5003702",
+      "tipo": "plano_saneamento",
+      "url": "https://do.dourados.ms.gov.br/wp-content/uploads/2019/01/ANEXO-1.pdf",
+      "direto": true
+    }
+  ]
+}

@@ -26,8 +26,14 @@ def test_defaults_relacionamentos_e_schemas(db_session: Session) -> None:
 @pytest.mark.parametrize(
     ("primeiro", "duplicado"),
     [
-        (Municipio(codigo_ibge="5099981", nome="Original", uf="MS"), Municipio(codigo_ibge="5099981", nome="Duplicado", uf="MS")),
-        (Indicador(codigo="codigo_unico_teste", nome="Original", tema="Teste"), Indicador(codigo="codigo_unico_teste", nome="Duplicado", tema="Teste")),
+        (
+            Municipio(codigo_ibge="5099981", nome="Original", uf="MS"),
+            Municipio(codigo_ibge="5099981", nome="Duplicado", uf="MS"),
+        ),
+        (
+            Indicador(codigo="codigo_unico_teste", nome="Original", tema="Teste"),
+            Indicador(codigo="codigo_unico_teste", nome="Duplicado", tema="Teste"),
+        ),
     ],
 )
 def test_campos_de_negocio_sao_unicos(db_session: Session, primeiro: object, duplicado: object) -> None:
@@ -50,5 +56,7 @@ def test_valor_nao_duplica_mesma_chave_de_importacao(db_session: Session) -> Non
 
     with pytest.raises(IntegrityError):
         with db_session.begin_nested():
-            db_session.add(ValorIndicador(municipio=municipio, indicador=indicador, fonte_dados=fonte, ano=2023, valor=20))
+            db_session.add(
+                ValorIndicador(municipio=municipio, indicador=indicador, fonte_dados=fonte, ano=2023, valor=20)
+            )
             db_session.flush()

@@ -24,9 +24,7 @@ def main() -> None:
         dourados.populacao, dourados.area_km2 = 264_017, 4_086.2
         gloria.populacao, gloria.area_km2 = 10_817, 491.0
 
-        indicadores = {
-            item.codigo: item for item in db.scalars(select(Indicador)).all()
-        }
+        indicadores = {item.codigo: item for item in db.scalars(select(Indicador)).all()}
         for indice, (codigo, *_resto) in enumerate(INDICADORES_INICIAIS):
             indicador = indicadores[codigo]
             for municipio, deslocamento in ((dourados, 0), (gloria, -8)):
