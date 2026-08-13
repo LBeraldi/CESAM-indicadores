@@ -106,7 +106,7 @@ export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: strin
   }, [codigoIbge, features]);
 
   return (
-    <div className="overflow-hidden rounded-md border border-ms-line bg-white shadow-sm">
+    <div className="flex h-full min-h-[17rem] flex-col overflow-hidden rounded-md border border-ms-line bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-ms-line px-4 py-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-ms-green">Localização no estado</p>
@@ -114,9 +114,9 @@ export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: strin
         </div>
         <MapPin className="h-5 w-5 text-ms-blue" />
       </div>
-      <div className="relative bg-gradient-to-br from-ms-sky to-white p-2">
+      <div className="relative flex min-h-0 flex-1 items-center bg-gradient-to-br from-ms-sky to-white p-2">
         {desenho ? (
-          <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="mx-auto block h-52 w-full" role="img" aria-label={`Mapa de Mato Grosso do Sul com ${municipio} destacado`}>
+          <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="mx-auto block h-48 w-full" role="img" aria-label={`Mapa de Mato Grosso do Sul com ${municipio} destacado`}>
             {desenho.paths.map((path) => {
               const selecionado = path.codigo === codigoIbge;
               return (
@@ -138,7 +138,7 @@ export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: strin
             ) : null}
           </svg>
         ) : (
-          <div className="flex h-52 items-center justify-center text-sm text-ms-muted">Carregando localização...</div>
+          <div className="flex h-48 w-full items-center justify-center text-sm text-ms-muted">Carregando localização...</div>
         )}
         <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-md border border-ms-line bg-white/95 px-2.5 py-1.5 text-xs font-medium text-ms-muted shadow-sm">
           <span className="h-3 w-3 rounded-sm bg-ms-green" />

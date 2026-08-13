@@ -21,7 +21,7 @@ def _preferencia_fonte():
 def _slug(value: str) -> str:
     normalized = unicodedata.normalize("NFKD", value or "")
     ascii_text = normalized.encode("ascii", "ignore").decode("ascii")
-    return ascii_text.lower().strip().replace(" ", "_")
+    return ascii_text.lower().strip().replace("-", "_").replace(" ", "_")
 
 
 def tema_matches(actual: str, requested: str) -> bool:

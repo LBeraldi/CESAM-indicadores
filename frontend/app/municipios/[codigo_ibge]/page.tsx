@@ -54,14 +54,27 @@ export default async function MunicipioDetalhePage({ params }: Props) {
       </Link>
 
       <section className="mt-6 border-b border-ms-line pb-6">
-        <p className="text-sm font-semibold uppercase tracking-wide text-ms-green">{municipio.uf}</p>
-        <div className="mt-2 grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-4xl font-semibold tracking-normal text-ms-ink">{municipio.nome}</h1>
-            <div className="mt-3 max-w-4xl rounded-md border border-ms-line bg-white p-4 shadow-sm">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <p className="text-sm font-semibold uppercase tracking-wide text-ms-green">Município de {municipio.uf}</p>
+            <h1 className="mt-1 text-4xl font-semibold tracking-normal text-ms-ink">{municipio.nome}</h1>
+          </div>
+          <div className="flex flex-wrap gap-2 text-xs font-medium text-ms-muted sm:justify-end">
+            <span className="inline-flex items-center rounded-full border border-ms-line bg-white px-3 py-1.5">
+              Código IBGE&nbsp;<strong className="text-ms-ink">{municipio.codigo_ibge}</strong>
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-ms-sky px-3 py-1.5 text-ms-blue">
+              <Database className="h-3.5 w-3.5" />
+              <strong>{indicadores.length}</strong> registros disponíveis
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-4 grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(19rem,0.75fr)]">
+          <div className="h-full rounded-md border border-ms-line bg-white p-5 shadow-sm">
+              <div className="flex h-full flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                 <div className="flex min-w-0 gap-3">
-                  <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-ms-sky text-ms-blue">
+                  <span className="mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-ms-sky text-ms-blue">
                     <Droplets className="h-5 w-5" />
                   </span>
                   <div className="min-w-0">
@@ -78,7 +91,7 @@ export default async function MunicipioDetalhePage({ params }: Props) {
                     <p className="mt-2 text-xs text-ms-muted">Prestador: {prestadorAgua?.fonte ?? "Fonte não informada"}</p>
                   </div>
                 </div>
-                <div className="flex shrink-0 flex-wrap gap-2 lg:max-w-72 lg:justify-end">
+                <div className="flex shrink-0 flex-wrap gap-2 xl:max-w-72 xl:justify-end">
                   {atendimentoPrestador ? (
                     <>
                       <a
@@ -103,24 +116,14 @@ export default async function MunicipioDetalhePage({ params }: Props) {
                     </>
                   ) : null}
                   {prestadorAgua?.areaAtuacao ? (
-                    <span className="w-fit rounded-md bg-ms-bg px-3 py-2 text-xs font-medium text-ms-muted">
+                    <span className="w-full rounded-md bg-ms-bg px-3 py-2 text-xs font-medium leading-5 text-ms-muted xl:text-right">
                       {prestadorAgua.areaAtuacao}
                     </span>
                   ) : null}
                 </div>
               </div>
-            </div>
-            <p className="mt-2 text-sm text-ms-muted">
-              Código IBGE {municipio.codigo_ibge}
-            </p>
           </div>
-          <div className="grid gap-3">
-            <MiniMapaMunicipio codigoIbge={municipio.codigo_ibge} municipio={municipio.nome} />
-            <div className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ms-sky px-3 py-2 text-sm font-medium text-ms-blue">
-              <Database className="h-4 w-4" />
-              {indicadores.length} registros disponíveis
-            </div>
-          </div>
+          <MiniMapaMunicipio codigoIbge={municipio.codigo_ibge} municipio={municipio.nome} />
         </div>
       </section>
 
