@@ -1,9 +1,9 @@
 fastapi==0.141.1
-uvicorn[standard]==0.34.0
-SQLAlchemy==2.0.36
-psycopg[binary]==3.2.3
-alembic==1.14.0
+uvicorn[standard]==0.52.1
+SQLAlchemy==2.0.51
+psycopg[binary]==3.3.4
+alembic==1.19.1
 pandas==2.2.3
 openpyxl==3.1.5
-xlrd==2.0.1
+xlrd==2.0.2
 python-dotenv==1.2.2
