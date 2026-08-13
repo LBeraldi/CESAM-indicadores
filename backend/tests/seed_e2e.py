@@ -1,6 +1,11 @@
 """Popula apenas os dados determinísticos necessários aos testes E2E do CI."""
 
+import sys
+from pathlib import Path
+
 from sqlalchemy import select
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.database import SessionLocal
 from app.models import FonteDados, Indicador, Municipio, ValorIndicador
