@@ -27,7 +27,7 @@ jobs:
     env:
       DATABASE_URL: postgresql+psycopg://observatorio_saneamento:observatorio_saneamento@localhost:5432/observatorio_saneamento
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -46,7 +46,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v5
         with:
           node-version: 20
@@ -61,7 +61,7 @@ jobs:
   containers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - run: docker compose config --quiet
       - run: docker compose -f docker-compose.prod.yml --env-file .env.production.example config --quiet
       - run: docker compose build backend frontend
@@ -86,7 +86,7 @@ jobs:
       NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
       API_INTERNAL_URL: http://127.0.0.1:8000
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
