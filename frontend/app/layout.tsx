@@ -63,32 +63,32 @@ export default function RootLayout({
               </Link>
 
               <nav
-                className="-mx-4 flex flex-nowrap items-center justify-between gap-1 overflow-x-auto px-4 text-sm font-medium text-ms-muted [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:justify-start sm:gap-2 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
+                className="-mx-4 flex flex-nowrap items-center justify-between gap-0 overflow-x-auto px-4 text-sm font-medium text-ms-muted [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:justify-start sm:gap-2 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
                 aria-label="Navegacao principal"
               >
                 <Link
                   href="/"
-                  className="inline-flex h-10 shrink-0 items-center rounded-md px-2 hover:bg-ms-sky hover:text-ms-blue sm:px-3"
+                  className="inline-flex h-10 shrink-0 items-center rounded-md px-1.5 hover:bg-ms-sky hover:text-ms-blue sm:px-3"
                 >
                   Visao geral
                 </Link>
                 <Link
                   href="/municipios"
-                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md px-2 hover:bg-ms-sky hover:text-ms-blue sm:gap-2 sm:px-3"
+                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md px-1.5 hover:bg-ms-sky hover:text-ms-blue sm:gap-2 sm:px-3"
                 >
                   <BarChart3 className="h-4 w-4" />
                   Municipios
                 </Link>
                 <Link
                   href="/ranking"
-                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md px-2 hover:bg-ms-sky hover:text-ms-blue sm:gap-2 sm:px-3"
+                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md px-1.5 hover:bg-ms-sky hover:text-ms-blue sm:gap-2 sm:px-3"
                 >
                   <Trophy className="h-4 w-4" />
                   Ranking
                 </Link>
                 <a
                   href={`${apiUrl}/docs`}
-                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md border border-ms-line bg-white px-2 text-ms-ink hover:border-ms-blue hover:text-ms-blue sm:gap-2 sm:px-3"
+                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md border border-ms-line bg-white px-1.5 text-ms-ink hover:border-ms-blue hover:text-ms-blue sm:gap-2 sm:px-3"
                 >
                   <Database className="h-4 w-4" />
                   API
