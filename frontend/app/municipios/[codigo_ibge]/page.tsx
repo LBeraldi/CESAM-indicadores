@@ -75,6 +75,7 @@ export default async function MunicipioDetalhePage({ params }: Props) {
       <ResumoMunicipio
         municipio={municipio}
         atendimento={institucional.atendimento_agua}
+        indicadores={indicadores}
         totalRegistros={indicadores.length}
       />
 

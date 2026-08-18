@@ -64,6 +64,35 @@ export function ordemTema(tema: string): number {
   return index === -1 ? TEMA_ORDEM.length : index;
 }
 
+export type CoberturaTema = {
+  tema: string;
+  config: TemaConfig;
+  coberto: boolean;
+};
+
+/**
+ * Um tema conta como coberto quando há pelo menos um valor não nulo com
+ * status_validacao "oficial_sinisa" ou "oficial_snis" — a união das duas
+ * fontes oficiais, não só a mais recente. Propositalmente mais permissivo
+ * que o padrão de app/scripts/relatorio_cobertura_temas.py (que isola
+ * --fonte oficial_sinisa): aqui o objetivo é responder "o site tem algum
+ * dado oficial pra mostrar nesse tema", não "o SINISA 2023 cobriu esse
+ * município".
+ */
+export function calcularCobertura(indicadores: ValorIndicador[]): CoberturaTema[] {
+  const temasComDadoOficial = new Set(
+    indicadores
+      .filter((valor) => valor.valor !== null && valor.status_validacao.includes("oficial"))
+      .map((valor) => valor.indicador.tema),
+  );
+
+  return TEMA_ORDEM.map((tema) => ({
+    tema,
+    config: temaConfig(tema),
+    coberto: temasComDadoOficial.has(tema),
+  }));
+}
+
 export function calcularScore(valores: ValorIndicador[]): number | null {
   const percentuais = valores
     .filter(
