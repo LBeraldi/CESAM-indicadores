@@ -1,18 +1,21 @@
-import { Database, Droplets, ExternalLink, Globe2, MapPinned, Navigation } from "lucide-react";
+import { CheckCircle2, Database, Droplets, ExternalLink, Globe2, MapPinned, MinusCircle, Navigation } from "lucide-react";
 
 import { MiniMapaMunicipio } from "@/components/MiniMapaMunicipio";
-import type { AtendimentoAgua, Municipio } from "@/lib/api";
+import { calcularCobertura } from "@/components/municipio/fichaConfig";
+import type { AtendimentoAgua, Municipio, ValorIndicador } from "@/lib/api";
 
 type Props = {
   municipio: Municipio;
   atendimento: AtendimentoAgua | null;
+  indicadores: ValorIndicador[];
   totalRegistros: number;
 };
 
-export function ResumoMunicipio({ municipio, atendimento, totalRegistros }: Props) {
+export function ResumoMunicipio({ municipio, atendimento, indicadores, totalRegistros }: Props) {
   const prestador = atendimento
     ? `${atendimento.prestador_nome}${atendimento.sigla ? ` (${atendimento.sigla})` : ""}`
     : "Não informado";
+  const cobertura = calcularCobertura(indicadores);
 
   return (
     <section className="mt-6 border-b border-ms-line pb-6">
@@ -30,6 +33,34 @@ export function ResumoMunicipio({ municipio, atendimento, totalRegistros }: Prop
             <strong>{totalRegistros}</strong> registros disponíveis
           </span>
         </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <span className="text-xs font-semibold uppercase tracking-wide text-ms-muted">Cobertura oficial</span>
+        {cobertura.map(({ tema, config, coberto }) => {
+          const Icon = config.icon;
+          return (
+            <span
+              key={tema}
+              title={
+                coberto
+                  ? `${tema}: dado oficial (SINISA ou SNIS) disponível para este município.`
+                  : `${tema}: nenhuma fonte oficial reportou dado para este município até o momento.`
+              }
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ${
+                coberto ? config.panelClass : "bg-ms-bg text-ms-muted"
+              }`}
+            >
+              <Icon className={`h-3.5 w-3.5 ${coberto ? "" : "opacity-50"}`} />
+              {tema}
+              {coberto ? (
+                <CheckCircle2 className="h-3.5 w-3.5" />
+              ) : (
+                <MinusCircle className="h-3.5 w-3.5 opacity-50" />
+              )}
+            </span>
+          );
+        })}
       </div>
 
       <div className="mt-4 grid items-stretch gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(19rem,0.75fr)]">

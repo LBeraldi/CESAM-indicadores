@@ -1,13 +1,32 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, MapPinned } from "lucide-react";
 import { FichaMunicipal } from "@/components/FichaMunicipal";
 import { ResumoMunicipio } from "@/components/municipio/ResumoMunicipio";
-import { fetchApi, fetchApiSafe, type IndicadoresMunicipio, type InstitucionalMunicipio } from "@/lib/api";
+import { fetchApi, fetchApiSafe, type IndicadoresMunicipio, type InstitucionalMunicipio, type Municipio } from "@/lib/api";
 
 type Props = {
   params: Promise<{ codigo_ibge: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { codigo_ibge } = await params;
+
+  try {
+    const municipio = await fetchApi<Municipio>(`/municipios/${codigo_ibge}`);
+    const titulo = `Saneamento em ${municipio.nome} (${municipio.uf})`;
+    const descricao = `Indicadores oficiais de água, esgoto, resíduos sólidos e águas pluviais de ${municipio.nome} - ${municipio.uf}, com série histórica e dados institucionais do prestador de serviço.`;
+
+    return {
+      title: titulo,
+      description: descricao,
+      alternates: { canonical: `/municipios/${municipio.codigo_ibge}` }
+    };
+  } catch {
+    return { title: "Município" };
+  }
+}
 
 export default async function MunicipioDetalhePage({ params }: Props) {
   const { codigo_ibge } = await params;
@@ -56,6 +75,7 @@ export default async function MunicipioDetalhePage({ params }: Props) {
       <ResumoMunicipio
         municipio={municipio}
         atendimento={institucional.atendimento_agua}
+        indicadores={indicadores}
         totalRegistros={indicadores.length}
       />
 
