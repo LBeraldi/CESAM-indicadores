@@ -10,23 +10,22 @@ const DESCRICAO =
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3002"),
-  title: TITULO,
+  title: {
+    default: TITULO,
+    template: `%s | ${TITULO}`
+  },
   description: DESCRICAO,
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg"
   },
   openGraph: {
-    title: TITULO,
-    description: DESCRICAO,
     locale: "pt_BR",
     type: "website",
     images: ["/brand/observatorio-saneamento.svg"]
   },
   twitter: {
     card: "summary_large_image",
-    title: TITULO,
-    description: DESCRICAO,
     images: ["/brand/observatorio-saneamento.svg"]
   }
 };
