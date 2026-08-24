@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type ElementType } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ElementType } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
@@ -34,6 +34,7 @@ export function DropdownNavigation({ navItems }: Props) {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [alignRight, setAlignRight] = useState<Record<string, boolean>>({});
   const panelRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const navRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
     if (!openMenu) return;
@@ -53,8 +54,31 @@ export function DropdownNavigation({ navItems }: Props) {
     return () => window.removeEventListener("resize", resetAlignment);
   }, []);
 
+  useEffect(() => {
+    if (!openMenu) return;
+
+    function fecharSeForaOuEscape(event: MouseEvent | TouchEvent | KeyboardEvent) {
+      if (event instanceof KeyboardEvent) {
+        if (event.key === "Escape") setOpenMenu(null);
+        return;
+      }
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setOpenMenu(null);
+      }
+    }
+
+    document.addEventListener("click", fecharSeForaOuEscape);
+    document.addEventListener("touchstart", fecharSeForaOuEscape);
+    document.addEventListener("keydown", fecharSeForaOuEscape);
+    return () => {
+      document.removeEventListener("click", fecharSeForaOuEscape);
+      document.removeEventListener("touchstart", fecharSeForaOuEscape);
+      document.removeEventListener("keydown", fecharSeForaOuEscape);
+    };
+  }, [openMenu]);
+
   return (
-    <nav className="relative" aria-label="Navegação principal">
+    <nav ref={navRef} className="relative" aria-label="Navegação principal">
       <ul
         className="-mx-4 flex flex-nowrap items-center gap-0 overflow-x-auto px-4 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
       >
@@ -91,7 +115,7 @@ export function DropdownNavigation({ navItems }: Props) {
               onMouseEnter={() => setOpenMenu(navItem.label)}
               onMouseLeave={() => setOpenMenu(null)}
             >
-              {navItem.subMenus ? (
+              {navItem.subMenus && !navItem.link ? (
                 <button
                   type="button"
                   className={triggerClassName}
@@ -108,6 +132,8 @@ export function DropdownNavigation({ navItems }: Props) {
                   className={triggerClassName}
                   onMouseEnter={() => setHoveredId(navItem.id)}
                   onMouseLeave={() => setHoveredId(null)}
+                  onClick={() => setOpenMenu(null)}
+                  aria-expanded={navItem.subMenus ? isOpen : undefined}
                 >
                   {triggerContent}
                 </Link>

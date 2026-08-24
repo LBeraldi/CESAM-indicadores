@@ -118,13 +118,15 @@ def _obter_indicadores(db: Session) -> dict[str, models.Indicador]:
 
 
 def _limpar_importacao_anterior(db: Session) -> None:
+    """Remove os dados da importação anterior sem commitar: fica na mesma
+    transação dos novos inserts, para que uma falha no meio do import
+    restaure o estado anterior em vez de deixar o banco sem dados."""
     fontes = db.scalars(select(models.FonteDados).where(models.FonteDados.nome == FONTE_NOME)).all()
     fonte_ids = [fonte.id for fonte in fontes]
     if fonte_ids:
         db.execute(delete(models.ValorIndicador).where(models.ValorIndicador.fonte_dados_id.in_(fonte_ids)))
         db.execute(delete(models.FonteDados).where(models.FonteDados.id.in_(fonte_ids)))
     db.execute(delete(models.LogImportacao).where(models.LogImportacao.fonte == FONTE_NOME))
-    db.commit()
 
 
 def _criar_fonte(db: Session) -> models.FonteDados:
@@ -176,7 +178,7 @@ def _extrair_primeiro(zip_path: Path, marcador: str, destino: Path) -> Path:
             (
                 entrada
                 for entrada in entradas
-                if marcador in entrada and entrada.lower().endswith((".xlsx", ".xls", ".zip"))
+                if marcador in entrada and entrada.lower().endswith((".xlsx", ".xls", ".zip", ".rar"))
             ),
             None,
         )
@@ -365,6 +367,8 @@ def _importar_regulacao(
                 continue
             valor, erro = converter_valor(row[5])
             if erro or valor is None:
+                erros += 1
+                avisos.append(f"{sheet_name}: valor de regulação inválido/ausente para {codigo}")
                 continue
             # Se houver regulação em qualquer componente, o município possui
             # agência/regulador para a finalidade do indicador composto.
