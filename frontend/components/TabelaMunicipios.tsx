@@ -59,7 +59,9 @@ export function TabelaMunicipios({ municipios, codigosComDados }: Props) {
       <div className="rounded-md border border-ms-line bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-ms-green">Consulta municipal</p>
+            <p className="inline-block border-b-2 border-ms-green pb-1 text-xs font-semibold uppercase tracking-[0.16em] text-ms-green">
+              Consulta municipal
+            </p>
             <h1 className="mt-1 text-3xl font-semibold text-ms-ink">Municípios de Mato Grosso do Sul</h1>
             <p className="mt-2 text-sm text-ms-muted">
               {filtrados.length} de {municipios.length} municípios listados
@@ -117,10 +119,10 @@ export function TabelaMunicipios({ municipios, codigosComDados }: Props) {
                         <span className="font-semibold text-ms-ink">{municipio.nome}</span>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4 text-ms-muted">
+                    <td className="font-data whitespace-nowrap px-5 py-4 text-ms-muted">
                       {municipio.populacao ? municipio.populacao.toLocaleString("pt-BR") : "Não informada"}
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4 text-ms-muted">
+                    <td className="font-data whitespace-nowrap px-5 py-4 text-ms-muted">
                       {municipio.area_km2 ? municipio.area_km2.toLocaleString("pt-BR") : "Não informada"}
                     </td>
                     <td className="whitespace-nowrap px-5 py-4">

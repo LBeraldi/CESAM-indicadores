@@ -20,8 +20,14 @@ const config: Config = {
           navy: "#0c2d57",
           green: "#18765a",
           teal: "#0f766e",
-          amber: "#b7791f"
+          amber: "#b7791f",
+          terra: "#b4552b"
         }
+      },
+      fontFamily: {
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        serif: ["var(--font-display)", "Georgia", "serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "monospace"]
       },
       boxShadow: {
         soft: "0 18px 45px rgba(16, 32, 51, 0.08)"

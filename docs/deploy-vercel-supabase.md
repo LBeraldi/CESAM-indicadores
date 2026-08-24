@@ -26,6 +26,9 @@ vercel env run -e production -- python -m app.scripts.preparar_banco --seed
 ```
 
 Migrations e seed nunca são executados pelos workers HTTP. Essa etapa deve terminar antes de promover a nova API.
+Em uma VPS, o `db-init` também importa automaticamente os arquivos encontrados em `data/raw`; na Vercel, os arquivos
+oficiais devem ser importados explicitamente no ambiente de manutenção com `python -m app.scripts.importar_sinisa_2023`
+e, se necessário, `python -m app.scripts.importar_snis_historico`.
 
 ## 2. Frontend Next.js
 

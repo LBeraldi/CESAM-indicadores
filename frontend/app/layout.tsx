@@ -1,8 +1,31 @@
 import type { Metadata } from "next";
+import { Fraunces, IBM_Plex_Mono, Public_Sans } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
-import { BarChart3, Database, Trophy } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
 import "./globals.css";
+
+const fontSans = Public_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-sans",
+  display: "swap"
+});
+
+const fontDisplay = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-display",
+  display: "swap"
+});
+
+const fontMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap"
+});
 
 const TITULO = "Observatório de Saneamento";
 const DESCRICAO =
@@ -35,10 +58,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className={`${fontSans.variable} ${fontDisplay.variable} ${fontMono.variable}`}>
       <body className="min-h-screen bg-ms-bg font-sans text-ms-ink antialiased">
         <div className="flex min-h-screen flex-col">
           <header className="no-print sticky top-0 z-40 border-b border-ms-line/80 bg-white/95 backdrop-blur">
@@ -61,38 +84,7 @@ export default function RootLayout({
                 />
               </Link>
 
-              <nav
-                className="-mx-4 flex flex-nowrap items-center justify-between gap-0 overflow-x-auto px-4 text-sm font-medium text-ms-muted [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:justify-start sm:gap-2 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
-                aria-label="Navegacao principal"
-              >
-                <Link
-                  href="/"
-                  className="inline-flex h-10 shrink-0 items-center rounded-md px-1.5 hover:bg-ms-sky hover:text-ms-blue sm:px-3"
-                >
-                  Visao geral
-                </Link>
-                <Link
-                  href="/municipios"
-                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md px-1.5 hover:bg-ms-sky hover:text-ms-blue sm:gap-2 sm:px-3"
-                >
-                  <BarChart3 className="h-4 w-4" />
-                  Municipios
-                </Link>
-                <Link
-                  href="/ranking"
-                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md px-1.5 hover:bg-ms-sky hover:text-ms-blue sm:gap-2 sm:px-3"
-                >
-                  <Trophy className="h-4 w-4" />
-                  Ranking
-                </Link>
-                <a
-                  href={`${apiUrl}/docs`}
-                  className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-md border border-ms-line bg-white px-1.5 text-ms-ink hover:border-ms-blue hover:text-ms-blue sm:gap-2 sm:px-3"
-                >
-                  <Database className="h-4 w-4" />
-                  API
-                </a>
-              </nav>
+              <Navbar apiUrl={apiUrl} />
             </div>
           </header>
 

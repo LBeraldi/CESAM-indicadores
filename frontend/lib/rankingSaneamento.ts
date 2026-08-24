@@ -37,6 +37,7 @@ export type RankingSaneamentoItem = {
   codigo_ibge: string;
   municipio: string;
   uf: string;
+  ano: number;
   nota: number;
   agua: number;
   esgoto: number;
@@ -89,7 +90,7 @@ function pontuacaoIndicador(indicador: IndicadorRanking, valor: number, universo
 function pontuar(
   municipio: MunicipioRankingBase,
   universos: Map<string, number[]>
-): Omit<RankingSaneamentoItem, "posicao"> {
+): Omit<RankingSaneamentoItem, "posicao" | "ano"> {
   const notas: Record<Modulo, number[]> = {
     agua: [],
     esgoto: [],
@@ -146,10 +147,23 @@ function pontuar(
 export const INDICADORES_RANKING_SANEAMENTO = INDICADORES_RANKING.map((item) => item.codigo);
 
 export async function obterRankingSaneamento(limit = 79): Promise<RankingSaneamentoItem[]> {
-  const valores = await fetchApiSafe<RankingSaneamentoValor[]>(
+  let ano = ANO_RANKING_SANEAMENTO;
+  let valores = await fetchApiSafe<RankingSaneamentoValor[]>(
     `/ranking/saneamento?ano=${ANO_RANKING_SANEAMENTO}`,
     []
   );
+
+  // O SINISA 2023 é a preferência. Enquanto ele não estiver importado, a
+  // série histórica do SNIS continua permitindo exibir o último ano real,
+  // em vez de deixar mapa e ranking vazios.
+  if (valores.length === 0) {
+    const anos = await fetchApiSafe<number[]>("/indicadores/agua_atendimento_total/anos", []);
+    const anoDisponivel = anos[0];
+    if (anoDisponivel && anoDisponivel !== ANO_RANKING_SANEAMENTO) {
+      ano = anoDisponivel;
+      valores = await fetchApiSafe<RankingSaneamentoValor[]>(`/ranking/saneamento?ano=${ano}`, []);
+    }
+  }
   const rankings = INDICADORES_RANKING.map((indicador) => ({
     indicador: indicador.codigo,
     itens: valores.filter((item) => item.indicador === indicador.codigo)
@@ -178,7 +192,7 @@ export async function obterRankingSaneamento(limit = 79): Promise<RankingSaneame
   }
 
   return Array.from(municipios.values())
-    .map((municipio) => pontuar(municipio, universos))
+    .map((municipio) => ({ ...pontuar(municipio, universos), ano }))
     .sort((a, b) => b.nota - a.nota || b.cobertura - a.cobertura || a.municipio.localeCompare(b.municipio, "pt-BR"))
     .slice(0, limit)
     .map((item, index) => ({ ...item, posicao: index + 1 }));

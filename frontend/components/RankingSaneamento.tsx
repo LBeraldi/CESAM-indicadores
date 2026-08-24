@@ -23,6 +23,7 @@ export function RankingSaneamento({ ranking }: Props) {
   }
 
   const lider = ranking[0];
+  const ano = lider.ano ?? ANO_RANKING_SANEAMENTO;
 
   return (
     <section className="mx-auto min-w-0 max-w-7xl px-4 pb-8">
@@ -31,10 +32,12 @@ export function RankingSaneamento({ ranking }: Props) {
           <div className="min-w-0 p-5 md:p-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div className="min-w-0">
-                <p className="text-sm font-semibold uppercase tracking-wide text-ms-green">Referência PNQS/ABES</p>
+                <p className="inline-block border-b-2 border-ms-green pb-1 text-xs font-semibold uppercase tracking-[0.16em] text-ms-green">
+                  Referência PNQS/ABES
+                </p>
                 <h2 className="mt-1 text-2xl font-semibold text-ms-ink">Ranking municipal de saneamento</h2>
                 <p className="mt-2 max-w-3xl text-sm leading-6 text-ms-muted">
-                  Nota calculada pelo Observatório a partir de 16 indicadores dos cinco módulos do SINISA, em escala
+                  Nota calculada pelo Observatório a partir dos indicadores oficiais disponíveis dos cinco módulos do SINISA/SNIS, em escala
                   comparável de 0 a 100. Não representa certificação ou premiação oficial da ABES.
                 </p>
                 <details className="mt-3 max-w-3xl text-sm text-ms-muted">
@@ -51,7 +54,7 @@ export function RankingSaneamento({ ranking }: Props) {
               <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
                 <span className="inline-flex w-fit items-center gap-2 rounded-md bg-ms-bg px-3 py-2 text-sm font-medium text-ms-muted">
                   <Gauge className="h-4 w-4 text-ms-blue" />
-                  Ref. {ANO_RANKING_SANEAMENTO}
+                  Ref. {ano}
                 </span>
                 <Link href="/ranking" className="inline-flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-ms-blue hover:text-ms-navy">
                   Ver ranking completo
@@ -77,7 +80,7 @@ export function RankingSaneamento({ ranking }: Props) {
                   {ranking.map((item) => (
                     <tr key={item.codigo_ibge} className="align-top">
                       <td className="whitespace-nowrap py-4 pr-4">
-                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-ms-sky text-sm font-semibold text-ms-blue">
+                        <span className="font-data inline-flex h-8 w-8 items-center justify-center rounded-md bg-ms-sky text-sm font-semibold text-ms-blue">
                           {item.posicao}
                         </span>
                       </td>
@@ -92,23 +95,23 @@ export function RankingSaneamento({ ranking }: Props) {
                       </td>
                       <td className="min-w-28 py-4 pr-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-semibold text-ms-ink">{formatNota(item.nota)}</span>
+                          <span className="font-data text-lg font-semibold text-ms-ink">{formatNota(item.nota)}</span>
                           <div className="h-2 w-16 overflow-hidden rounded-full bg-ms-bg lg:w-20">
                             <div className="h-full rounded-full bg-ms-blue" style={{ width: barra(item.nota) }} />
                           </div>
                         </div>
                       </td>
                       <td className="min-w-20 py-4 pr-4">
-                        <span className="font-semibold text-ms-green">{formatNota(item.agua)}</span>
+                        <span className="font-data font-semibold text-ms-green">{formatNota(item.agua)}</span>
                       </td>
                       <td className="min-w-20 py-4 pr-4">
-                        <span className="font-semibold text-ms-blue">{formatNota(item.esgoto)}</span>
+                        <span className="font-data font-semibold text-ms-blue">{formatNota(item.esgoto)}</span>
                       </td>
                       <td className="min-w-20 py-4 pr-4">
-                        <span className="font-semibold text-ms-green">{formatNota(item.residuos)}</span>
+                        <span className="font-data font-semibold text-ms-green">{formatNota(item.residuos)}</span>
                       </td>
                       <td className="min-w-20 py-4 pr-4">
-                        <span className="font-semibold text-ms-blue">{formatNota(item.aguasPluviais)}</span>
+                        <span className="font-data font-semibold text-ms-blue">{formatNota(item.aguasPluviais)}</span>
                       </td>
                     </tr>
                   ))}
@@ -118,7 +121,7 @@ export function RankingSaneamento({ ranking }: Props) {
           </div>
 
           <aside className="min-w-0 border-t border-ms-line bg-ms-bg p-5 xl:border-l xl:border-t-0">
-            <div className="rounded-md bg-white p-4 shadow-sm">
+            <div className="ficha-campo rounded-md p-4">
               <div className="flex items-center gap-3">
                 <span className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-ms-blue text-white">
                   <Trophy className="h-5 w-5" />
@@ -128,7 +131,7 @@ export function RankingSaneamento({ ranking }: Props) {
                   <p className="font-semibold text-ms-ink">{lider.municipio}</p>
                 </div>
               </div>
-              <p className="mt-4 text-3xl font-semibold tracking-normal text-ms-blue">{formatNota(lider.nota)}</p>
+              <p className="font-data mt-4 text-3xl font-medium tracking-normal text-ms-blue">{formatNota(lider.nota)}</p>
               <p className="mt-1 text-xs text-ms-muted">Nota PNQS/ABES adaptada</p>
             </div>
 

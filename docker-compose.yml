@@ -18,7 +18,7 @@ services:
   db-init:
     build:
       context: ./backend
-    command: python -m app.scripts.preparar_banco --seed
+    command: python -m app.scripts.preparar_banco --seed --importar-dados
     environment:
       DATABASE_URL: postgresql+psycopg://observatorio_saneamento:observatorio_saneamento@db:5432/observatorio_saneamento
       DATA_DIR: /app/data
