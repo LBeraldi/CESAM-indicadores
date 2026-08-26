@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.database import get_db
+from app.services.institucional import obter_cadastro_estatico
 
 router = APIRouter(tags=["municipios"])
 
@@ -59,5 +61,21 @@ def obter_dados_institucionais(
     municipio = crud.get_municipio_by_codigo(db, codigo_ibge)
     if not municipio:
         raise HTTPException(status_code=404, detail="Municipio nao encontrado pelo codigo IBGE informado.")
-    atendimento, recursos = crud.get_institucional_municipio(db, municipio.id)
+    try:
+        atendimento, recursos = crud.get_institucional_municipio(db, municipio.id)
+    except ProgrammingError as erro:
+        # Durante o primeiro deploy a migration institucional pode ainda
+        # não ter sido aplicada. Servimos o catálogo versionado sem mascarar
+        # outros erros de banco.
+        sqlstate = getattr(getattr(erro, "orig", None), "sqlstate", None)
+        if sqlstate != "42P01" and "does not exist" not in str(erro).lower():
+            raise
+        atendimento, recursos = obter_cadastro_estatico(codigo_ibge)
+    else:
+        # Também cobre bancos já migrados, mas ainda não populados pelo seed.
+        cadastro_atendimento, cadastro_recursos = obter_cadastro_estatico(codigo_ibge)
+        if atendimento is None:
+            atendimento = cadastro_atendimento
+        if not recursos:
+            recursos = cadastro_recursos
     return schemas.InstitucionalMunicipioResponse(atendimento_agua=atendimento, recursos=recursos)
