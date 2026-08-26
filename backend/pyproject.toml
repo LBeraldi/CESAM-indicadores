@@ -1,3 +1,21 @@
+[project]
+name = "observatorio-saneamento-api"
+version = "0.1.0"
+description = "API de indicadores municipais de saneamento de Mato Grosso do Sul."
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.141.1",
+    "uvicorn[standard]==0.34.0",
+    "SQLAlchemy==2.0.36",
+    "psycopg[binary]==3.2.3",
+    "alembic==1.14.0",
+    "pandas==2.2.3",
+    "openpyxl==3.1.5",
+    "xlrd==2.0.1",
+    "python-dotenv==1.2.2",
+    "rarfile==4.2",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--cov=app.api --cov=app.crud --cov=app.main --cov=app.middleware --cov=app.models --cov=app.schemas --cov=app.services.normalizacao --cov=app.services.validacao --cov-report=term-missing --cov-fail-under=80"
