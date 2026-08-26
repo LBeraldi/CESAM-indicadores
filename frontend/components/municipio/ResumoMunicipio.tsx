@@ -15,6 +15,11 @@ export function ResumoMunicipio({ municipio, atendimento, indicadores, totalRegi
   const prestador = atendimento
     ? `${atendimento.prestador_nome}${atendimento.sigla ? ` (${atendimento.sigla})` : ""}`
     : "Não informado";
+  const gestaoMunicipal = atendimento
+    ? /autarquia|prefeitura|municipal|saae|servi[cç]o aut[oô]nomo/i.test(
+        `${atendimento.prestador_nome} ${atendimento.sigla ?? ""} ${atendimento.natureza_juridica ?? ""}`,
+      )
+    : false;
   const cobertura = calcularCobertura(indicadores);
 
   return (
@@ -73,7 +78,16 @@ export function ResumoMunicipio({ municipio, atendimento, indicadores, totalRegi
                 <Droplets className="h-5 w-5" />
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-ms-muted">Atendimento de água no município</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-medium text-ms-muted">
+                    {gestaoMunicipal ? "Serviço municipal de água" : "Atendimento de água no município"}
+                  </p>
+                  {gestaoMunicipal ? (
+                    <span className="rounded-full bg-ms-green/10 px-2 py-0.5 text-[11px] font-semibold text-ms-green">
+                      Gestão municipal
+                    </span>
+                  ) : null}
+                </div>
                 <p className="mt-1 break-words text-base font-semibold text-ms-ink">{prestador}</p>
                 <div className="mt-2 flex items-start gap-2 text-sm text-ms-muted">
                   <MapPinned className="mt-0.5 h-4 w-4 shrink-0 text-ms-green" />
