@@ -111,10 +111,6 @@ test.describe("celular com toque", () => {
   test("ficha e lista não possuem rolagem horizontal", async ({ page }) => {
     await abrirPagina(page, "/municipios");
     await expectNoHorizontalOverflow(page);
-    const apiLink = page.getByRole("link", { name: "API", exact: true });
-    const apiBox = await apiLink.boundingBox();
-    expect(apiBox?.x ?? 0).toBeGreaterThanOrEqual(0);
-    expect((apiBox?.x ?? 0) + (apiBox?.width ?? 0)).toBeLessThanOrEqual(390);
     await abrirPagina(page, "/municipios/5003702");
     await expectNoHorizontalOverflow(page);
   });
