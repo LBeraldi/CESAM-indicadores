@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 from app.database import SessionLocal
-from app.scripts.migrar import migrar
+from app.scripts.migrar import main as migrar
 from app.seed import DATA_DIR, seed_all
 from app.services.ingestao import EXTENSOES_SUPORTADAS, listar_arquivos, processar_arquivo, processar_zip
 

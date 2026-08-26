@@ -41,6 +41,7 @@ export function RankingCompleto({ indicadores, rankingSaneamento }: Props) {
 
   const indicadorSelecionado = indicadores.find((item) => item.codigo === metrica) ?? null;
   const menorMelhor = indicadorSelecionado?.sentido === "menor_melhor";
+  const anoRanking = rankingSaneamento[0]?.ano ?? ANO_RANKING_SANEAMENTO;
 
   const temasAgrupados = useMemo(() => {
     const grupos = new Map<string, Indicador[]>();
@@ -156,7 +157,7 @@ export function RankingCompleto({ indicadores, rankingSaneamento }: Props) {
   return (
     <section className="space-y-5">
       <div className="rounded-md border border-ms-line bg-white p-5 shadow-sm">
-        <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-ms-green">
+        <div className="inline-flex items-center gap-2 border-b-2 border-ms-green pb-1 text-xs font-semibold uppercase tracking-[0.16em] text-ms-green">
           <Trophy className="h-4 w-4" />
           Ranking PNQS/ABES
         </div>
@@ -179,7 +180,7 @@ export function RankingCompleto({ indicadores, rankingSaneamento }: Props) {
                 {Math.round(PESOS_RANKING_SANEAMENTO.gestao * 100)}%.
               </p>
               <p>
-                A nota usa 16 indicadores oficiais de 2023. Perdas de água, domicílios em risco e população afetada
+                A nota usa os indicadores oficiais disponíveis em {anoRanking}. Perdas de água, domicílios em risco e população afetada
                 são invertidos; nos demais, o maior resultado pontua melhor. Dado ausente vale zero no respectivo
                 módulo e a cobertura é exibida em cada linha.
               </p>
@@ -291,7 +292,7 @@ export function RankingCompleto({ indicadores, rankingSaneamento }: Props) {
                 {filtradas.map((linha) => (
                   <tr key={linha.codigo_ibge} className="hover:bg-ms-sky/50">
                     <td className="whitespace-nowrap px-5 py-4">
-                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-ms-sky text-sm font-semibold text-ms-blue">
+                      <span className="font-data inline-flex h-8 w-8 items-center justify-center rounded-md bg-ms-sky text-sm font-semibold text-ms-blue">
                         {linha.posicao}
                       </span>
                     </td>
@@ -300,7 +301,7 @@ export function RankingCompleto({ indicadores, rankingSaneamento }: Props) {
                         {linha.municipio}
                       </Link>
                     </td>
-                    <td className="whitespace-nowrap px-5 py-4 text-lg font-semibold text-ms-ink">{linha.valorTexto}</td>
+                    <td className="font-data whitespace-nowrap px-5 py-4 text-lg font-semibold text-ms-ink">{linha.valorTexto}</td>
                     <td className="px-5 py-4 text-xs text-ms-muted">{linha.detalhe}</td>
                   </tr>
                 ))}

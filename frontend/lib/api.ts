@@ -1,9 +1,10 @@
 const API_BASE_URL =
   process.env.API_INTERNAL_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-// Usada em componentes de cliente ("use client"): API_INTERNAL_URL só é
-// resolvível dentro da rede Docker do backend, nunca a partir do navegador.
-export const CLIENT_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// Componentes de cliente sempre passam pelo Route Handler do Next. Assim o
+// navegador não tenta acessar `localhost:8000` (que é o computador do
+// visitante) e a URL interna da API continua sendo resolvida no servidor.
+export const CLIENT_API_BASE_URL = "/api";
 
 export type Municipio = {
   id: number;

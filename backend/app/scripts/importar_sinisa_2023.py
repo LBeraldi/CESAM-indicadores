@@ -3,13 +3,14 @@ from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
 import pandas as pd
+from rarfile import RarFile
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 from app import models
 from app.database import SessionLocal
-from app.scripts.migrar import migrar
+from app.scripts.migrar import main as migrar
 from app.seed import DATA_DIR, seed_all
 from app.services.validacao import converter_valor
 
@@ -24,8 +25,8 @@ ARQUIVOS_OBRIGATORIOS = [
     "SINISA_Resultados_Ref2023.zip",
     "SINISA_ESGOTO_Planilhas_2023_v2.zip",
     "SINISA_GESTAOMUNICIPAL_Informacoes_2023.xlsx",
-    "SINISA_RESIDUOS_Indicadores_2023.xlsx",
-    "SINISA_AGUASPLUVIAIS_Indicadores_2023_v2.zip",
+    "SINISA_RESIDUOS_Planilhas_2023.rar",
+    "SINISA_AGUASPLUVIAIS_PLANILHAS_2023_V224042025.rar",
 ]
 
 MAPEAMENTO_AGUA = [
@@ -93,6 +94,13 @@ MAPEAMENTO_AGUAS_PLUVIAIS = [
     ("aguas_pluviais_populacao_impactada", 34),
 ]
 
+PLANILHAS_REGULACAO = [
+    "GM- Regulação de Serviços AG",
+    "GM- Regulação de Serviços ES",
+    "GM- Regulação de Serviços RS",
+    "GM- Regulação de Serviços AP",
+]
+
 
 def _normalizar_codigo(valor: object) -> str:
     texto = str(valor).strip().split(".")[0]
@@ -110,13 +118,15 @@ def _obter_indicadores(db: Session) -> dict[str, models.Indicador]:
 
 
 def _limpar_importacao_anterior(db: Session) -> None:
+    """Remove os dados da importação anterior sem commitar: fica na mesma
+    transação dos novos inserts, para que uma falha no meio do import
+    restaure o estado anterior em vez de deixar o banco sem dados."""
     fontes = db.scalars(select(models.FonteDados).where(models.FonteDados.nome == FONTE_NOME)).all()
     fonte_ids = [fonte.id for fonte in fontes]
     if fonte_ids:
         db.execute(delete(models.ValorIndicador).where(models.ValorIndicador.fonte_dados_id.in_(fonte_ids)))
         db.execute(delete(models.FonteDados).where(models.FonteDados.id.in_(fonte_ids)))
     db.execute(delete(models.LogImportacao).where(models.LogImportacao.fonte == FONTE_NOME))
-    db.commit()
 
 
 def _criar_fonte(db: Session) -> models.FonteDados:
@@ -160,12 +170,26 @@ def _registrar_valor(
 
 
 def _extrair_primeiro(zip_path: Path, marcador: str, destino: Path) -> Path:
-    with ZipFile(zip_path) as zip_file:
+    """Extrai a primeira planilha que contém o marcador, inclusive em ZIP aninhado."""
+    arquivo_zip = ZipFile if zip_path.suffix.lower() == ".zip" else RarFile
+    with arquivo_zip(zip_path) as archive:
+        entradas = archive.namelist()
         nome = next(
-            entrada for entrada in zip_file.namelist() if marcador in entrada and entrada.lower().endswith(".xlsx")
+            (
+                entrada
+                for entrada in entradas
+                if marcador in entrada and entrada.lower().endswith((".xlsx", ".xls", ".zip", ".rar"))
+            ),
+            None,
         )
-        zip_file.extract(nome, destino)
-        return destino / nome
+        if nome is None:
+            raise FileNotFoundError(f"Nenhum arquivo com marcador {marcador!r} em {zip_path.name}")
+        archive.extract(nome, destino)
+
+    extraido = destino / nome
+    if extraido.suffix.lower() in {".zip", ".rar"}:
+        return _extrair_primeiro(extraido, marcador, destino)
+    return extraido
 
 
 def _importar_planilha_indicadores(
@@ -319,6 +343,56 @@ def _importar_gestao(
     return importados, erros, avisos
 
 
+def _importar_regulacao(
+    db: Session,
+    arquivo: Path,
+    fonte: models.FonteDados,
+    municipios: dict[str, models.Municipio],
+    indicadores: dict[str, models.Indicador],
+) -> tuple[int, int, list[str]]:
+    """Consolida a existência de agência reguladora nos quatro componentes."""
+    respostas: dict[str, float] = {}
+    erros = 0
+    avisos: list[str] = []
+
+    for sheet_name in PLANILHAS_REGULACAO:
+        df = pd.read_excel(arquivo, sheet_name=sheet_name, header=None, skiprows=14)
+        for _, row in df.iterrows():
+            if str(row[3]).strip().upper() != "MS":
+                continue
+            codigo = _normalizar_codigo(row[1])
+            if codigo not in municipios:
+                erros += 1
+                avisos.append(f"{sheet_name}: município MS não cadastrado: {codigo}")
+                continue
+            valor, erro = converter_valor(row[5])
+            if erro or valor is None:
+                erros += 1
+                avisos.append(f"{sheet_name}: valor de regulação inválido/ausente para {codigo}")
+                continue
+            # Se houver regulação em qualquer componente, o município possui
+            # agência/regulador para a finalidade do indicador composto.
+            respostas[codigo] = max(respostas.get(codigo, 0.0), valor)
+
+    importados = 0
+    indicador = indicadores["gestao_agencia_reguladora"]
+    for codigo, valor in respostas.items():
+        if _registrar_valor(
+            db,
+            municipios[codigo],
+            indicador,
+            fonte,
+            valor,
+            (
+                "Gestão Municipal - regulação: existência de entidade reguladora em água, "
+                "esgoto, resíduos ou águas pluviais"
+            ),
+        ):
+            importados += 1
+
+    return importados, erros, avisos
+
+
 def _importar_residuos(
     db: Session,
     arquivo: Path,
@@ -456,8 +530,13 @@ def main() -> None:
                 temp_dir,
             )
             aguas_pluviais = _extrair_primeiro(
-                raw_dir / "SINISA_AGUASPLUVIAIS_Indicadores_2023_v2.zip",
+                raw_dir / "SINISA_AGUASPLUVIAIS_PLANILHAS_2023_V224042025.rar",
                 "Indicadores_2023",
+                temp_dir,
+            )
+            residuos = _extrair_primeiro(
+                raw_dir / "SINISA_RESIDUOS_Planilhas_2023.rar",
+                "SINISA_RESIDUOS_Indicadores_2023",
                 temp_dir,
             )
 
@@ -497,27 +576,34 @@ def main() -> None:
             total_erros += erros
             avisos.extend(novos_avisos)
 
-        importados, erros, novos_avisos = _importar_residuos(
-            db,
-            raw_dir / "SINISA_RESIDUOS_Indicadores_2023.xlsx",
-            fonte,
-            municipios,
-            indicadores,
-        )
-        total_importados += importados
-        total_erros += erros
-        avisos.extend(novos_avisos)
+            importados, erros, novos_avisos = _importar_residuos(
+                db, residuos, fonte, municipios, indicadores
+            )
+            total_importados += importados
+            total_erros += erros
+            avisos.extend(novos_avisos)
 
-        importados, erros, novos_avisos = _importar_gestao(
-            db,
-            raw_dir / "SINISA_GESTAOMUNICIPAL_Informacoes_2023.xlsx",
-            fonte,
-            municipios,
-            indicadores,
-        )
-        total_importados += importados
-        total_erros += erros
-        avisos.extend(novos_avisos)
+            importados, erros, novos_avisos = _importar_gestao(
+                db,
+                raw_dir / "SINISA_GESTAOMUNICIPAL_Informacoes_2023.xlsx",
+                fonte,
+                municipios,
+                indicadores,
+            )
+            total_importados += importados
+            total_erros += erros
+            avisos.extend(novos_avisos)
+
+            importados, erros, novos_avisos = _importar_regulacao(
+                db,
+                raw_dir / "SINISA_GESTAOMUNICIPAL_Informacoes_2023.xlsx",
+                fonte,
+                municipios,
+                indicadores,
+            )
+            total_importados += importados
+            total_erros += erros
+            avisos.extend(novos_avisos)
 
         db.add(
             models.LogImportacao(

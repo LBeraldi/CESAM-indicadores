@@ -21,16 +21,18 @@ export function ResumoMunicipio({ municipio, atendimento, indicadores, totalRegi
     <section className="mt-6 border-b border-ms-line pb-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-ms-green">Município de {municipio.uf}</p>
-          <h1 className="mt-1 text-4xl font-semibold tracking-normal text-ms-ink">{municipio.nome}</h1>
+          <p className="inline-block border-b-2 border-ms-green pb-1 text-xs font-semibold uppercase tracking-[0.16em] text-ms-green">
+            Município de {municipio.uf}
+          </p>
+          <h1 className="mt-2 font-serif text-4xl text-ms-ink">{municipio.nome}</h1>
         </div>
         <div className="flex flex-wrap gap-2 text-xs font-medium text-ms-muted sm:justify-end">
-          <span className="inline-flex items-center rounded-full border border-ms-line bg-white px-3 py-1.5">
+          <span className="font-data inline-flex items-center rounded-full border border-ms-line bg-white px-3 py-1.5">
             Código IBGE&nbsp;<strong className="text-ms-ink">{municipio.codigo_ibge}</strong>
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-ms-sky px-3 py-1.5 text-ms-blue">
             <Database className="h-3.5 w-3.5" />
-            <strong>{totalRegistros}</strong> registros disponíveis
+            <strong className="font-data">{totalRegistros}</strong> registros disponíveis
           </span>
         </div>
       </div>

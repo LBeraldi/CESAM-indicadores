@@ -1,12 +1,25 @@
 "use client";
 
-import { ChevronDown, Download, Filter, Printer, RotateCcw, TrendingDown, TrendingUp } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronDown,
+  Database,
+  Download,
+  Filter,
+  Layers,
+  ListChecks,
+  Printer,
+  RotateCcw,
+  TrendingDown,
+  TrendingUp
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { Municipio, RecursoMunicipal, ValorIndicador } from "@/lib/api";
 import { formatValorIndicador } from "@/lib/formatters";
 import { baixarCsvMunicipal } from "@/lib/exportarCsv";
 import { RecursoGestao } from "@/components/municipio/RecursoGestao";
+import { StatCardGroup } from "@/components/ui/stat-card-group";
 import { calcularScore, ordenarTexto, ordemTema, temaConfig, type TemaConfig } from "@/components/municipio/fichaConfig";
 
 type Props = {
@@ -249,17 +262,17 @@ function HistoricoFlutuante({
       <span className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <span className="rounded-md bg-ms-bg p-3">
           <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Primeiro valor</span>
-          <span className="mt-1 block font-semibold">{formatNumeroHistorico(primeiro.valor, valor.indicador.unidade)}</span>
+          <span className="font-data mt-1 block font-medium">{formatNumeroHistorico(primeiro.valor, valor.indicador.unidade)}</span>
           <span className="block text-xs text-ms-muted">{primeiro.ano}</span>
         </span>
         <span className="rounded-md bg-ms-bg p-3">
           <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Último valor</span>
-          <span className="mt-1 block font-semibold">{formatNumeroHistorico(ultimo.valor, valor.indicador.unidade)}</span>
+          <span className="font-data mt-1 block font-medium">{formatNumeroHistorico(ultimo.valor, valor.indicador.unidade)}</span>
           <span className="block text-xs text-ms-muted">{ultimo.ano}</span>
         </span>
         <span className="rounded-md bg-ms-bg p-3">
           <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Variação</span>
-          <span className={`mt-1 flex items-center gap-1 font-semibold ${variacao >= 0 ? "text-ms-green" : "text-red-700"}`}>
+          <span className={`font-data mt-1 flex items-center gap-1 font-medium ${variacao >= 0 ? "text-ms-green" : "text-red-700"}`}>
             <TrendIcon className="h-4 w-4" />
             {variacao >= 0 ? "+" : ""}{formatNumeroHistorico(variacao, valor.indicador.unidade)}
           </span>
@@ -269,7 +282,7 @@ function HistoricoFlutuante({
         </span>
         <span className="rounded-md bg-ms-bg p-3">
           <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Amplitude</span>
-          <span className="mt-1 block font-semibold">{formatNumeroHistorico(maximo.valor - minimo.valor, valor.indicador.unidade)}</span>
+          <span className="font-data mt-1 block font-medium">{formatNumeroHistorico(maximo.valor - minimo.valor, valor.indicador.unidade)}</span>
           <span className="block text-xs text-ms-muted">mín. a máx.</span>
         </span>
       </span>
@@ -282,12 +295,12 @@ function HistoricoFlutuante({
         <span className="grid grid-cols-2 gap-2 text-xs">
           <span className="rounded-md border border-ms-line p-3">
             <span className="block text-ms-muted">Menor registro</span>
-            <span className="mt-1 block font-semibold text-ms-ink">{formatNumeroHistorico(minimo.valor, valor.indicador.unidade)}</span>
+            <span className="font-data mt-1 block font-medium text-ms-ink">{formatNumeroHistorico(minimo.valor, valor.indicador.unidade)}</span>
             <span className="text-ms-muted">em {minimo.ano}</span>
           </span>
           <span className="rounded-md border border-ms-line p-3">
             <span className="block text-ms-muted">Maior registro</span>
-            <span className="mt-1 block font-semibold text-ms-ink">{formatNumeroHistorico(maximo.valor, valor.indicador.unidade)}</span>
+            <span className="font-data mt-1 block font-medium text-ms-ink">{formatNumeroHistorico(maximo.valor, valor.indicador.unidade)}</span>
             <span className="text-ms-muted">em {maximo.ano}</span>
           </span>
         </span>
@@ -296,9 +309,9 @@ function HistoricoFlutuante({
             <span>Ano</span><span className="text-right">Valor</span>
           </span>
           {[...pontos].reverse().map((ponto) => (
-            <span key={`tabela-${ponto.ano}`} className="grid grid-cols-2 border-t border-ms-line px-3 py-1.5 text-xs">
+            <span key={`tabela-${ponto.ano}`} className="font-data grid grid-cols-2 border-t border-ms-line px-3 py-1.5 text-xs">
               <span>{ponto.ano}</span>
-              <span className="text-right font-semibold">{formatNumeroHistorico(ponto.valor, valor.indicador.unidade)}</span>
+              <span className="text-right font-medium">{formatNumeroHistorico(ponto.valor, valor.indicador.unidade)}</span>
             </span>
           ))}
         </span>
@@ -472,7 +485,9 @@ export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props)
   return (
     <section className="py-8">
       <div className="print-only mb-6">
-        <p className="text-sm font-medium uppercase text-ms-green">Relatório municipal</p>
+        <p className="inline-block border-b-2 border-ms-green pb-1 text-xs font-semibold uppercase tracking-[0.16em] text-ms-green">
+          Relatório municipal
+        </p>
         <h2 className="mt-1 text-2xl font-semibold text-ms-ink">{municipio.nome}</h2>
         <p className="mt-1 text-sm text-ms-muted">
           Código IBGE {municipio.codigo_ibge} · UF {municipio.uf}
@@ -482,7 +497,7 @@ export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props)
       <div className="no-print rounded-md border border-ms-line bg-white p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-ms-green">
+            <div className="inline-flex items-center gap-2 border-b-2 border-ms-green pb-1 text-xs font-semibold uppercase tracking-[0.16em] text-ms-green">
               <Filter className="h-4 w-4" />
               Filtros da ficha
             </div>
@@ -582,24 +597,39 @@ export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props)
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 text-sm md:grid-cols-4">
-        <div className="rounded-md border border-ms-line bg-white p-4 shadow-sm">
-          <p className="text-ms-muted">Ano selecionado</p>
-          <p className="mt-1 text-lg font-semibold text-ms-ink">{ano === TODOS ? "Todos" : ano}</p>
-        </div>
-        <div className="rounded-md border border-ms-line bg-white p-4 shadow-sm">
-          <p className="text-ms-muted">Dimensões</p>
-          <p className="mt-1 text-lg font-semibold text-ms-ink">{temasSelecionados.length}</p>
-        </div>
-        <div className="rounded-md border border-ms-line bg-white p-4 shadow-sm">
-          <p className="text-ms-muted">Fontes</p>
-          <p className="mt-1 text-lg font-semibold text-ms-ink">{fontesSelecionadas.length}</p>
-        </div>
-        <div className="rounded-md border border-ms-line bg-white p-4 shadow-sm">
-          <p className="text-ms-muted">Registros</p>
-          <p className="mt-1 text-lg font-semibold text-ms-ink">{filtrados.length}</p>
-        </div>
-      </div>
+      <StatCardGroup
+        className="mt-5"
+        items={[
+          {
+            label: "Ano selecionado",
+            value: ano === TODOS ? "Todos" : ano,
+            icon: CalendarDays,
+            tone: "blue",
+            detail: "Filtro da ficha"
+          },
+          {
+            label: "Dimensões",
+            value: temasSelecionados.length,
+            icon: Layers,
+            tone: "green",
+            detail: "Módulos com dados"
+          },
+          {
+            label: "Fontes",
+            value: fontesSelecionadas.length,
+            icon: Database,
+            tone: "teal",
+            detail: "Origem dos registros"
+          },
+          {
+            label: "Registros",
+            value: filtrados.length,
+            icon: ListChecks,
+            tone: "navy",
+            detail: "Resultado filtrado"
+          }
+        ]}
+      />
 
       {filtrados.length === 0 ? (
         <div className="mt-5 rounded-md border border-dashed border-ms-line bg-white p-6 text-sm text-ms-muted">
@@ -675,7 +705,7 @@ export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props)
                     <span className="relative z-10 mt-5 flex flex-wrap items-end justify-between gap-3">
                       <span>
                         <span className="block text-xs font-medium text-white/75">Resumo da dimensão</span>
-                        <span className="mt-1 block text-4xl font-semibold tracking-normal">
+                        <span className="font-data mt-1 block text-4xl font-medium tracking-normal">
                           {formatScore(dimensao.score, dimensao.valores.length)}
                         </span>
                         <span className="mt-1 block text-xs text-white/75">
@@ -714,7 +744,7 @@ export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props)
                                 </span>
                                 <span className="mt-1 block text-sm font-semibold text-ms-ink">{valor.indicador.nome}</span>
                                 <span className="mt-2 flex items-end justify-between gap-3">
-                                  <span className="block text-2xl font-semibold tracking-normal">
+                                  <span className="font-data block text-2xl font-medium tracking-normal">
                                     {formatValorIndicador(valor)}
                                   </span>
                                   {pontos.length > 1 ? (
@@ -774,7 +804,7 @@ export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props)
                           </span>
                         ) : null}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 font-semibold text-ms-green">{formatValorIndicador(valor)}</td>
+                      <td className="font-data whitespace-nowrap px-5 py-4 font-semibold text-ms-green">{formatValorIndicador(valor)}</td>
                       <td className="whitespace-nowrap px-5 py-4 text-ms-muted">
                         {valor.fonte ?? valor.indicador.fonte ?? "Fonte não informada"}
                       </td>

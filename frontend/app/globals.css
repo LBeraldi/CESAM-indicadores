@@ -37,8 +37,9 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   letter-spacing: -0.01em;
+  font-weight: 600;
 }
 
 button,
@@ -54,6 +55,49 @@ input {
 
 ::selection {
   background: rgba(24, 118, 90, 0.18);
+}
+
+.font-data {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-feature-settings: "tnum" 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.ficha-campo {
+  position: relative;
+  background: #ffffff;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2.74rem,
+    rgba(216, 225, 235, 0.8) 2.74rem,
+    rgba(216, 225, 235, 0.8) calc(2.74rem + 1px)
+  );
+}
+
+.ficha-campo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(216, 225, 235, 0.95);
+  pointer-events: none;
+}
+
+.hidrografia-marca {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hidrografia-marca svg {
+  position: absolute;
+  right: -6rem;
+  top: -3rem;
+  height: 130%;
+  width: auto;
+  opacity: 0.09;
 }
 
 @layer components {

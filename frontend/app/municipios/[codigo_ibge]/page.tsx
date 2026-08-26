@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, MapPinned } from "lucide-react";
+import { ArrowLeft, CalendarDays, LandPlot, MapPinned, Users } from "lucide-react";
 import { FichaMunicipal } from "@/components/FichaMunicipal";
 import { ResumoMunicipio } from "@/components/municipio/ResumoMunicipio";
+import { StatCardGroup } from "@/components/ui/stat-card-group";
 import { fetchApi, fetchApiSafe, type IndicadoresMunicipio, type InstitucionalMunicipio, type Municipio } from "@/lib/api";
 
 type Props = {
@@ -79,36 +80,39 @@ export default async function MunicipioDetalhePage({ params }: Props) {
         totalRegistros={indicadores.length}
       />
 
-      <div className="mt-5 grid gap-3 md:grid-cols-4">
-        <div className="rounded-md border border-ms-line bg-white p-4 shadow-sm">
-          <div className="flex items-center gap-2 text-sm text-ms-muted">
-            <MapPinned className="h-4 w-4 text-ms-green" />
-            UF
-          </div>
-          <p className="mt-2 text-lg font-semibold text-ms-ink">{municipio.uf}</p>
-        </div>
-        <div className="rounded-md border border-ms-line bg-white p-4 shadow-sm">
-          <div className="flex items-center gap-2 text-sm text-ms-muted">
-            <CalendarDays className="h-4 w-4 text-ms-blue" />
-            Série histórica
-          </div>
-          <p className="mt-2 text-lg font-semibold text-ms-ink">
-            {anoMaisAntigo && anoMaisRecente ? `${anoMaisAntigo}-${anoMaisRecente}` : "Não informada"}
-          </p>
-        </div>
-        <div className="rounded-md border border-ms-line bg-white p-4 shadow-sm">
-          <p className="text-sm text-ms-muted">População estimada (IBGE)</p>
-          <p className="mt-2 text-lg font-semibold text-ms-ink">
-            {municipio.populacao ? municipio.populacao.toLocaleString("pt-BR") : "Não informada"}
-          </p>
-        </div>
-        <div className="rounded-md border border-ms-line bg-white p-4 shadow-sm">
-          <p className="text-sm text-ms-muted">Área territorial (IBGE)</p>
-          <p className="mt-2 text-lg font-semibold text-ms-ink">
-            {municipio.area_km2 ? `${municipio.area_km2.toLocaleString("pt-BR")} km²` : "Não informada"}
-          </p>
-        </div>
-      </div>
+      <StatCardGroup
+        className="mt-5"
+        items={[
+          {
+            label: "UF",
+            value: municipio.uf,
+            icon: MapPinned,
+            tone: "green",
+            detail: "Unidade federativa"
+          },
+          {
+            label: "Série histórica",
+            value: anoMaisAntigo && anoMaisRecente ? `${anoMaisAntigo}-${anoMaisRecente}` : "Não informada",
+            icon: CalendarDays,
+            tone: "blue",
+            detail: "Período com registros"
+          },
+          {
+            label: "População estimada (IBGE)",
+            value: municipio.populacao ? municipio.populacao.toLocaleString("pt-BR") : "Não informada",
+            icon: Users,
+            tone: "teal",
+            detail: "Referência territorial IBGE"
+          },
+          {
+            label: "Área territorial (IBGE)",
+            value: municipio.area_km2 ? `${municipio.area_km2.toLocaleString("pt-BR")} km²` : "Não informada",
+            icon: LandPlot,
+            tone: "amber",
+            detail: "Extensão do município"
+          }
+        ]}
+      />
 
       <FichaMunicipal municipio={municipio} indicadores={indicadores} recursos={institucional.recursos} />
     </div>

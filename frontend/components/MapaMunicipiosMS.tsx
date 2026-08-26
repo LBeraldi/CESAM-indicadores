@@ -32,7 +32,7 @@ const SVG_WIDTH = 860;
 const SVG_HEIGHT = 620;
 const MAP_PADDING = 34;
 const FALLBACK_CODE = "5002704";
-const ANO_METRICA = 2023;
+const ANO_METRICA_PREFERIDO = 2023;
 const ZOOM_MIN = 1;
 const ZOOM_MAX = 5;
 const ZOOM_STEP = 1.5;
@@ -46,7 +46,18 @@ const METRICAS: Metrica[] = [
   { codigo: "esgoto_atendimento_total", nome: "Esgoto — atendimento total", unidade: "%" },
   { codigo: "esgoto_coleta", nome: "Esgoto — coleta", unidade: "%" },
   { codigo: "esgoto_tratamento", nome: "Esgoto — tratamento", unidade: "%" },
-  { codigo: "esgoto_extensao_rede", nome: "Esgoto — extensão da rede", unidade: "km" }
+  { codigo: "esgoto_extensao_rede", nome: "Esgoto — extensão da rede", unidade: "km" },
+  { codigo: "residuos_cobertura_coleta_domiciliar", nome: "Resíduos — coleta domiciliar", unidade: "%" },
+  { codigo: "residuos_cobertura_coleta_seletiva", nome: "Resíduos — coleta seletiva", unidade: "%" },
+  { codigo: "residuos_massa_coletada_per_capita", nome: "Resíduos — massa coletada per capita", unidade: "kg/hab.dia" },
+  { codigo: "residuos_massa_recuperada_per_capita", nome: "Resíduos — massa recuperada per capita", unidade: "kg/hab.ano" },
+  { codigo: "aguas_pluviais_vias_pavimentadas", nome: "Pluviais — vias pavimentadas", unidade: "%" },
+  { codigo: "aguas_pluviais_rede_subterranea", nome: "Pluviais — rede subterrânea", unidade: "%" },
+  { codigo: "aguas_pluviais_domicilios_risco_inundacao", nome: "Pluviais — domicílios em risco", unidade: "%" },
+  { codigo: "aguas_pluviais_populacao_impactada", nome: "Pluviais — população impactada", unidade: "%" },
+  { codigo: "gestao_plano_municipal_saneamento", nome: "Gestão — plano municipal", unidade: "sim/não" },
+  { codigo: "gestao_conselho_municipal", nome: "Gestão — conselho municipal", unidade: "sim/não" },
+  { codigo: "gestao_agencia_reguladora", nome: "Gestão — agência reguladora", unidade: "sim/não" }
 ];
 
 const TEXT = {
@@ -104,6 +115,7 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
   const [metrica, setMetrica] = useState<string>("nota_saneamento");
   const [valoresIndicador, setValoresIndicador] = useState<Map<string, number> | null>(null);
   const [sentidoIndicador, setSentidoIndicador] = useState<SentidoIndicador>("maior_melhor");
+  const [anoMetrica, setAnoMetrica] = useState(ANO_METRICA_PREFERIDO);
   const [carregandoMetrica, setCarregandoMetrica] = useState(false);
 
   const [chosenCode, setChosenCode] = useState<string | null>(null);
@@ -147,14 +159,25 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
     if (metrica === "nota_saneamento") {
       setValoresIndicador(null);
       setSentidoIndicador("maior_melhor");
+      setAnoMetrica(ANO_METRICA_PREFERIDO);
       return;
     }
 
     let ativo = true;
     setCarregandoMetrica(true);
 
-    fetch(`${CLIENT_API_BASE_URL}/ranking?indicador=${metrica}&ano=${ANO_METRICA}&limit=200`)
-      .then((response) => (response.ok ? (response.json() as Promise<RankingItem[]>) : Promise.reject()))
+    fetch(`${CLIENT_API_BASE_URL}/indicadores/${metrica}/anos`)
+      .then((response) => (response.ok ? (response.json() as Promise<number[]>) : Promise.reject()))
+      .then((anos) => {
+        const ano = anos.includes(ANO_METRICA_PREFERIDO) ? ANO_METRICA_PREFERIDO : (anos[0] ?? null);
+        if (ano === null) {
+          return [] as RankingItem[];
+        }
+        setAnoMetrica(ano);
+        return fetch(`${CLIENT_API_BASE_URL}/ranking?indicador=${metrica}&ano=${ano}&limit=200`).then((response) =>
+          response.ok ? (response.json() as Promise<RankingItem[]>) : Promise.reject()
+        );
+      })
       .then((itens) => {
         if (!ativo) {
           return;
@@ -387,7 +410,7 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
             </p>
             {selectedCode && valoresPorCodigo.has(selectedCode) ? (
               <p className="mt-2 text-sm text-white/90">
-                {metricaAtual.nome}:{" "}
+                {metricaAtual.nome} ({anoMetrica}):{" "}
                 <span className="font-semibold">
                   {formatarValor(valoresPorCodigo.get(selectedCode) as number, metricaAtual.unidade)}
                 </span>

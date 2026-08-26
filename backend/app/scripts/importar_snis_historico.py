@@ -7,7 +7,7 @@ from sqlalchemy.sql import text
 
 from app import models
 from app.database import SessionLocal
-from app.scripts.migrar import migrar
+from app.scripts.migrar import main as migrar
 from app.seed import DATA_DIR, seed_all
 from app.services.validacao import converter_valor
 

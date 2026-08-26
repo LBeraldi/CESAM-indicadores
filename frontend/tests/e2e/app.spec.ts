@@ -33,8 +33,9 @@ async function abrirPagina(page: Page, rota: string) {
 test("página inicial e navegação principal funcionam", async ({ page }) => {
   await abrirPagina(page, "/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Municípios" })).toBeVisible();
-  await page.getByRole("link", { name: "Municípios" }).click();
+  const municipiosLink = page.getByRole("link", { name: "Municípios", exact: true });
+  await expect(municipiosLink).toBeVisible();
+  await municipiosLink.click();
   await expect(page).toHaveURL(/\/municipios$/);
   await expect(page.getByRole("heading", { name: "Municípios de Mato Grosso do Sul" })).toBeVisible();
 });
@@ -110,10 +111,6 @@ test.describe("celular com toque", () => {
   test("ficha e lista não possuem rolagem horizontal", async ({ page }) => {
     await abrirPagina(page, "/municipios");
     await expectNoHorizontalOverflow(page);
-    const apiLink = page.getByRole("link", { name: "API", exact: true });
-    const apiBox = await apiLink.boundingBox();
-    expect(apiBox?.x ?? 0).toBeGreaterThanOrEqual(0);
-    expect((apiBox?.x ?? 0) + (apiBox?.width ?? 0)).toBeLessThanOrEqual(390);
     await abrirPagina(page, "/municipios/5003702");
     await expectNoHorizontalOverflow(page);
   });

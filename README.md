@@ -28,7 +28,9 @@ docker compose ps
 - OpenAPI: http://localhost:8000/docs
 - PostgreSQL: acessível apenas dentro da rede Docker
 
-O serviço `db-init` aplica migrations e seed antes de liberar a API. Nenhum worker HTTP cria tabelas.
+O serviço `db-init` aplica migrations, cadastra os 79 municípios e importa automaticamente os arquivos oficiais
+disponíveis em `data/raw` antes de liberar a API. Nenhum worker HTTP cria tabelas. Se os arquivos do SINISA ainda não
+estiverem presentes, a inicialização mantém a base disponível e usa o último ano importado do SNIS histórico.
 
 Para alterar portas ou CORS: `Copy-Item .env.development.example .env`.
 
