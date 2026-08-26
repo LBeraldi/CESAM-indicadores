@@ -33,8 +33,9 @@ async function abrirPagina(page: Page, rota: string) {
 test("página inicial e navegação principal funcionam", async ({ page }) => {
   await abrirPagina(page, "/");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Municípios" })).toBeVisible();
-  await page.getByRole("link", { name: "Municípios" }).click();
+  const municipiosLink = page.getByRole("link", { name: "Municípios", exact: true });
+  await expect(municipiosLink).toBeVisible();
+  await municipiosLink.click();
   await expect(page).toHaveURL(/\/municipios$/);
   await expect(page.getByRole("heading", { name: "Municípios de Mato Grosso do Sul" })).toBeVisible();
 });
