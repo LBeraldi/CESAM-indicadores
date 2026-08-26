@@ -383,7 +383,10 @@ def _importar_regulacao(
             indicador,
             fonte,
             valor,
-            "Gestão Municipal - regulação: existência de entidade reguladora em água, esgoto, resíduos ou águas pluviais",
+            (
+                "Gestão Municipal - regulação: existência de entidade reguladora em água, "
+                "esgoto, resíduos ou águas pluviais"
+            ),
         ):
             importados += 1
 
