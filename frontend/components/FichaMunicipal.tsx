@@ -245,7 +245,7 @@ function HistoricoFlutuante({
         if (event.pointerType === "mouse") agendarFechamento();
       }}
       onClick={(event) => event.stopPropagation()}
-      className={`historico-popover ${aberto ? "is-open" : "is-closing"} fixed z-[100] block max-h-[calc(100vh-24px)] overflow-y-auto rounded-lg border border-ms-line bg-white p-5 text-left text-ms-ink shadow-2xl`}
+      className={`historico-popover ${aberto ? "is-open" : "is-closing"} fixed z-100 block max-h-[calc(100vh-24px)] overflow-y-auto rounded-lg border border-ms-line bg-white p-5 text-left text-ms-ink shadow-2xl`}
       style={posicao}
     >
       <span className="flex items-start justify-between gap-4">

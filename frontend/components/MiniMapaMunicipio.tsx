@@ -65,7 +65,7 @@ export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: strin
         </div>
         <MapPin className="h-5 w-5 text-ms-blue" />
       </div>
-      <div className="relative flex min-h-0 flex-1 items-center bg-gradient-to-br from-ms-sky to-white p-2">
+      <div className="relative flex min-h-0 flex-1 items-center bg-linear-to-br from-ms-sky to-white p-2">
         {desenho ? (
           <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="mx-auto block h-48 w-full" role="img" aria-label={`Mapa de Mato Grosso do Sul com ${municipio} destacado`}>
             {desenho.paths.map((path) => {

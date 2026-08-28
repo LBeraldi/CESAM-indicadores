@@ -88,7 +88,7 @@ export function ResumoMunicipio({ municipio, atendimento, indicadores, totalRegi
                     </span>
                   ) : null}
                 </div>
-                <p className="mt-1 break-words text-base font-semibold text-ms-ink">{prestador}</p>
+                <p className="mt-1 wrap-break-word text-base font-semibold text-ms-ink">{prestador}</p>
                 <div className="mt-2 flex items-start gap-2 text-sm text-ms-muted">
                   <MapPinned className="mt-0.5 h-4 w-4 shrink-0 text-ms-green" />
                   <span>
