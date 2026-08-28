@@ -31,7 +31,12 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
+  // "standalone" é exigido pelo Dockerfile de self-host (copia .next/standalone
+  // e roda `node server.js`). Na Vercel esse modo não é necessário — a
+  // plataforma já empacota as funções serverless por conta própria — e no
+  // Next.js 16 ele quebra o passo de tracing do build da Vercel (ENOENT em
+  // next-server.js.nft.json). A Vercel expõe VERCEL=1 durante o build.
+  ...(process.env.VERCEL ? {} : { output: "standalone" }),
   poweredByHeader: false,
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
