@@ -80,7 +80,7 @@ export function DropdownNavigation({ navItems }: Props) {
   return (
     <nav ref={navRef} className="relative" aria-label="Navegação principal">
       <ul
-        className="-mx-4 flex flex-nowrap items-center gap-0 overflow-x-auto px-4 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 flex flex-nowrap items-center gap-0 overflow-x-auto px-4 [-webkit-overflow-scrolling:touch] scrollbar-none sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
       >
         {navItems.map((navItem) => {
           const isOpen = openMenu === navItem.label;
