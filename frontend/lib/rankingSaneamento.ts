@@ -1,6 +1,6 @@
 import { fetchApiSafe, type RankingSaneamentoValor } from "@/lib/api";
 
-export const ANO_RANKING_SANEAMENTO = 2023;
+export const ANO_RANKING_SANEAMENTO = 2024;
 
 /**
  * Adaptação municipal do referencial de indicadores do GRMD/PNQS da ABES.
@@ -146,24 +146,11 @@ function pontuar(
 
 export const INDICADORES_RANKING_SANEAMENTO = INDICADORES_RANKING.map((item) => item.codigo);
 
-export async function obterRankingSaneamento(limit = 79): Promise<RankingSaneamentoItem[]> {
-  let ano = ANO_RANKING_SANEAMENTO;
-  let valores = await fetchApiSafe<RankingSaneamentoValor[]>(
-    `/ranking/saneamento?ano=${ANO_RANKING_SANEAMENTO}`,
-    []
-  );
-
-  // O SINISA 2023 é a preferência. Enquanto ele não estiver importado, a
-  // série histórica do SNIS continua permitindo exibir o último ano real,
-  // em vez de deixar mapa e ranking vazios.
-  if (valores.length === 0) {
-    const anos = await fetchApiSafe<number[]>("/indicadores/agua_atendimento_total/anos", []);
-    const anoDisponivel = anos[0];
-    if (anoDisponivel && anoDisponivel !== ANO_RANKING_SANEAMENTO) {
-      ano = anoDisponivel;
-      valores = await fetchApiSafe<RankingSaneamentoValor[]>(`/ranking/saneamento?ano=${ano}`, []);
-    }
-  }
+export function calcularRankingSaneamento(
+  valores: RankingSaneamentoValor[],
+  ano: number,
+  limit = 79,
+): RankingSaneamentoItem[] {
   const rankings = INDICADORES_RANKING.map((indicador) => ({
     indicador: indicador.codigo,
     itens: valores.filter((item) => item.indicador === indicador.codigo)
@@ -196,4 +183,26 @@ export async function obterRankingSaneamento(limit = 79): Promise<RankingSaneame
     .sort((a, b) => b.nota - a.nota || b.cobertura - a.cobertura || a.municipio.localeCompare(b.municipio, "pt-BR"))
     .slice(0, limit)
     .map((item, index) => ({ ...item, posicao: index + 1 }));
+}
+
+export async function obterRankingSaneamento(limit = 79): Promise<RankingSaneamentoItem[]> {
+  let ano = ANO_RANKING_SANEAMENTO;
+  let valores = await fetchApiSafe<RankingSaneamentoValor[]>(
+    `/ranking/saneamento?ano=${ANO_RANKING_SANEAMENTO}`,
+    []
+  );
+
+  // O SINISA 2024 é a preferência. Enquanto ele não estiver importado, a
+  // série histórica do SNIS continua permitindo exibir o último ano real,
+  // em vez de deixar mapa e ranking vazios.
+  if (valores.length === 0) {
+    const anos = await fetchApiSafe<number[]>("/indicadores/agua_atendimento_total/anos", []);
+    const anoDisponivel = anos[0];
+    if (anoDisponivel && anoDisponivel !== ANO_RANKING_SANEAMENTO) {
+      ano = anoDisponivel;
+      valores = await fetchApiSafe<RankingSaneamentoValor[]>(`/ranking/saneamento?ano=${ano}`, []);
+    }
+  }
+
+  return calcularRankingSaneamento(valores, ano, limit);
 }

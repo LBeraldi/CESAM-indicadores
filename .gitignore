@@ -28,6 +28,9 @@ data/raw/*
 data/processed/*
 !data/processed/.gitkeep
 
+# Planilhas oficiais usadas somente pela importação local do SINISA
+Planilhas Indicadores/
+
 *.log
 tunnel*.log
 *.dump

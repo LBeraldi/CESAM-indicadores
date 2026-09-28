@@ -1,55 +1,83 @@
 import { CloudRain, Droplets, Leaf, ShieldCheck, Trash2, Waves, type LucideIcon } from "lucide-react";
 
 import type { ValorIndicador } from "@/lib/api";
+import type { RankingSaneamentoItem } from "@/lib/rankingSaneamento";
 
+type ChaveModulo = "agua" | "esgoto" | "residuos" | "aguasPluviais" | "gestao";
+
+// DS-03: a cor da dimensão só identifica (ícone, marcador, linha, barra),
+// sempre acompanhada do ícone e do nome. Nunca como fundo de bloco inteiro.
 export type TemaConfig = {
   icon: LucideIcon;
+  nomeCurto: string;
+  /** Cor da dimensão como valor CSS, para SVG. */
+  cor: string;
+  textClass: string;
   bgClass: string;
-  accentClass: string;
-  panelClass: string;
+  /** Campo da nota do módulo em RankingSaneamentoItem (ADR-001). */
+  modulo: ChaveModulo | null;
 };
 
-const TEMA_ORDEM = ["Água", "Esgoto", "Resíduos sólidos", "Águas pluviais", "Gestão municipal"];
+export const TEMA_ORDEM = ["Água", "Esgoto", "Resíduos sólidos", "Águas pluviais", "Gestão municipal"];
 
 const TEMA_CONFIG: Record<string, TemaConfig> = {
   Água: {
     icon: Droplets,
-    bgClass: "bg-[#0f766e]",
-    accentClass: "bg-[#0f766e]",
-    panelClass: "bg-[#e5f4f1] text-[#0f6f62]",
+    nomeCurto: "Água",
+    cor: "var(--dim-agua)",
+    textClass: "text-dim-agua",
+    bgClass: "bg-dim-agua",
+    modulo: "agua",
   },
   Esgoto: {
     icon: Waves,
-    bgClass: "bg-[#0c2d57]",
-    accentClass: "bg-[#0c2d57]",
-    panelClass: "bg-[#e7edf5] text-[#0c2d57]",
+    nomeCurto: "Esgoto",
+    cor: "var(--dim-esgoto)",
+    textClass: "text-dim-esgoto",
+    bgClass: "bg-dim-esgoto",
+    modulo: "esgoto",
   },
   "Resíduos sólidos": {
     icon: Trash2,
-    bgClass: "bg-[#7a4e2d]",
-    accentClass: "bg-[#7a4e2d]",
-    panelClass: "bg-[#f3e9df] text-[#6b3f24]",
+    nomeCurto: "Resíduos",
+    cor: "var(--dim-residuos)",
+    textClass: "text-dim-residuos",
+    bgClass: "bg-dim-residuos",
+    modulo: "residuos",
   },
   "Águas pluviais": {
     icon: CloudRain,
-    bgClass: "bg-[#1f5f9f]",
-    accentClass: "bg-[#1f5f9f]",
-    panelClass: "bg-[#e7f0f8] text-[#1f5f9f]",
+    nomeCurto: "Pluviais",
+    cor: "var(--dim-pluviais)",
+    textClass: "text-dim-pluviais",
+    bgClass: "bg-dim-pluviais",
+    modulo: "aguasPluviais",
   },
   "Gestão municipal": {
     icon: ShieldCheck,
-    bgClass: "bg-[#b7791f]",
-    accentClass: "bg-[#b7791f]",
-    panelClass: "bg-[#fbf1de] text-[#8f5f0d]",
+    nomeCurto: "Gestão",
+    cor: "var(--dim-gestao)",
+    textClass: "text-dim-gestao",
+    bgClass: "bg-dim-gestao",
+    modulo: "gestao",
   },
 };
 
 const TEMA_FALLBACK: TemaConfig = {
   icon: Leaf,
+  nomeCurto: "Outros",
+  cor: "var(--color-navy)",
+  textClass: "text-ms-navy",
   bgClass: "bg-ms-navy",
-  accentClass: "bg-ms-navy",
-  panelClass: "bg-ms-sky text-ms-navy",
+  modulo: null,
 };
+
+/** Nota do módulo usada no ranking (ADR-001: um número por conceito em todo o site). */
+export function notaDoModulo(item: RankingSaneamentoItem | null | undefined, tema: string): number | null {
+  const modulo = temaConfig(tema).modulo;
+  if (!item || !modulo) return null;
+  return item[modulo];
+}
 
 export function ordenarTexto(a: string, b: string) {
   return a.localeCompare(b, "pt-BR", { sensitivity: "base" });

@@ -1,549 +1,249 @@
 "use client";
 
-import {
-  CalendarDays,
-  ChevronDown,
-  Database,
-  Download,
-  Filter,
-  Layers,
-  ListChecks,
-  Printer,
-  RotateCcw,
-  TrendingDown,
-  TrendingUp
-} from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { createPortal } from "react-dom";
+import { Download, LineChart, Printer, RotateCcw, SlidersHorizontal } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Municipio, RecursoMunicipal, ValorIndicador } from "@/lib/api";
-import { formatValorIndicador } from "@/lib/formatters";
 import { baixarCsvMunicipal } from "@/lib/exportarCsv";
+import { ehUnidadeBinaria, formatarNota } from "@/lib/formatters";
+import type { RankingSaneamentoItem } from "@/lib/rankingSaneamento";
+import { cn } from "@/lib/utils";
 import { RecursoGestao } from "@/components/municipio/RecursoGestao";
-import { StatCardGroup } from "@/components/ui/stat-card-group";
-import { calcularScore, ordenarTexto, ordemTema, temaConfig, type TemaConfig } from "@/components/municipio/fichaConfig";
+import { SeriePainel, type PontoHistorico } from "@/components/municipio/SeriePainel";
+import { notaDoModulo, ordenarTexto, ordemTema, temaConfig } from "@/components/municipio/fichaConfig";
+import { Badge, BadgeFonte, rotuloFonte } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Delta } from "@/components/ui/Delta";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { campoClasses } from "@/components/ui/Field";
+import { Sparkline } from "@/components/ui/Sparkline";
+import { Valor } from "@/components/ui/Valor";
 
 type Props = {
   municipio: Municipio;
   indicadores: ValorIndicador[];
   recursos?: RecursoMunicipal[];
-};
-
-type Dimensao = {
-  tema: string;
-  valores: ValorIndicador[];
-  score: number | null;
-  config: TemaConfig;
+  /** Nota do ranking para as abas de dimensão (ADR-001). */
+  rankingItem?: RankingSaneamentoItem | null;
 };
 
 const TODOS = "todos";
+const PAINEL_ID = "painel-indicadores";
 
-type PontoHistorico = { ano: number; valor: number };
-
-function ehBinario(valor: ValorIndicador): boolean {
-  const unidade = valor.indicador.unidade?.trim().toLocaleLowerCase("pt-BR");
-  return unidade === "sim/não" || unidade === "sim/nao";
+function fonteDe(valor: ValorIndicador): string {
+  return valor.fonte ?? valor.indicador.fonte ?? "Fonte não informada";
 }
 
 function construirHistorico(indicadores: ValorIndicador[]): Map<string, PontoHistorico[]> {
-  const mapa = new Map<string, PontoHistorico[]>();
+  const mapa = new Map<string, Map<number, PontoHistorico>>();
 
   for (const item of indicadores) {
-    if (item.valor === null || ehBinario(item)) {
-      continue;
+    if (item.valor === null || ehUnidadeBinaria(item.indicador.unidade)) continue;
+    const porAno = mapa.get(item.indicador.codigo) ?? new Map<number, PontoHistorico>();
+    const existente = porAno.get(item.ano);
+    const fonte = item.fonte ?? item.indicador.fonte;
+    // Se dois registros cobrem o mesmo ano, o SINISA prevalece sobre o SNIS.
+    if (!existente || (fonte ?? "").toLocaleLowerCase("pt-BR").includes("sinisa")) {
+      porAno.set(item.ano, { ano: item.ano, valor: Number(item.valor), fonte });
     }
-
-    const lista = mapa.get(item.indicador.codigo) ?? [];
-    lista.push({ ano: item.ano, valor: Number(item.valor) });
-    mapa.set(item.indicador.codigo, lista);
+    mapa.set(item.indicador.codigo, porAno);
   }
 
-  for (const lista of mapa.values()) {
-    lista.sort((a, b) => a.ano - b.ano);
-  }
-
-  return mapa;
-}
-
-function Sparkline({ pontos }: { pontos: PontoHistorico[] }) {
-  if (pontos.length < 2) {
-    return null;
-  }
-
-  const width = 96;
-  const height = 28;
-  const valores = pontos.map((ponto) => ponto.valor);
-  const min = Math.min(...valores);
-  const max = Math.max(...valores);
-  const amplitude = max - min || 1;
-  const passo = width / (pontos.length - 1);
-
-  const coordenadas = pontos.map((ponto, indice) => {
-    const x = indice * passo;
-    const y = height - ((ponto.valor - min) / amplitude) * (height - 6) - 3;
-    return [x, y] as const;
-  });
-
-  const linha = coordenadas.map(([x, y], indice) => `${indice === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`).join(" ");
-  const [ultimoX, ultimoY] = coordenadas[coordenadas.length - 1];
-  const area = `${linha} L ${ultimoX.toFixed(1)} ${height} L 0 ${height} Z`;
-
-  return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible" aria-hidden="true">
-      <path d={area} fill="currentColor" opacity={0.14} />
-      <path d={linha} fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={ultimoX} cy={ultimoY} r={2.4} fill="currentColor" />
-    </svg>
+  return new Map(
+    Array.from(mapa.entries(), ([codigo, porAno]) => [codigo, Array.from(porAno.values()).sort((a, b) => a.ano - b.ano)])
   );
 }
 
-function formatNumeroHistorico(valor: number, unidade?: string | null): string {
-  const numero = valor.toLocaleString("pt-BR", { maximumFractionDigits: 2 });
-  if (!unidade) return numero;
-  return unidade === "%" ? `${numero}%` : `${numero} ${unidade}`;
+function slug(texto: string): string {
+  return texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, "-");
 }
 
-function GraficoHistoricoDetalhado({ pontos, unidade }: { pontos: PontoHistorico[]; unidade?: string | null }) {
-  const width = 600;
-  const height = 230;
-  const margem = { top: 18, right: 18, bottom: 38, left: 58 };
-  const areaWidth = width - margem.left - margem.right;
-  const areaHeight = height - margem.top - margem.bottom;
-  const valores = pontos.map((ponto) => ponto.valor);
-  const minOriginal = Math.min(...valores);
-  const maxOriginal = Math.max(...valores);
-  const folga = (maxOriginal - minOriginal || Math.max(Math.abs(maxOriginal), 1)) * 0.12;
-  const min = minOriginal - folga;
-  const max = maxOriginal + folga;
-  const amplitude = max - min || 1;
-  const x = (indice: number) => margem.left + (indice / Math.max(1, pontos.length - 1)) * areaWidth;
-  const y = (valor: number) => margem.top + ((max - valor) / amplitude) * areaHeight;
-  const linha = pontos.map((ponto, indice) => `${indice === 0 ? "M" : "L"} ${x(indice)} ${y(ponto.valor)}`).join(" ");
-  const area = `${linha} L ${x(pontos.length - 1)} ${margem.top + areaHeight} L ${margem.left} ${margem.top + areaHeight} Z`;
-  const ticksY = Array.from({ length: 5 }, (_, indice) => max - (indice / 4) * amplitude);
-  const intervaloAno = Math.max(1, Math.ceil(pontos.length / 7));
-
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full" role="img" aria-label="Gráfico detalhado da série histórica">
-      {ticksY.map((tick) => (
-        <g key={tick}>
-          <line x1={margem.left} x2={width - margem.right} y1={y(tick)} y2={y(tick)} stroke="#d8e1eb" strokeDasharray="4 4" />
-          <text x={margem.left - 9} y={y(tick) + 4} textAnchor="end" className="fill-ms-muted text-[10px]">
-            {tick.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}
-          </text>
-        </g>
-      ))}
-      <path d={area} fill="#1f5f9f" opacity={0.1} />
-      <path d={linha} fill="none" stroke="#1f5f9f" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      {pontos.map((ponto, indice) => (
-        <g key={`${ponto.ano}-${ponto.valor}`}>
-          <circle cx={x(indice)} cy={y(ponto.valor)} r={4} fill="white" stroke="#1f5f9f" strokeWidth={2.5} />
-          <title>{`${ponto.ano}: ${formatNumeroHistorico(ponto.valor, unidade)}`}</title>
-          {(indice % intervaloAno === 0 || indice === pontos.length - 1) && (
-            <text x={x(indice)} y={height - 13} textAnchor="middle" className="fill-ms-muted text-[10px]">
-              {ponto.ano}
-            </text>
-          )}
-        </g>
-      ))}
-    </svg>
-  );
-}
-
-type PosicaoFlutuante = { left: number; top: number; width: number };
-
-function HistoricoFlutuante({
-  valor,
-  pontos,
-  className,
-  children
-}: {
-  valor: ValorIndicador;
-  pontos: PontoHistorico[];
-  className: string;
-  children: ReactNode;
-}) {
-  const [aberto, setAberto] = useState(false);
-  const [renderizado, setRenderizado] = useState(false);
-  const [posicao, setPosicao] = useState<PosicaoFlutuante | null>(null);
-  const gatilhoRef = useRef<HTMLSpanElement>(null);
-  const abrirRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const fecharRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const desmontarRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const primeiro = pontos[0];
-  const ultimo = pontos[pontos.length - 1];
-  const variacao = ultimo.valor - primeiro.valor;
-  const variacaoPercentual = primeiro.valor === 0 ? null : (variacao / Math.abs(primeiro.valor)) * 100;
-  const minimo = pontos.reduce((menor, ponto) => (ponto.valor < menor.valor ? ponto : menor), primeiro);
-  const maximo = pontos.reduce((maior, ponto) => (ponto.valor > maior.valor ? ponto : maior), primeiro);
-  const TrendIcon = variacao >= 0 ? TrendingUp : TrendingDown;
-
-  function atualizarPosicao() {
-    const elemento = gatilhoRef.current;
-    if (!elemento) return;
-    const rect = elemento.getBoundingClientRect();
-    const width = Math.min(660, window.innerWidth - 24);
-    const left = Math.max(12, Math.min(rect.right - width, window.innerWidth - width - 12));
-    const alturaEstimada = Math.min(620, window.innerHeight - 24);
-    const abaixo = rect.bottom + 10;
-    const top = abaixo + alturaEstimada <= window.innerHeight ? abaixo : Math.max(12, rect.top - alturaEstimada - 10);
-    setPosicao({ left, top, width });
-  }
-
-  function abrir() {
-    if (abrirRef.current) clearTimeout(abrirRef.current);
-    if (fecharRef.current) clearTimeout(fecharRef.current);
-    if (desmontarRef.current) clearTimeout(desmontarRef.current);
-    atualizarPosicao();
-    setRenderizado(true);
-    setAberto(true);
-  }
-
-  function agendarAbertura() {
-    if (abrirRef.current) clearTimeout(abrirRef.current);
-    if (fecharRef.current) clearTimeout(fecharRef.current);
-    abrirRef.current = setTimeout(abrir, 800);
-  }
-
-  function fechar() {
-    setAberto(false);
-    if (desmontarRef.current) clearTimeout(desmontarRef.current);
-    desmontarRef.current = setTimeout(() => setRenderizado(false), 200);
-  }
-
-  function agendarFechamento() {
-    if (abrirRef.current) clearTimeout(abrirRef.current);
-    if (fecharRef.current) clearTimeout(fecharRef.current);
-    if (renderizado) fecharRef.current = setTimeout(fechar, 140);
-  }
-
-  useEffect(() => {
-    if (!renderizado) return;
-    const reposicionar = () => atualizarPosicao();
-    window.addEventListener("resize", reposicionar);
-    window.addEventListener("scroll", reposicionar, true);
-    return () => {
-      window.removeEventListener("resize", reposicionar);
-      window.removeEventListener("scroll", reposicionar, true);
-    };
-  }, [renderizado]);
-
-  useEffect(() => () => {
-    if (abrirRef.current) clearTimeout(abrirRef.current);
-    if (fecharRef.current) clearTimeout(fecharRef.current);
-    if (desmontarRef.current) clearTimeout(desmontarRef.current);
-  }, []);
-
-  const painel = renderizado && posicao ? (
-    <span
-      role="dialog"
-      aria-label={`Série histórica detalhada de ${valor.indicador.nome}`}
-      onPointerEnter={(event) => {
-        if (event.pointerType === "mouse") abrir();
-      }}
-      onPointerLeave={(event) => {
-        if (event.pointerType === "mouse") agendarFechamento();
-      }}
-      onClick={(event) => event.stopPropagation()}
-      className={`historico-popover ${aberto ? "is-open" : "is-closing"} fixed z-100 block max-h-[calc(100vh-24px)] overflow-y-auto rounded-lg border border-ms-line bg-white p-5 text-left text-ms-ink shadow-2xl`}
-      style={posicao}
-    >
-      <span className="flex items-start justify-between gap-4">
-        <span>
-          <span className="block text-xs font-semibold uppercase tracking-wide text-ms-blue">Série histórica detalhada</span>
-          <span className="mt-1 block text-lg font-semibold leading-snug">{valor.indicador.nome}</span>
-          <span className="mt-1 block text-xs text-ms-muted">
-            {primeiro.ano}–{ultimo.ano} · {pontos.length} anos com dados · {valor.fonte ?? valor.indicador.fonte ?? "Fonte não informada"}
-          </span>
-        </span>
-        <span className="rounded-md bg-ms-sky px-2.5 py-1 text-xs font-semibold text-ms-blue">{valor.indicador.unidade || "valor"}</span>
-      </span>
-
-      <span className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <span className="rounded-md bg-ms-bg p-3">
-          <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Primeiro valor</span>
-          <span className="font-data mt-1 block font-medium">{formatNumeroHistorico(primeiro.valor, valor.indicador.unidade)}</span>
-          <span className="block text-xs text-ms-muted">{primeiro.ano}</span>
-        </span>
-        <span className="rounded-md bg-ms-bg p-3">
-          <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Último valor</span>
-          <span className="font-data mt-1 block font-medium">{formatNumeroHistorico(ultimo.valor, valor.indicador.unidade)}</span>
-          <span className="block text-xs text-ms-muted">{ultimo.ano}</span>
-        </span>
-        <span className="rounded-md bg-ms-bg p-3">
-          <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Variação</span>
-          <span className={`font-data mt-1 flex items-center gap-1 font-medium ${variacao >= 0 ? "text-ms-green" : "text-red-700"}`}>
-            <TrendIcon className="h-4 w-4" />
-            {variacao >= 0 ? "+" : ""}{formatNumeroHistorico(variacao, valor.indicador.unidade)}
-          </span>
-          <span className="block text-xs text-ms-muted">
-            {variacaoPercentual === null ? "base inicial zero" : `${variacaoPercentual >= 0 ? "+" : ""}${variacaoPercentual.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`}
-          </span>
-        </span>
-        <span className="rounded-md bg-ms-bg p-3">
-          <span className="block text-[0.68rem] uppercase tracking-wide text-ms-muted">Amplitude</span>
-          <span className="font-data mt-1 block font-medium">{formatNumeroHistorico(maximo.valor - minimo.valor, valor.indicador.unidade)}</span>
-          <span className="block text-xs text-ms-muted">mín. a máx.</span>
-        </span>
-      </span>
-
-      <span className="mt-4 block rounded-md border border-ms-line bg-white p-2">
-        <GraficoHistoricoDetalhado pontos={pontos} unidade={valor.indicador.unidade} />
-      </span>
-
-      <span className="mt-4 grid gap-3 sm:grid-cols-[1fr_1.35fr]">
-        <span className="grid grid-cols-2 gap-2 text-xs">
-          <span className="rounded-md border border-ms-line p-3">
-            <span className="block text-ms-muted">Menor registro</span>
-            <span className="font-data mt-1 block font-medium text-ms-ink">{formatNumeroHistorico(minimo.valor, valor.indicador.unidade)}</span>
-            <span className="text-ms-muted">em {minimo.ano}</span>
-          </span>
-          <span className="rounded-md border border-ms-line p-3">
-            <span className="block text-ms-muted">Maior registro</span>
-            <span className="font-data mt-1 block font-medium text-ms-ink">{formatNumeroHistorico(maximo.valor, valor.indicador.unidade)}</span>
-            <span className="text-ms-muted">em {maximo.ano}</span>
-          </span>
-        </span>
-        <span className="max-h-32 overflow-y-auto rounded-md border border-ms-line">
-          <span className="grid grid-cols-2 bg-ms-bg px-3 py-2 text-[0.68rem] font-semibold uppercase tracking-wide text-ms-muted">
-            <span>Ano</span><span className="text-right">Valor</span>
-          </span>
-          {[...pontos].reverse().map((ponto) => (
-            <span key={`tabela-${ponto.ano}`} className="font-data grid grid-cols-2 border-t border-ms-line px-3 py-1.5 text-xs">
-              <span>{ponto.ano}</span>
-              <span className="text-right font-medium">{formatNumeroHistorico(ponto.valor, valor.indicador.unidade)}</span>
-            </span>
-          ))}
-        </span>
-      </span>
-      {valor.indicador.sentido === "menor_melhor" ? (
-        <span className="mt-3 block rounded-md bg-[#fbf1de] px-3 py-2 text-xs text-[#8f5f0d]">
-          Neste indicador, valores menores representam melhor desempenho.
-        </span>
-      ) : null}
-    </span>
-  ) : null;
-
-  return (
-    <span
-      ref={gatilhoRef}
-      role="button"
-      tabIndex={0}
-      aria-expanded={aberto}
-      onPointerEnter={(event) => {
-        if (event.pointerType === "mouse") agendarAbertura();
-      }}
-      onPointerLeave={(event) => {
-        if (event.pointerType === "mouse") agendarFechamento();
-      }}
-      onFocus={(event) => {
-        if (event.currentTarget.matches(":focus-visible")) abrir();
-      }}
-      onBlur={agendarFechamento}
-      onClick={(event) => {
-        event.stopPropagation();
-        if (aberto) fechar();
-        else abrir();
-      }}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          if (aberto) fechar();
-          else abrir();
-        }
-        if (event.key === "Escape") fechar();
-      }}
-      className={`${className} cursor-pointer outline-none ring-inset ring-ms-blue/30 transition-shadow hover:ring-2 focus-visible:ring-2`}
-      title="Mantenha o mouse sobre o indicador para ver a série histórica detalhada"
-    >
-      {children}
-      {typeof document !== "undefined" && painel ? createPortal(painel, document.body) : null}
-    </span>
-  );
-}
-
-function CartaoIndicador({
-  valor,
-  pontos,
-  className,
-  children
-}: {
-  valor: ValorIndicador;
-  pontos: PontoHistorico[];
-  className: string;
-  children: ReactNode;
-}) {
-  if (pontos.length < 2) {
-    return <span className={className}>{children}</span>;
-  }
-
-  return (
-    <HistoricoFlutuante valor={valor} pontos={pontos} className={className}>
-      {children}
-    </HistoricoFlutuante>
-  );
-}
-
-function formatScore(score: number | null, quantidade: number): string {
-  if (score === null) {
-    return `${quantidade}`;
-  }
-
-  return score.toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
-}
-
-export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props) {
+export function FichaMunicipal({ municipio, indicadores, recursos = [], rankingItem = null }: Props) {
   const anos = useMemo(
     () => Array.from(new Set(indicadores.map((valor) => valor.ano))).sort((a, b) => b - a),
     [indicadores]
   );
   const temas = useMemo(
-    () => Array.from(new Set(indicadores.map((valor) => valor.indicador.tema))).sort((a, b) => {
-      const ordem = ordemTema(a) - ordemTema(b);
-      return ordem === 0 ? ordenarTexto(a, b) : ordem;
-    }),
-    [indicadores]
-  );
-  const fontes = useMemo(
     () =>
-      Array.from(new Set(indicadores.map((valor) => valor.fonte ?? valor.indicador.fonte ?? "Fonte não informada"))).sort(
-        ordenarTexto
-      ),
+      Array.from(new Set(indicadores.map((valor) => valor.indicador.tema))).sort((a, b) => {
+        const ordem = ordemTema(a) - ordemTema(b);
+        return ordem === 0 ? ordenarTexto(a, b) : ordem;
+      }),
     [indicadores]
   );
+  const fontes = useMemo(() => Array.from(new Set(indicadores.map(fonteDe))).sort(ordenarTexto), [indicadores]);
 
-  const [ano, setAno] = useState(anos[0] ? String(anos[0]) : TODOS);
+  const anoPadrao = anos[0] ? String(anos[0]) : TODOS;
+  const [ano, setAno] = useState(anoPadrao);
   const [tema, setTema] = useState(TODOS);
   const [fonte, setFonte] = useState(TODOS);
   const [somenteOficiais, setSomenteOficiais] = useState(true);
-  const [temaAberto, setTemaAberto] = useState<string | null>(temas[0] ?? null);
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+  const [serieAberta, setSerieAberta] = useState<ValorIndicador | null>(null);
+  const [dataGeracao, setDataGeracao] = useState("");
+  const abasRef = useRef<Array<HTMLButtonElement | null>>([]);
 
-  const filtrados = useMemo(() => {
-    return indicadores
-      .filter((valor) => ano === TODOS || String(valor.ano) === ano)
-      .filter((valor) => tema === TODOS || valor.indicador.tema === tema)
-      .filter((valor) => fonte === TODOS || (valor.fonte ?? valor.indicador.fonte ?? "Fonte não informada") === fonte)
-      .filter((valor) => !somenteOficiais || valor.status_validacao.includes("oficial"))
-      .sort((a, b) => {
-        const temaCompare = ordemTema(a.indicador.tema) - ordemTema(b.indicador.tema);
-        if (temaCompare !== 0) {
-          return temaCompare;
-        }
+  useEffect(() => {
+    setDataGeracao(new Date().toLocaleDateString("pt-BR"));
+  }, []);
 
-        const nomeCompare = ordenarTexto(a.indicador.nome, b.indicador.nome);
-        if (nomeCompare !== 0) {
-          return nomeCompare;
-        }
+  const filtradosSemTema = useMemo(
+    () =>
+      indicadores
+        .filter((valor) => ano === TODOS || String(valor.ano) === ano)
+        .filter((valor) => fonte === TODOS || fonteDe(valor) === fonte)
+        .filter((valor) => !somenteOficiais || valor.status_validacao.includes("oficial")),
+    [ano, fonte, indicadores, somenteOficiais]
+  );
 
-        return b.ano - a.ano;
-      });
-  }, [ano, fonte, indicadores, somenteOficiais, tema]);
+  const filtrados = useMemo(
+    () =>
+      filtradosSemTema
+        .filter((valor) => tema === TODOS || valor.indicador.tema === tema)
+        .sort((a, b) => {
+          const temaCompare = ordemTema(a.indicador.tema) - ordemTema(b.indicador.tema);
+          if (temaCompare !== 0) return temaCompare;
+          const nomeCompare = ordenarTexto(a.indicador.nome, b.indicador.nome);
+          if (nomeCompare !== 0) return nomeCompare;
+          return b.ano - a.ano;
+        }),
+    [filtradosSemTema, tema]
+  );
 
-  const dimensoes = useMemo<Dimensao[]>(() => {
-    const grupos = new Map<string, ValorIndicador[]>();
+  const temasDisponiveis = useMemo(
+    () => temas.filter((item) => filtradosSemTema.some((valor) => valor.indicador.tema === item)),
+    [filtradosSemTema, temas]
+  );
 
+  const historico = useMemo(
+    () => construirHistorico(indicadores.filter((valor) => !somenteOficiais || valor.status_validacao.includes("oficial"))),
+    [indicadores, somenteOficiais]
+  );
+
+  const grupos = useMemo(() => {
+    const mapa = new Map<string, ValorIndicador[]>();
     for (const valor of filtrados) {
-      const grupo = grupos.get(valor.indicador.tema) ?? [];
-      grupo.push(valor);
-      grupos.set(valor.indicador.tema, grupo);
+      const lista = mapa.get(valor.indicador.tema) ?? [];
+      lista.push(valor);
+      mapa.set(valor.indicador.tema, lista);
     }
-
-    return Array.from(grupos.entries())
-      .map(([nomeTema, valores]) => ({
-        tema: nomeTema,
-        valores,
-        score: calcularScore(valores),
-        config: temaConfig(nomeTema)
-      }))
-      .sort((a, b) => {
-        const ordem = ordemTema(a.tema) - ordemTema(b.tema);
-        return ordem === 0 ? ordenarTexto(a.tema, b.tema) : ordem;
-      });
+    return Array.from(mapa.entries());
   }, [filtrados]);
 
-  const historico = useMemo(() => {
-    const base = indicadores.filter((valor) => !somenteOficiais || valor.status_validacao.includes("oficial"));
-    return construirHistorico(base);
-  }, [indicadores, somenteOficiais]);
+  const totalDimensoes = new Set(filtrados.map((valor) => valor.indicador.tema)).size;
+  const totalFontes = new Set(filtrados.map(fonteDe)).size;
+  const filtrosAlterados = ano !== anoPadrao || tema !== TODOS || fonte !== TODOS || !somenteOficiais;
+  const anoNumero = ano === TODOS ? null : Number(ano);
+  const abas = [...temasDisponiveis, TODOS];
+  const abaAtiva = abas.includes(tema) ? tema : TODOS;
 
-  const temasSelecionados = dimensoes.map((dimensao) => dimensao.tema);
-  const fontesSelecionadas = Array.from(new Set(filtrados.map((valor) => valor.fonte ?? valor.indicador.fonte ?? "")));
-  const temaAbertoValido = dimensoes.some((dimensao) => dimensao.tema === temaAberto);
-  const temaExpandido = temaAbertoValido ? temaAberto : dimensoes[0]?.tema ?? null;
+  const resumoFiltros = `${filtrados.length} ${filtrados.length === 1 ? "registro" : "registros"} · ${totalDimensoes} ${
+    totalDimensoes === 1 ? "dimensão" : "dimensões"
+  } · ${totalFontes} ${totalFontes === 1 ? "fonte" : "fontes"}`;
+
+  const fecharSerie = useCallback(() => setSerieAberta(null), []);
 
   function limparFiltros() {
-    setAno(anos[0] ? String(anos[0]) : TODOS);
+    setAno(anoPadrao);
     setTema(TODOS);
     setFonte(TODOS);
     setSomenteOficiais(true);
-    setTemaAberto(temas[0] ?? null);
   }
 
+  function aoTeclarAba(event: React.KeyboardEvent<HTMLButtonElement>, indice: number) {
+    const ultimo = abas.length - 1;
+    const destino =
+      event.key === "ArrowRight" ? (indice === ultimo ? 0 : indice + 1)
+      : event.key === "ArrowLeft" ? (indice === 0 ? ultimo : indice - 1)
+      : event.key === "Home" ? 0
+      : event.key === "End" ? ultimo
+      : null;
+    if (destino === null) return;
+    event.preventDefault();
+    setTema(abas[destino]);
+    abasRef.current[destino]?.focus();
+  }
+
+  function variacaoAnual(valor: ValorIndicador): { variacao: number; desde: number } | null {
+    if (valor.valor === null || ehUnidadeBinaria(valor.indicador.unidade)) return null;
+    const anterior = historico.get(valor.indicador.codigo)?.find((ponto) => ponto.ano === valor.ano - 1);
+    return anterior ? { variacao: Number(valor.valor) - anterior.valor, desde: anterior.ano } : null;
+  }
+
+  function botaoSerie(valor: ValorIndicador) {
+    const pontos = historico.get(valor.indicador.codigo) ?? [];
+    if (pontos.length < 2) return null;
+    return (
+      <Button
+        variante="ghost"
+        tamanho="sm"
+        onClick={() => setSerieAberta(valor)}
+        aria-label={`Série histórica de ${valor.indicador.nome}`}
+        aria-haspopup="dialog"
+      >
+        <LineChart className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+        Série
+      </Button>
+    );
+  }
+
+  const pontosSerie = serieAberta ? (historico.get(serieAberta.indicador.codigo) ?? []) : [];
+
   return (
-    <section className="py-8">
+    <section className="pb-12" aria-label="Indicadores do município">
       <div className="print-only mb-6">
-        <p className="inline-block border-b-2 border-ms-green pb-1 text-xs font-semibold uppercase tracking-[0.16em] text-ms-green">
-          Relatório municipal
-        </p>
-        <h2 className="mt-1 text-2xl font-semibold text-ms-ink">{municipio.nome}</h2>
+        <p className="eyebrow">Relatório municipal</p>
+        <h2 className="t-h2 mt-2 text-ms-ink">{municipio.nome}</h2>
         <p className="mt-1 text-sm text-ms-muted">
-          Código IBGE {municipio.codigo_ibge} · UF {municipio.uf}
+          Código IBGE {municipio.codigo_ibge} · Ano {ano === TODOS ? "todos os anos" : ano} · Fonte{" "}
+          {fonte === TODOS ? "todas as fontes" : fonte}
+          {somenteOficiais ? " · somente oficiais" : ""}
+          {dataGeracao ? ` · Gerado em ${dataGeracao}` : ""}
         </p>
       </div>
 
-      <div className="no-print rounded-md border border-ms-line bg-white p-5 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <div className="inline-flex items-center gap-2 border-b-2 border-ms-green pb-1 text-xs font-semibold uppercase tracking-[0.16em] text-ms-green">
-              <Filter className="h-4 w-4" />
-              Filtros da ficha
-            </div>
-            <h2 className="mt-2 text-2xl font-semibold text-ms-ink">Indicadores disponíveis</h2>
-            <p className="mt-1 text-sm text-ms-muted">
-              {filtrados.length} de {indicadores.length} registros exibidos
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={limparFiltros}
-              className="inline-flex h-10 items-center gap-2 rounded-md border border-ms-line bg-white px-3 text-sm font-medium text-ms-ink hover:border-ms-blue hover:text-ms-blue"
-            >
-              <RotateCcw className="h-4 w-4" />
-              Limpar
-            </button>
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="inline-flex h-10 items-center gap-2 rounded-md border border-ms-line bg-white px-3 text-sm font-medium text-ms-ink hover:border-ms-blue hover:text-ms-blue"
-            >
-              <Printer className="h-4 w-4" />
-              Imprimir
-            </button>
-            <button
-              type="button"
-              onClick={() => baixarCsvMunicipal(municipio, filtrados)}
-              disabled={filtrados.length === 0}
-              className="inline-flex h-10 items-center gap-2 rounded-md bg-ms-blue px-3 text-sm font-medium text-white hover:bg-ms-navy disabled:cursor-not-allowed disabled:bg-slate-300"
-            >
-              <Download className="h-4 w-4" />
-              Exportar CSV
-            </button>
-          </div>
+      {/* CP-11 Barra de contexto fixa */}
+      <div className="no-print sticky top-[var(--header-h)] z-30 -mx-4 border-y border-ms-line bg-ms-surface px-4 shadow-e1 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
+        <div className="flex items-center justify-between gap-3 py-2 lg:hidden">
+          <p className="min-w-0 truncate text-sm">
+            <span className="font-semibold text-ms-ink">{municipio.nome}</span>
+            <span className="text-ms-muted">
+              {" · "}
+              {ano === TODOS ? "Todos os anos" : ano}
+              {somenteOficiais ? " · Oficiais" : ""}
+            </span>
+          </p>
+          <Button
+            variante="secondary"
+            tamanho="sm"
+            aria-expanded={filtrosAbertos}
+            aria-controls="filtros-ficha"
+            onClick={() => setFiltrosAbertos((atual) => !atual)}
+          >
+            <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+            Filtros
+          </Button>
         </div>
 
-        <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_1fr_1fr_auto]">
-          <label className="text-sm">
-            <span className="mb-1 block font-medium text-ms-muted">Ano de referência</span>
-            <select
-              value={ano}
-              onChange={(event) => setAno(event.target.value)}
-              className="h-11 w-full rounded-md border border-ms-line bg-ms-bg px-3 text-base outline-none ring-ms-blue/20 focus:border-ms-blue focus:bg-white focus:ring-4 md:text-sm"
-            >
+        <div
+          id="filtros-ficha"
+          className={cn("flex-wrap items-end gap-x-4 gap-y-3 pb-3 lg:flex lg:py-3", filtrosAbertos ? "grid" : "hidden")}
+        >
+          <div className="hidden min-w-0 lg:grid lg:gap-0.5">
+            <span className="truncate font-semibold text-ms-ink">{municipio.nome}</span>
+            <span className="whitespace-nowrap text-xs text-ms-muted" aria-live="polite">
+              {resumoFiltros}
+            </span>
+          </div>
+
+          <div className="grid gap-1">
+            <label htmlFor="ficha-ano" className="text-[13px] font-semibold text-ms-ink">
+              Ano de referência
+            </label>
+            <select id="ficha-ano" value={ano} onChange={(event) => setAno(event.target.value)} className={cn(campoClasses, "lg:w-32")}>
               <option value={TODOS}>Todos os anos</option>
               {anos.map((item) => (
                 <option key={item} value={item}>
@@ -551,15 +251,13 @@ export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props)
                 </option>
               ))}
             </select>
-          </label>
+          </div>
 
-          <label className="text-sm">
-            <span className="mb-1 block font-medium text-ms-muted">Tema</span>
-            <select
-              value={tema}
-              onChange={(event) => setTema(event.target.value)}
-              className="h-11 w-full rounded-md border border-ms-line bg-ms-bg px-3 text-base outline-none ring-ms-blue/20 focus:border-ms-blue focus:bg-white focus:ring-4 md:text-sm"
-            >
+          <div className="grid gap-1">
+            <label htmlFor="ficha-tema" className="text-[13px] font-semibold text-ms-ink">
+              Tema
+            </label>
+            <select id="ficha-tema" value={tema} onChange={(event) => setTema(event.target.value)} className={cn(campoClasses, "lg:w-40")}>
               <option value={TODOS}>Todos os temas</option>
               {temas.map((item) => (
                 <option key={item} value={item}>
@@ -567,15 +265,13 @@ export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props)
                 </option>
               ))}
             </select>
-          </label>
+          </div>
 
-          <label className="text-sm">
-            <span className="mb-1 block font-medium text-ms-muted">Fonte</span>
-            <select
-              value={fonte}
-              onChange={(event) => setFonte(event.target.value)}
-              className="h-11 w-full rounded-md border border-ms-line bg-ms-bg px-3 text-base outline-none ring-ms-blue/20 focus:border-ms-blue focus:bg-white focus:ring-4 md:text-sm"
-            >
+          <div className="grid gap-1">
+            <label htmlFor="ficha-fonte" className="text-[13px] font-semibold text-ms-ink">
+              Fonte
+            </label>
+            <select id="ficha-fonte" value={fonte} onChange={(event) => setFonte(event.target.value)} className={cn(campoClasses, "lg:w-40")}>
               <option value={TODOS}>Todas as fontes</option>
               {fontes.map((item) => (
                 <option key={item} value={item}>
@@ -583,239 +279,236 @@ export function FichaMunicipal({ municipio, indicadores, recursos = [] }: Props)
                 </option>
               ))}
             </select>
-          </label>
+          </div>
 
-          <label className="flex h-11 items-center gap-2 self-end rounded-md border border-ms-line bg-ms-bg px-3 text-sm font-medium text-ms-muted">
+          <label className="flex h-10 items-center gap-2 text-sm font-medium text-ms-ink">
             <input
               type="checkbox"
               checked={somenteOficiais}
               onChange={(event) => setSomenteOficiais(event.target.checked)}
-              className="h-4 w-4 rounded border-ms-line text-ms-blue"
+              className="h-[18px] w-[18px] accent-ms-blue"
             />
             Somente oficiais
           </label>
+
+          <p className="flex h-10 items-center text-[13px] text-ms-muted lg:hidden">{resumoFiltros}</p>
+
+          <div className="flex flex-wrap gap-2 lg:ml-auto">
+            {filtrosAlterados ? (
+              <Button variante="ghost" onClick={limparFiltros}>
+                <RotateCcw className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+                Limpar filtros
+              </Button>
+            ) : null}
+            <Button variante="secondary" onClick={() => window.print()}>
+              <Printer className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+              Imprimir
+            </Button>
+            <Button variante="primary" onClick={() => baixarCsvMunicipal(municipio, filtrados)} disabled={filtrados.length === 0}>
+              <Download className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+              Exportar CSV
+            </Button>
+          </div>
         </div>
       </div>
 
-      <StatCardGroup
-        className="mt-5"
-        items={[
-          {
-            label: "Ano selecionado",
-            value: ano === TODOS ? "Todos" : ano,
-            icon: CalendarDays,
-            tone: "blue",
-            detail: "Filtro da ficha"
-          },
-          {
-            label: "Dimensões",
-            value: temasSelecionados.length,
-            icon: Layers,
-            tone: "green",
-            detail: "Módulos com dados"
-          },
-          {
-            label: "Fontes",
-            value: fontesSelecionadas.length,
-            icon: Database,
-            tone: "teal",
-            detail: "Origem dos registros"
-          },
-          {
-            label: "Registros",
-            value: filtrados.length,
-            icon: ListChecks,
-            tone: "navy",
-            detail: "Resultado filtrado"
-          }
-        ]}
-      />
-
-      {filtrados.length === 0 ? (
-        <div className="mt-5 rounded-md border border-dashed border-ms-line bg-white p-6 text-sm text-ms-muted">
-          Não há dados para os filtros selecionados.
+      {/* CP-12 Abas por dimensão */}
+      <div className="no-print relative mt-6 overflow-x-auto scrollbar-none border-b border-ms-line">
+        <div role="tablist" aria-label="Dimensões" className="flex min-w-max gap-1">
+          {abas.map((item, indice) => {
+            const selecionada = item === abaAtiva;
+            const config = item === TODOS ? null : temaConfig(item);
+            const Icone = config?.icon;
+            const nota = item === TODOS ? null : notaDoModulo(rankingItem, item);
+            return (
+              <button
+                key={item}
+                ref={(elemento) => {
+                  abasRef.current[indice] = elemento;
+                }}
+                type="button"
+                role="tab"
+                id={`aba-${slug(item)}`}
+                aria-selected={selecionada}
+                aria-controls={PAINEL_ID}
+                tabIndex={selecionada ? 0 : -1}
+                onClick={() => setTema(item)}
+                onKeyDown={(event) => aoTeclarAba(event, indice)}
+                className={cn(
+                  "-mb-px inline-flex h-11 items-center gap-2 whitespace-nowrap border-b-2 px-3 text-sm font-semibold",
+                  selecionada ? "border-ms-ink text-ms-ink" : "border-transparent text-ms-muted hover:text-ms-ink"
+                )}
+              >
+                {Icone ? <Icone className={cn("h-4 w-4", config?.textClass)} strokeWidth={1.75} aria-hidden="true" /> : null}
+                {item === TODOS ? "Todos os indicadores" : item}
+                {nota !== null ? (
+                  <span className="font-data text-xs font-medium text-ms-muted">
+                    {formatarNota(nota)}
+                    <span className="sr-only"> de nota em {rankingItem?.ano}</span>
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
         </div>
-      ) : (
-        <>
-          <div className="no-print mt-6 grid gap-6 lg:grid-cols-[13rem_1fr]">
-            <aside className="lg:sticky lg:top-24 lg:self-start">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-ms-muted">Ir para dimensão</h3>
-              <nav className="mt-3 grid gap-1" aria-label="Navegação entre dimensões">
-                {dimensoes.map((dimensao) => {
-                  const ativa = temaExpandido === dimensao.tema;
-                  const Icon = dimensao.config.icon;
+      </div>
 
-                  return (
-                    <button
-                      key={dimensao.tema}
-                      type="button"
-                      onClick={() => setTemaAberto(dimensao.tema)}
-                      aria-current={ativa}
-                      className={`flex items-center gap-2.5 rounded-md border px-3 py-2.5 text-left text-sm font-medium transition ${
-                        ativa
-                          ? "border-ms-blue bg-white text-ms-ink shadow-sm"
-                          : "border-transparent text-ms-muted hover:bg-white hover:text-ms-ink"
-                      }`}
-                    >
-                      <span
-                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-white ${dimensao.config.accentClass}`}
-                      >
-                        <Icon className="h-3.5 w-3.5" strokeWidth={2} />
-                      </span>
-                      {dimensao.tema}
-                    </button>
-                  );
-                })}
-              </nav>
-            </aside>
-
-            <div className="dimension-card-grid">
-              {dimensoes.map((dimensao) => {
-                const aberta = temaExpandido === dimensao.tema;
-                const Icon = dimensao.config.icon;
-                const valoresExibidos = dimensao.valores.slice(0, 8);
-
+      <div
+        id={PAINEL_ID}
+        role="tabpanel"
+        aria-labelledby={`aba-${slug(abaAtiva)}`}
+        className="mt-4 overflow-hidden rounded-md border border-ms-line bg-ms-surface"
+      >
+        {filtrados.length === 0 ? (
+          <EmptyState
+            titulo="Não há dados para os filtros selecionados"
+            descricao="Mude o ano, a fonte ou desmarque “Somente oficiais”."
+            acao={<Button onClick={limparFiltros}>Limpar filtros</Button>}
+          />
+        ) : (
+          <>
+            {/* CP-13 Tabela de indicadores (desktop e impressão) */}
+            <table className="hidden w-full text-sm md:table print:table">
+              <caption className="sr-only">
+                Indicadores de {municipio.nome}
+                {anoNumero ? ` em ${anoNumero}` : ""}
+              </caption>
+              <thead className="border-b border-ms-line bg-ms-surface-muted text-left">
+                <tr>
+                  <th scope="col" className="t-label px-4 py-2.5 text-ms-muted">Indicador</th>
+                  {anoNumero === null ? <th scope="col" className="t-label px-3 py-2.5 text-ms-muted">Ano</th> : null}
+                  <th scope="col" className="t-label px-3 py-2.5 text-right text-ms-muted">
+                    Valor{anoNumero ? ` ${anoNumero}` : ""}
+                  </th>
+                  <th scope="col" className="t-label px-3 py-2.5 text-ms-muted">
+                    {anoNumero ? `Desde ${anoNumero - 1}` : "Var. anual"}
+                  </th>
+                  <th scope="col" className="t-label px-3 py-2.5 text-ms-muted print:hidden">
+                    <span className="sr-only">Evolução</span>
+                    <span aria-hidden="true">Série</span>
+                  </th>
+                  <th scope="col" className="t-label px-3 py-2.5 text-ms-muted">Fonte</th>
+                  <th scope="col" className="px-3 py-2.5 print:hidden">
+                    <span className="sr-only">Ações</span>
+                  </th>
+                </tr>
+              </thead>
+              {grupos.map(([nomeTema, valores]) => {
+                const config = temaConfig(nomeTema);
+                const Icone = config.icon;
                 return (
-                  <div
-                    key={dimensao.tema}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setTemaAberto(dimensao.tema)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        setTemaAberto(dimensao.tema);
-                      }
-                    }}
-                    className={`dimension-card ${aberta ? "is-open" : "is-closed"} group relative overflow-hidden rounded-md p-5 text-left text-white shadow-sm hover:-translate-y-0.5 hover:shadow-soft ${
-                      dimensao.config.bgClass
-                    }`}
-                  >
-                    <span className="absolute right-4 top-4 rounded-md border border-white/25 bg-white/10 p-1.5">
-                      <ChevronDown className={`h-4 w-4 transition-transform duration-500 ${aberta ? "rotate-180" : ""}`} />
-                    </span>
-
-                    <span className="relative z-10 flex items-center gap-2.5 pr-10">
-                      <span className="dimension-card-icon flex items-center justify-center rounded-md bg-white/15">
-                        <Icon className="h-4 w-4 text-white" strokeWidth={2} />
-                      </span>
-                      <span className="text-sm font-semibold">{dimensao.tema}</span>
-                    </span>
-
-                    <span className="relative z-10 mt-5 flex flex-wrap items-end justify-between gap-3">
-                      <span>
-                        <span className="block text-xs font-medium text-white/75">Resumo da dimensão</span>
-                        <span className="font-data mt-1 block text-4xl font-medium tracking-normal">
-                          {formatScore(dimensao.score, dimensao.valores.length)}
-                        </span>
-                        <span className="mt-1 block text-xs text-white/75">
-                          {dimensao.score === null ? "quantidade de registros" : "média % (normalizada)"}
-                        </span>
-                      </span>
-                      <span className="rounded-md border border-white/25 bg-white/10 px-3 py-2 text-xs font-medium">
-                        {dimensao.valores.length} registros
-                      </span>
-                    </span>
-
-                    <span
-                      aria-hidden={!aberta}
-                      className="dimension-card-content relative z-10 block overflow-hidden rounded-md bg-white text-ms-ink"
-                    >
-                        <span className="grid gap-3 md:grid-cols-2">
-                          {valoresExibidos.map((valor, indice) => {
-                            const pontos = historico.get(valor.indicador.codigo) ?? [];
-                            const invertido = valor.indicador.sentido === "menor_melhor";
-                            const ultimoImpar = valoresExibidos.length % 2 === 1 && indice === valoresExibidos.length - 1;
-
-                            return (
-                              <CartaoIndicador
-                                key={valor.id}
-                                valor={valor}
-                                pontos={pontos}
-                                className={`block rounded-md p-3 ${ultimoImpar ? "md:col-span-2" : ""} ${dimensao.config.panelClass}`}
-                              >
-                                <span className="flex items-start justify-between gap-2">
-                                  <span className="block text-xs font-semibold uppercase tracking-wide">{valor.ano}</span>
-                                  {invertido ? (
-                                    <span className="rounded-full bg-white/60 px-2 py-0.5 text-[0.65rem] font-semibold">
-                                      menor é melhor
-                                    </span>
-                                  ) : null}
-                                </span>
-                                <span className="mt-1 block text-sm font-semibold text-ms-ink">{valor.indicador.nome}</span>
-                                <span className="mt-2 flex items-end justify-between gap-3">
-                                  <span className="font-data block text-2xl font-medium tracking-normal">
-                                    {formatValorIndicador(valor)}
-                                  </span>
-                                  {pontos.length > 1 ? (
-                                    <span className="inline-flex flex-col items-end px-1 py-0.5">
-                                      <Sparkline pontos={pontos} />
-                                      <span className="mt-0.5 text-[0.62rem] font-semibold opacity-70">ver detalhes</span>
-                                    </span>
-                                  ) : null}
-                                </span>
-                                {pontos.length > 1 ? (
-                                  <span className="mt-1 block text-[0.7rem] opacity-70">
-                                    Evolução {pontos[0].ano}–{pontos[pontos.length - 1].ano}
-                                  </span>
-                                ) : null}
-                                <span className="mt-2 block text-xs opacity-80">
-                                  {valor.fonte ?? valor.indicador.fonte ?? "Fonte não informada"}
-                                </span>
-                                <RecursoGestao valor={valor} municipio={municipio} recursos={recursos} />
-                              </CartaoIndicador>
-                            );
-                          })}
-                        </span>
-                        {dimensao.valores.length > 8 ? (
-                          <span className="mt-3 block text-xs text-ms-muted">
-                            Mais {dimensao.valores.length - 8} registros aparecem na tabela detalhada.
+                  <tbody key={nomeTema}>
+                    {abaAtiva === TODOS ? (
+                      <tr className="border-b border-ms-line bg-ms-surface-muted">
+                        <th scope="colgroup" colSpan={anoNumero === null ? 7 : 6} className="px-4 py-2 text-left">
+                          <span className="inline-flex items-center gap-2 text-[13px] font-semibold text-ms-ink">
+                            <Icone className={cn("h-4 w-4", config.textClass)} strokeWidth={1.75} aria-hidden="true" />
+                            {nomeTema}
                           </span>
-                        ) : null}
-                    </span>
-                  </div>
+                        </th>
+                      </tr>
+                    ) : null}
+                    {valores.map((valor) => {
+                      const pontos = historico.get(valor.indicador.codigo) ?? [];
+                      const delta = variacaoAnual(valor);
+                      return (
+                        <tr key={valor.id} className="border-b border-ms-line last:border-b-0 hover:bg-ms-sky/40">
+                          <td className="px-4 py-3 align-top">
+                            <span className="flex flex-wrap items-center gap-2">
+                              <span className="font-medium text-ms-ink">{valor.indicador.nome}</span>
+                              {valor.indicador.sentido === "menor_melhor" ? <Badge variante="inverse">menor é melhor</Badge> : null}
+                            </span>
+                            <RecursoGestao valor={valor} municipio={municipio} recursos={recursos} />
+                          </td>
+                          {anoNumero === null ? <td className="font-data px-3 py-3 align-top text-ms-muted">{valor.ano}</td> : null}
+                          <td className="px-3 py-3 text-right align-top text-ms-ink">
+                            <Valor valor={valor.valor} unidade={valor.indicador.unidade} numeroClassName="font-medium" />
+                          </td>
+                          <td className="px-3 py-3 align-top">
+                            {delta ? (
+                              <Delta variacao={delta.variacao} sentido={valor.indicador.sentido} unidade={valor.indicador.unidade} desde={delta.desde} />
+                            ) : (
+                              <span className="text-ms-muted">
+                                <span aria-hidden="true">—</span>
+                                <span className="sr-only">sem comparação com o ano anterior</span>
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-3 py-3 align-top print:hidden">
+                            <Sparkline pontos={pontos} cor={config.cor} />
+                          </td>
+                          <td className="px-3 py-3 align-top">
+                            <BadgeFonte fonte={fonteDe(valor)} ano={valor.ano} status={valor.status_validacao} />
+                          </td>
+                          <td className="px-3 py-2 text-right align-top print:hidden">{botaoSerie(valor)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                );
+              })}
+            </table>
+
+            {/* CP-13.3 Celular: cada indicador vira um bloco */}
+            <div className="md:hidden print:hidden">
+              {grupos.map(([nomeTema, valores]) => {
+                const config = temaConfig(nomeTema);
+                const Icone = config.icon;
+                return (
+                  <section key={nomeTema} aria-label={nomeTema}>
+                    {abaAtiva === TODOS ? (
+                      <h3 className="flex items-center gap-2 border-b border-ms-line bg-ms-surface-muted px-4 py-2 font-sans text-[13px] font-semibold text-ms-ink">
+                        <Icone className={cn("h-4 w-4", config.textClass)} strokeWidth={1.75} aria-hidden="true" />
+                        {nomeTema}
+                      </h3>
+                    ) : null}
+                    <ul className="divide-y divide-ms-line">
+                      {valores.map((valor) => {
+                        const pontos = historico.get(valor.indicador.codigo) ?? [];
+                        const delta = variacaoAnual(valor);
+                        return (
+                          <li key={valor.id} className="grid gap-1.5 px-4 py-3">
+                            <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-ms-ink">
+                              {valor.indicador.nome}
+                              {valor.indicador.sentido === "menor_melhor" ? <Badge variante="inverse">menor é melhor</Badge> : null}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                              <Valor valor={valor.valor} unidade={valor.indicador.unidade} numeroClassName="text-base font-medium" />
+                              {delta ? (
+                                <Delta
+                                  variacao={delta.variacao}
+                                  sentido={valor.indicador.sentido}
+                                  unidade={valor.indicador.unidade}
+                                  desde={delta.desde}
+                                />
+                              ) : null}
+                              <span className="ml-auto">
+                                <Sparkline pontos={pontos} cor={config.cor} />
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <span className="text-xs text-ms-muted">
+                                {anoNumero === null ? `${valor.ano} · ` : ""}
+                                {rotuloFonte(fonteDe(valor), valor.ano)}
+                              </span>
+                              {botaoSerie(valor)}
+                            </div>
+                            <RecursoGestao valor={valor} municipio={municipio} recursos={recursos} />
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
                 );
               })}
             </div>
-          </div>
+          </>
+        )}
+      </div>
 
-          <div className="mt-6 overflow-hidden rounded-md border border-ms-line bg-white shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-ms-line text-sm">
-                <thead className="bg-ms-bg text-left text-xs font-semibold uppercase tracking-wide text-ms-muted">
-                  <tr>
-                    <th className="px-5 py-4">Ano</th>
-                    <th className="px-5 py-4">Dimensão</th>
-                    <th className="px-5 py-4">Indicador</th>
-                    <th className="px-5 py-4">Valor</th>
-                    <th className="px-5 py-4">Fonte</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-ms-line">
-                  {filtrados.map((valor) => (
-                    <tr key={`linha-${valor.id}`} className="hover:bg-ms-sky/50">
-                      <td className="whitespace-nowrap px-5 py-4 text-ms-muted">{valor.ano}</td>
-                      <td className="whitespace-nowrap px-5 py-4 text-ms-muted">{valor.indicador.tema}</td>
-                      <td className="px-5 py-4 font-medium text-ms-ink">
-                        {valor.indicador.nome}
-                        {valor.indicador.sentido === "menor_melhor" ? (
-                          <span className="ml-2 rounded-full bg-ms-bg px-2 py-0.5 text-[0.65rem] font-semibold text-ms-muted">
-                            menor é melhor
-                          </span>
-                        ) : null}
-                      </td>
-                      <td className="font-data whitespace-nowrap px-5 py-4 font-semibold text-ms-green">{formatValorIndicador(valor)}</td>
-                      <td className="whitespace-nowrap px-5 py-4 text-ms-muted">
-                        {valor.fonte ?? valor.indicador.fonte ?? "Fonte não informada"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
-      )}
+      {serieAberta && pontosSerie.length >= 2 ? (
+        <SeriePainel indicador={serieAberta.indicador} municipio={municipio.nome} pontos={pontosSerie} onFechar={fecharSerie} />
+      ) : null}
     </section>
   );
 }

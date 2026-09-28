@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CalendarDays, LandPlot, MapPinned, Users } from "lucide-react";
 import { FichaMunicipal } from "@/components/FichaMunicipal";
-import { ResumoMunicipio } from "@/components/municipio/ResumoMunicipio";
-import { StatCardGroup } from "@/components/ui/stat-card-group";
+import { CoberturaOficial, ResumoMunicipio } from "@/components/municipio/ResumoMunicipio";
+import { TEMA_ORDEM, notaDoModulo, temaConfig } from "@/components/municipio/fichaConfig";
+import { ScoreBar } from "@/components/ui/ScoreBar";
 import { fetchApi, fetchApiSafe, type IndicadoresMunicipio, type InstitucionalMunicipio, type Municipio } from "@/lib/api";
+import { formatarArea, formatarNota, formatarPopulacao } from "@/lib/formatters";
+import { ANO_RANKING_SANEAMENTO, obterRankingSaneamento } from "@/lib/rankingSaneamento";
 
 type Props = {
   params: Promise<{ codigo_ibge: string }>;
@@ -46,75 +48,121 @@ export default async function MunicipioDetalhePage({ params }: Props) {
     notFound();
   }
 
+  const ranking = await obterRankingSaneamento();
   const { municipio, indicadores } = dados;
+  const rankingItem = ranking.find((item) => item.codigo_ibge === municipio.codigo_ibge) ?? null;
+  const anoRanking = ranking[0]?.ano ?? ANO_RANKING_SANEAMENTO;
   const anos = Array.from(new Set(indicadores.map((valor) => valor.ano))).sort((a, b) => b - a);
   const anoMaisRecente = anos[0] ?? null;
   const anoMaisAntigo = anos[anos.length - 1] ?? null;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <nav aria-label="Trilha de navegação" className="no-print flex flex-wrap items-center gap-1.5 text-sm text-ms-muted">
+    <div className="mx-auto max-w-7xl px-4 pt-6 md:px-6 md:pt-8 lg:px-8">
+      <nav aria-label="Trilha de navegação" className="no-print text-sm text-ms-muted">
         <Link href="/" className="hover:text-ms-blue">
           Início
         </Link>
-        <span aria-hidden="true">/</span>
+        <span aria-hidden="true"> / </span>
         <Link href="/municipios" className="hover:text-ms-blue">
           Municípios
         </Link>
-        <span aria-hidden="true">/</span>
-        <span className="font-medium text-ms-ink">{municipio.nome}</span>
+        <span aria-hidden="true"> / </span>
+        <span className="text-ms-ink" aria-current="page">
+          {municipio.nome}
+        </span>
       </nav>
 
-      <Link
-        href="/municipios"
-        className="no-print mt-3 inline-flex h-10 items-center gap-2 rounded-md border border-ms-line bg-white px-3 text-sm font-medium text-ms-ink hover:border-ms-blue hover:text-ms-blue"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Voltar para municípios
-      </Link>
+      <div className="mt-4 grid gap-6 pb-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="grid content-start gap-6">
+          <div>
+            <p className="eyebrow">Ficha municipal</p>
+            <h1 className="t-h1 mt-3 text-ms-ink">{municipio.nome}</h1>
+            {/* PG-03.2 Metadados em uma linha, no lugar dos cards */}
+            <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              <div className="flex gap-1.5">
+                <dt className="text-ms-muted">Código IBGE</dt>
+                <dd className="font-data text-ms-ink">{municipio.codigo_ibge}</dd>
+              </div>
+              <div className="flex gap-1.5">
+                <dt className="text-ms-muted">População</dt>
+                <dd className="text-ms-ink">
+                  <span className="font-data">{formatarPopulacao(municipio.populacao)}</span>
+                  {municipio.populacao ? <span className="ml-1 text-xs text-ms-muted">hab.</span> : null}
+                </dd>
+              </div>
+              <div className="flex gap-1.5">
+                <dt className="text-ms-muted">Área</dt>
+                <dd className="text-ms-ink">
+                  <span className="font-data">{formatarArea(municipio.area_km2)}</span>
+                  {municipio.area_km2 ? <span className="ml-1 text-xs text-ms-muted">km²</span> : null}
+                </dd>
+              </div>
+              <div className="flex gap-1.5">
+                <dt className="text-ms-muted">Série</dt>
+                <dd className="font-data text-ms-ink">
+                  {anoMaisAntigo && anoMaisRecente ? `${anoMaisAntigo}–${anoMaisRecente}` : "—"}
+                </dd>
+              </div>
+            </dl>
+          </div>
 
-      <ResumoMunicipio
+          {/* PG-03.3 Faixa de notas: mesma nota do ranking (ADR-001) */}
+          <section aria-label={`Notas de saneamento ${anoRanking}`} className="rounded-md border border-ms-line bg-ms-surface">
+            {rankingItem ? (
+              <div className="grid divide-y divide-ms-line md:grid-cols-[13rem_minmax(0,1fr)] md:divide-x md:divide-y-0">
+                <div className="grid content-center gap-1 p-4">
+                  <p className="t-label text-ms-muted">Nota geral {rankingItem.ano}</p>
+                  <p className="flex items-baseline gap-1.5">
+                    <span className="t-data-lg text-ms-ink">{formatarNota(rankingItem.nota)}</span>
+                    <span className="text-xs text-ms-muted">de 100</span>
+                  </p>
+                  <p className="text-[13px] text-ms-muted">
+                    {rankingItem.posicao}º de {ranking.length} municípios
+                  </p>
+                </div>
+                <ul className="grid grid-cols-2 gap-x-4 gap-y-3 p-4 sm:grid-cols-3 xl:grid-cols-5">
+                  {TEMA_ORDEM.map((tema) => {
+                    const config = temaConfig(tema);
+                    const Icon = config.icon;
+                    const nota = notaDoModulo(rankingItem, tema);
+                    return (
+                      <li key={tema} className="grid content-start gap-1.5">
+                        <span className="inline-flex items-center gap-1.5 text-[13px] text-ms-ink">
+                          <Icon className={`h-4 w-4 ${config.textClass}`} strokeWidth={1.75} aria-hidden="true" />
+                          {config.nomeCurto}
+                        </span>
+                        <span className="font-data text-lg font-medium text-ms-ink">{formatarNota(nota)}</span>
+                        <ScoreBar valor={nota} cor={config.cor} className="w-full max-w-24" />
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : (
+              <p className="p-4 text-sm text-ms-muted">
+                Sem nota geral oficial em {anoRanking}: o município não tem indicadores oficiais suficientes nesse ano.
+              </p>
+            )}
+            <p className="border-t border-ms-line px-4 py-2 text-xs text-ms-muted">
+              Notas de 0 a 100 do ranking do Observatório, com indicadores oficiais de {rankingItem?.ano ?? anoRanking}.{" "}
+              <Link href="/metodologia" className="font-semibold text-ms-blue hover:underline">
+                Como calculamos
+              </Link>
+            </p>
+          </section>
+
+          <CoberturaOficial indicadores={indicadores} />
+        </div>
+
+        <ResumoMunicipio municipio={municipio} atendimento={institucional.atendimento_agua} />
+      </div>
+
+      <FichaMunicipal
         municipio={municipio}
-        atendimento={institucional.atendimento_agua}
         indicadores={indicadores}
-        totalRegistros={indicadores.length}
+        recursos={institucional.recursos}
+        rankingItem={rankingItem}
       />
-
-      <StatCardGroup
-        className="mt-5"
-        items={[
-          {
-            label: "UF",
-            value: municipio.uf,
-            icon: MapPinned,
-            tone: "green",
-            detail: "Unidade federativa"
-          },
-          {
-            label: "Série histórica",
-            value: anoMaisAntigo && anoMaisRecente ? `${anoMaisAntigo}-${anoMaisRecente}` : "Não informada",
-            icon: CalendarDays,
-            tone: "blue",
-            detail: "Período com registros"
-          },
-          {
-            label: "População estimada (IBGE)",
-            value: municipio.populacao ? municipio.populacao.toLocaleString("pt-BR") : "Não informada",
-            icon: Users,
-            tone: "teal",
-            detail: "Referência territorial IBGE"
-          },
-          {
-            label: "Área territorial (IBGE)",
-            value: municipio.area_km2 ? `${municipio.area_km2.toLocaleString("pt-BR")} km²` : "Não informada",
-            icon: LandPlot,
-            tone: "amber",
-            detail: "Extensão do município"
-          }
-        ]}
-      />
-
-      <FichaMunicipal municipio={municipio} indicadores={indicadores} recursos={institucional.recursos} />
     </div>
   );
 }

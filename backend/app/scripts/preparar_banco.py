@@ -26,6 +26,10 @@ def _importar_dados_locais() -> None:
     from app.scripts.importar_sinisa_2023 import ARQUIVOS_OBRIGATORIOS as SINISA_ARQUIVOS
     from app.scripts.importar_sinisa_2023 import FONTE_NOME as SINISA_FONTE_NOME
     from app.scripts.importar_sinisa_2023 import main as importar_sinisa
+    from app.scripts.importar_sinisa_2024 import ARQUIVOS_OBRIGATORIOS as SINISA_2024_ARQUIVOS
+    from app.scripts.importar_sinisa_2024 import FONTE_NOME as SINISA_2024_FONTE_NOME
+    from app.scripts.importar_sinisa_2024 import PLANILHAS_DIR as SINISA_2024_DIR
+    from app.scripts.importar_sinisa_2024 import main as importar_sinisa_2024
     from app.scripts.importar_snis_historico import ARQUIVO_CSV as SNIS_ARQUIVO
     from app.scripts.importar_snis_historico import FONTE_NOME as SNIS_FONTE_NOME
     from app.scripts.importar_snis_historico import main as importar_snis
@@ -43,6 +47,19 @@ def _importar_dados_locais() -> None:
     else:
         faltantes = ", ".join(arquivo.name for arquivo in arquivos_sinisa if not arquivo.exists())
         print(f"SINISA 2023 não importado: arquivos ausentes ({faltantes}).")
+
+    arquivos_sinisa_2024 = [SINISA_2024_DIR / caminho for caminho in SINISA_2024_ARQUIVOS]
+    if all(arquivo.exists() for arquivo in arquivos_sinisa_2024):
+        if _fonte_possui_dados(SINISA_2024_FONTE_NOME):
+            print("SINISA 2024 já está importado; mantendo dados existentes.")
+        else:
+            try:
+                importar_sinisa_2024()
+            except Exception as erro:  # noqa: BLE001 - boot não pode depender de um import opcional
+                print(f"SINISA 2024 não importado: falha na importação ({erro}).")
+    else:
+        faltantes = ", ".join(arquivo.name for arquivo in arquivos_sinisa_2024 if not arquivo.exists())
+        print(f"SINISA 2024 não importado: planilhas ausentes ({faltantes}).")
 
     arquivo_snis = raw_dir / SNIS_ARQUIVO
     if arquivo_snis.exists():

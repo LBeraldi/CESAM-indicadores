@@ -33,11 +33,10 @@ export function RecursoGestao({ valor, municipio, recursos }: Props) {
       href={recurso.url}
       target="_blank"
       rel="noopener noreferrer"
-      onClick={(event) => event.stopPropagation()}
-      className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-current/25 bg-white/65 px-2.5 py-1.5 text-xs font-semibold transition hover:bg-white focus:outline-none focus:ring-2 focus:ring-current/30"
-      aria-label={`${rotulo} de ${municipio.nome}`}
+      className="no-print mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold text-ms-blue hover:underline"
+      aria-label={`${rotulo} de ${municipio.nome} (abre em nova aba)`}
     >
-      <Icon className="h-3.5 w-3.5" />
+      <Icon className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
       {rotulo}
     </a>
   );
