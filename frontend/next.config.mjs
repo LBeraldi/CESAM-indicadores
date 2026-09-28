@@ -31,7 +31,10 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",
+  // A Vercel já faz o output tracing. O standalone do Next 16.3 entra em
+  // conflito com o adaptador da Vercel e pode procurar arquivos NFT que não
+  // foram gerados durante o build.
+  output: process.env.VERCEL ? undefined : "standalone",
   poweredByHeader: false,
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
