@@ -22,8 +22,10 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://observatorio_saneamento:observatorio_saneamento@db:5432/observatorio_saneamento
       DATA_DIR: /app/data
+      SINISA_2024_DIR: /app/planilhas
     volumes:
       - ./data:/app/data
+      - ./Planilhas Indicadores:/app/planilhas:ro
     depends_on:
       db:
         condition: service_healthy
@@ -38,11 +40,13 @@ services:
       DATA_DIR: /app/data
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3002,http://127.0.0.1:3002,http://localhost:3000,http://127.0.0.1:3000}
       RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-120}
+      SINISA_2024_DIR: /app/planilhas
     ports:
       - "${API_PORT:-8000}:8000"
     volumes:
       - ./backend:/app/backend
       - ./data:/app/data
+      - ./Planilhas Indicadores:/app/planilhas:ro
     depends_on:
       db-init:
         condition: service_completed_successfully
