@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AvisoIndisponivel } from "@/components/AvisoIndisponivel";
 import { TabelaMunicipios } from "@/components/TabelaMunicipios";
 import { fetchApiResult, type Municipio } from "@/lib/api";
-import { obterRankingSaneamento } from "@/lib/rankingSaneamento";
+import { ANO_RANKING_SANEAMENTO, obterRankingSaneamento } from "@/lib/rankingSaneamento";
 
 export const metadata: Metadata = {
   title: "Municípios",
@@ -17,16 +17,18 @@ export default async function MunicipiosPage() {
     obterRankingSaneamento()
   ]);
 
-  const codigosComDados = new Set(rankingSaneamento.map((item) => item.codigo_ibge));
-
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-12 lg:px-8">
       {!municipiosResult.disponivel ? (
-        <div className="mb-5">
+        <div className="mb-6">
           <AvisoIndisponivel />
         </div>
       ) : null}
-      <TabelaMunicipios municipios={municipiosResult.data} codigosComDados={codigosComDados} />
+      <TabelaMunicipios
+        municipios={municipiosResult.data}
+        ranking={rankingSaneamento}
+        anoRanking={rankingSaneamento[0]?.ano ?? ANO_RANKING_SANEAMENTO}
+      />
     </div>
   );
 }

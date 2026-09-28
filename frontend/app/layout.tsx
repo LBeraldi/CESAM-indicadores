@@ -63,65 +63,74 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${fontSans.variable} ${fontDisplay.variable} ${fontMono.variable}`}>
       <body className="min-h-screen bg-ms-bg font-sans text-ms-ink antialiased">
+        <a href="#conteudo" className="skip-link">
+          Pular para o conteúdo
+        </a>
         <div className="flex min-h-screen flex-col">
-          <header className="no-print sticky top-0 z-40 border-b border-ms-line/80 bg-white/95 backdrop-blur">
-            <div className="border-b border-ms-line/60 bg-ms-navy text-white">
-              <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 text-xs">
-                <span className="font-medium">Centro de Estudos em Saneamento Ambiental</span>
-                <span className="hidden text-white/75 sm:inline">Dados oficiais para analise municipal</span>
+          <header className="no-print sticky top-0 z-40 border-b border-ms-line bg-ms-surface">
+            <div className="bg-ms-navy text-white">
+              <div className="mx-auto flex h-7 max-w-7xl items-center justify-between gap-4 px-4 text-xs md:h-8 md:px-6 lg:px-8">
+                <span className="truncate font-medium">Centro de Estudos em Saneamento Ambiental · UEMS</span>
+                <span className="hidden text-white/80 sm:inline">Dados oficiais para análise municipal</span>
               </div>
             </div>
-
-            <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between">
-              <Link href="/" className="flex items-center" aria-label="Observatório de Saneamento, página inicial">
-                <Image
-                  src="/brand/observatorio-saneamento.svg"
-                  alt="Observatório de Saneamento"
-                  width={272}
-                  height={56}
-                  priority
-                  className="h-10 w-auto max-w-[13rem] sm:h-14 sm:max-w-[17rem]"
-                />
-              </Link>
-
-              <Navbar apiUrl={apiUrl} />
-            </div>
+            <Navbar apiUrl={apiUrl} />
           </header>
 
-          <main className="flex-1">{children}</main>
+          <main id="conteudo" tabIndex={-1} className="flex-1 outline-none">
+            {children}
+          </main>
 
-          <footer className="no-print border-t border-ms-line bg-white">
-            <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:grid-cols-[1.4fr_1fr_1fr]">
+          <footer className="no-print relative overflow-hidden border-t border-ms-line bg-ms-surface">
+            <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-2 md:px-6 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:px-8">
               <div>
                 <Image
                   src="/brand/observatorio-saneamento.svg"
                   alt="Observatório de Saneamento"
                   width={288}
                   height={64}
-                  className="h-12 w-auto max-w-[14rem] sm:h-16 sm:max-w-[18rem]"
+                  className="h-12 w-auto max-w-[14rem]"
                 />
-                <p className="mt-3 max-w-xl text-sm leading-6 text-ms-muted">
-                  Plataforma para consulta, comparação e exportação de indicadores municipais de saneamento.
+                <p className="mt-3 max-w-sm text-sm leading-[22px] text-ms-muted">
+                  Plataforma do Centro de Estudos em Saneamento Ambiental (CESAM/UEMS) para consulta, comparação e
+                  exportação de indicadores municipais de saneamento.
                 </p>
               </div>
 
               <div>
-                <h2 className="text-sm font-semibold text-ms-ink">Navegacao</h2>
-                <div className="mt-3 grid gap-2 text-sm text-ms-muted">
-                  <Link href="/" className="hover:text-ms-blue">Visao geral</Link>
-                  <Link href="/municipios" className="hover:text-ms-blue">Municipios</Link>
-                  <Link href="/ranking" className="hover:text-ms-blue">Ranking</Link>
-                  <a href={`${apiUrl}/docs`} className="hover:text-ms-blue">Documentacao da API</a>
-                </div>
+                <h2 className="t-label text-ms-ink">Navegação</h2>
+                <ul className="mt-3 grid gap-2 text-sm text-ms-muted">
+                  <li><Link href="/" className="hover:text-ms-blue">Visão geral</Link></li>
+                  <li><Link href="/municipios" className="hover:text-ms-blue">Lista de municípios</Link></li>
+                  <li><Link href="/ranking" className="hover:text-ms-blue">Ranking</Link></li>
+                  <li><Link href="/metodologia" className="hover:text-ms-blue">Metodologia e fontes</Link></li>
+                </ul>
               </div>
 
               <div>
-                <h2 className="text-sm font-semibold text-ms-ink">Fontes</h2>
-                <div className="mt-3 grid gap-2 text-sm text-ms-muted">
-                  <span>SINISA 2023</span>
-                  <span>SNIS Serie Historica 1995-2022</span>
-                  <span>Malha municipal IBGE</span>
-                </div>
+                <h2 className="t-label text-ms-ink">Fontes</h2>
+                <ul className="mt-3 grid gap-2 text-sm text-ms-muted">
+                  <li>SINISA 2024</li>
+                  <li>SNIS Série Histórica 1995–2022</li>
+                  <li>Malha municipal IBGE</li>
+                </ul>
+              </div>
+
+              <div>
+                <h2 className="t-label text-ms-ink">Dados abertos</h2>
+                <ul className="mt-3 grid gap-2 text-sm text-ms-muted">
+                  <li>
+                    <a href={`${apiUrl}/docs`} target="_blank" rel="noopener noreferrer" className="hover:text-ms-blue">
+                      Documentação da API ↗
+                    </a>
+                  </li>
+                  <li>Exportação CSV em cada ficha municipal</li>
+                </ul>
+              </div>
+            </div>
+            <div className="border-t border-ms-line">
+              <div className="mx-auto max-w-7xl px-4 py-4 text-xs text-ms-muted md:px-6 lg:px-8">
+                © CESAM · UEMS
               </div>
             </div>
           </footer>

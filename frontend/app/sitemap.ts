@@ -9,7 +9,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const paginasPrincipais: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "monthly", priority: 1 },
     { url: `${SITE_URL}/municipios`, changeFrequency: "monthly", priority: 0.9 },
-    { url: `${SITE_URL}/ranking`, changeFrequency: "monthly", priority: 0.9 }
+    { url: `${SITE_URL}/ranking`, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${SITE_URL}/metodologia`, changeFrequency: "yearly", priority: 0.6 }
   ];
 
   const paginasMunicipios: MetadataRoute.Sitemap = municipios.map((municipio) => ({

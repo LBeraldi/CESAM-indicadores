@@ -1,10 +1,14 @@
 "use client";
 
-import { ArrowRight, ChevronDown, MapPinned, Minus, Plus, RotateCcw } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { ArrowRight, Minus, Plus, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ButtonLink } from "@/components/ui/Button";
+import { Field, campoClasses } from "@/components/ui/Field";
+import { ScoreBar } from "@/components/ui/ScoreBar";
+import { TEMA_ORDEM, notaDoModulo, temaConfig } from "@/components/municipio/fichaConfig";
 import { CLIENT_API_BASE_URL, type Municipio, type RankingItem, type SentidoIndicador } from "@/lib/api";
+import { COR_CLASSE, LIMITES_NOTA, classeDaNota, classePorQuebras, quebrasPorQuintil, type ClasseEscala } from "@/lib/escalaMapa";
+import { ehUnidadeBinaria, formatarNota, formatarNumero, formatarPopulacao, formatarValor } from "@/lib/formatters";
 import { createProjector, geometryToPath, getBounds, type GeoJsonCollection } from "@/lib/geo";
 import type { RankingSaneamentoItem } from "@/lib/rankingSaneamento";
 
@@ -13,33 +17,33 @@ type Props = {
   notaSaneamento: RankingSaneamentoItem[];
 };
 
-type MapPath = {
-  codigo: string;
-  nome: string;
-  path: string;
-  valor: number | null;
-  fill: string;
-};
-
 type Metrica = {
   codigo: string;
   nome: string;
   unidade: string;
-  composta?: boolean;
+};
+
+type DadoMunicipio = { valor: number; posicao: number | null };
+
+type MapPath = {
+  codigo: string;
+  nome: string;
+  path: string;
+  classe: ClasseEscala | null;
 };
 
 const SVG_WIDTH = 860;
 const SVG_HEIGHT = 620;
-const MAP_PADDING = 34;
+const MAP_PADDING = 24;
 const FALLBACK_CODE = "5002704";
-const ANO_METRICA_PREFERIDO = 2023;
+const ANO_METRICA_PREFERIDO = 2024;
 const ZOOM_MIN = 1;
 const ZOOM_MAX = 5;
 const ZOOM_STEP = 1.5;
-const COR_SEM_DADO = "#3a4a55";
+const NOTA = "nota_saneamento";
 
 const METRICAS: Metrica[] = [
-  { codigo: "nota_saneamento", nome: "Nota geral de saneamento", unidade: "pontos de 0 a 100", composta: true },
+  { codigo: NOTA, nome: "Nota geral de saneamento", unidade: "0–100" },
   { codigo: "agua_atendimento_total", nome: "Água — atendimento total", unidade: "%" },
   { codigo: "agua_perdas_distribuicao", nome: "Água — perdas na distribuição", unidade: "%" },
   { codigo: "agua_extensao_rede", nome: "Água — extensão da rede", unidade: "km" },
@@ -60,106 +64,73 @@ const METRICAS: Metrica[] = [
   { codigo: "gestao_agencia_reguladora", nome: "Gestão — agência reguladora", unidade: "sim/não" }
 ];
 
-const TEXT = {
-  title: "Selecione um município para analisar",
-  select: "Selecionar município",
-  selected: "Município selecionado",
-  code: "Código IBGE",
-  open: "Abrir ficha",
-  listed: "municípios",
-  loading: "Carregando mapa de MS...",
-  error: "Não foi possível carregar o mapa.",
-  noData: "Nenhum município encontrado na API."
-};
-
-function hexParaRgb(hex: string): [number, number, number] {
-  const valor = hex.replace("#", "");
-  return [
-    Number.parseInt(valor.slice(0, 2), 16),
-    Number.parseInt(valor.slice(2, 4), 16),
-    Number.parseInt(valor.slice(4, 6), 16)
-  ];
+function textoValor(valor: number, metrica: Metrica): string {
+  if (metrica.codigo === NOTA) return formatarNota(valor);
+  const { numero, unidade } = formatarValor(valor, metrica.unidade);
+  return unidade ? `${numero} ${unidade}` : numero;
 }
 
-function misturarCores(corA: string, corB: string, fracao: number): string {
-  const [r1, g1, b1] = hexParaRgb(corA);
-  const [r2, g2, b2] = hexParaRgb(corB);
-  const r = Math.round(r1 + (r2 - r1) * fracao);
-  const g = Math.round(g1 + (g2 - g1) * fracao);
-  const b = Math.round(b1 + (b2 - b1) * fracao);
-  return `rgb(${r}, ${g}, ${b})`;
+type TipoEscala = "nota" | "binaria" | "quintil";
+
+function tipoEscala(codigoMetrica: string): TipoEscala {
+  if (codigoMetrica === NOTA) return "nota";
+  const unidade = METRICAS.find((item) => item.codigo === codigoMetrica)?.unidade;
+  return ehUnidadeBinaria(unidade) ? "binaria" : "quintil";
 }
 
-// Rampa sequencial de matiz único (claro -> escuro), como recomendado para
-// representar magnitude: nunca um arco-íris arbitrário.
-const RAMPA_SEQUENCIAL = ["#eaf6f2", "#7fc4ae", "#0b4a3c"];
-
-function corSequencial(t: number): string {
-  const posicao = Math.min(0.999, Math.max(0, t)) * (RAMPA_SEQUENCIAL.length - 1);
-  const indice = Math.floor(posicao);
-  const fracao = posicao - indice;
-  return misturarCores(RAMPA_SEQUENCIAL[indice], RAMPA_SEQUENCIAL[indice + 1], fracao);
+function classeDoValor(valor: number | null, tipo: TipoEscala, quebras: number[], menorMelhor: boolean): ClasseEscala | null {
+  if (valor === null) return null;
+  if (tipo === "nota") return classeDaNota(valor);
+  if (tipo === "binaria") return valor >= 1 ? 4 : 1;
+  return classePorQuebras(valor, quebras, menorMelhor);
 }
 
-function formatarValor(valor: number, unidade: string): string {
-  const numero = valor.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
-  return unidade.startsWith("%") ? `${numero}%` : `${numero} ${unidade}`;
+function formatarLimite(valor: number, unidade: string): string {
+  const casas = unidade === "km" ? 0 : unidade === "kg/hab.dia" ? 2 : 1;
+  return formatarNumero(valor, casas);
 }
 
 export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
-  const router = useRouter();
-  const containerRef = useRef<HTMLDivElement>(null);
   const [geoJson, setGeoJson] = useState<GeoJsonCollection | null>(null);
   const [mapError, setMapError] = useState(false);
 
-  const [metrica, setMetrica] = useState<string>("nota_saneamento");
-  const [valoresIndicador, setValoresIndicador] = useState<Map<string, number> | null>(null);
+  const [metrica, setMetrica] = useState<string>(NOTA);
+  const [dadosIndicador, setDadosIndicador] = useState<Map<string, DadoMunicipio> | null>(null);
   const [sentidoIndicador, setSentidoIndicador] = useState<SentidoIndicador>("maior_melhor");
-  const [anoMetrica, setAnoMetrica] = useState(ANO_METRICA_PREFERIDO);
+  const [anoIndicador, setAnoIndicador] = useState(ANO_METRICA_PREFERIDO);
   const [carregandoMetrica, setCarregandoMetrica] = useState(false);
 
   const [chosenCode, setChosenCode] = useState<string | null>(null);
-  const [hoverCode, setHoverCode] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<{ codigo: string; x: number; y: number } | null>(null);
 
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const dragState = useRef<{ startX: number; startY: number; lastX: number; lastY: number; moved: boolean } | null>(
-    null
-  );
+  const dragState = useRef<{ startX: number; startY: number; lastX: number; lastY: number; moved: boolean } | null>(null);
+
+  const anoNota = notaSaneamento[0]?.ano ?? ANO_METRICA_PREFERIDO;
 
   useEffect(() => {
     let isMounted = true;
-
     fetch("/data/ms-municipios.geojson")
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("map-load-failed");
-        }
-
+        if (!response.ok) throw new Error("map-load-failed");
         return response.json() as Promise<GeoJsonCollection>;
       })
       .then((data) => {
-        if (isMounted) {
-          setGeoJson(data);
-        }
+        if (isMounted) setGeoJson(data);
       })
       .catch(() => {
-        if (isMounted) {
-          setMapError(true);
-        }
+        if (isMounted) setMapError(true);
       });
-
     return () => {
       isMounted = false;
     };
   }, []);
 
   useEffect(() => {
-    if (metrica === "nota_saneamento") {
-      setValoresIndicador(null);
+    if (metrica === NOTA) {
+      setDadosIndicador(null);
       setSentidoIndicador("maior_melhor");
-      setAnoMetrica(ANO_METRICA_PREFERIDO);
       return;
     }
 
@@ -170,39 +141,27 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
       .then((response) => (response.ok ? (response.json() as Promise<number[]>) : Promise.reject()))
       .then((anos) => {
         const ano = anos.includes(ANO_METRICA_PREFERIDO) ? ANO_METRICA_PREFERIDO : (anos[0] ?? null);
-        if (ano === null) {
-          return [] as RankingItem[];
-        }
-        setAnoMetrica(ano);
+        if (ano === null) return [] as RankingItem[];
+        setAnoIndicador(ano);
         return fetch(`${CLIENT_API_BASE_URL}/ranking?indicador=${metrica}&ano=${ano}&limit=200`).then((response) =>
           response.ok ? (response.json() as Promise<RankingItem[]>) : Promise.reject()
         );
       })
       .then((itens) => {
-        if (!ativo) {
-          return;
-        }
-        const mapa = new Map<string, number>();
+        if (!ativo) return;
+        const mapa = new Map<string, DadoMunicipio>();
         for (const item of itens) {
-          if (item.valor !== null) {
-            mapa.set(item.codigo_ibge, item.valor);
-          }
+          if (item.valor !== null) mapa.set(item.codigo_ibge, { valor: item.valor, posicao: item.posicao });
         }
-        setValoresIndicador(mapa);
-        // O sentido vem da própria API (Indicador.sentido), não de uma lista
-        // fixa no frontend — assim um indicador novo nunca fica com a
-        // direção errada por falta de atualização em dois lugares.
+        setDadosIndicador(mapa);
+        // O sentido vem da própria API (Indicador.sentido), fonte única da direção.
         setSentidoIndicador(itens[0]?.sentido ?? "maior_melhor");
       })
       .catch(() => {
-        if (ativo) {
-          setValoresIndicador(new Map());
-        }
+        if (ativo) setDadosIndicador(new Map());
       })
       .finally(() => {
-        if (ativo) {
-          setCarregandoMetrica(false);
-        }
+        if (ativo) setCarregandoMetrica(false);
       });
 
     return () => {
@@ -210,73 +169,54 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
     };
   }, [metrica]);
 
-  const municipiosByCode = useMemo(
-    () => new Map(municipios.map((municipio) => [municipio.codigo_ibge, municipio])),
-    [municipios]
-  );
-
-  const municipiosOrdenados = useMemo(
-    () => [...municipios].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")),
-    [municipios]
-  );
+  const municipiosByCode = useMemo(() => new Map(municipios.map((municipio) => [municipio.codigo_ibge, municipio])), [municipios]);
+  const municipiosOrdenados = useMemo(() => [...municipios].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR")), [municipios]);
+  const notaPorCodigo = useMemo(() => new Map(notaSaneamento.map((item) => [item.codigo_ibge, item])), [notaSaneamento]);
 
   const metricaAtual = METRICAS.find((item) => item.codigo === metrica) ?? METRICAS[0];
+  const ehNota = metrica === NOTA;
+  const ehBinaria = ehUnidadeBinaria(metricaAtual.unidade);
   const menorMelhor = sentidoIndicador === "menor_melhor";
+  const anoMetrica = ehNota ? anoNota : anoIndicador;
 
-  const valoresPorCodigo = useMemo(() => {
-    if (metrica === "nota_saneamento") {
-      return new Map(notaSaneamento.map((item) => [item.codigo_ibge, item.nota]));
+  const dados = useMemo<Map<string, DadoMunicipio>>(() => {
+    if (ehNota) {
+      return new Map(notaSaneamento.map((item) => [item.codigo_ibge, { valor: item.nota, posicao: item.posicao }]));
     }
-    return valoresIndicador ?? new Map<string, number>();
-  }, [metrica, notaSaneamento, valoresIndicador]);
+    return dadosIndicador ?? new Map();
+  }, [ehNota, notaSaneamento, dadosIndicador]);
 
-  const { min, max } = useMemo(() => {
-    const valores = Array.from(valoresPorCodigo.values());
-    if (valores.length === 0) {
-      return { min: 0, max: 100 };
-    }
-    return { min: Math.min(...valores), max: Math.max(...valores) };
-  }, [valoresPorCodigo]);
+  const quebras = useMemo(() => {
+    const tipo = tipoEscala(metrica);
+    return tipo === "quintil" ? quebrasPorQuintil(Array.from(dados.values(), (item) => item.valor)) : [];
+  }, [dados, metrica]);
 
-  const selectedCode = chosenCode ?? municipiosByCode.get(FALLBACK_CODE)?.codigo_ibge ?? municipiosOrdenados[0]?.codigo_ibge ?? null;
+  const selectedCode =
+    chosenCode ?? municipiosByCode.get(FALLBACK_CODE)?.codigo_ibge ?? municipiosOrdenados[0]?.codigo_ibge ?? null;
   const selectedMunicipio = selectedCode ? municipiosByCode.get(selectedCode) : null;
-  const highlightCode = hoverCode ?? selectedCode;
+  const selectedNota = selectedCode ? notaPorCodigo.get(selectedCode) : undefined;
+  const selectedDado = selectedCode ? dados.get(selectedCode) : undefined;
 
   const paths = useMemo<MapPath[]>(() => {
-    if (!geoJson) {
-      return [];
-    }
-
+    if (!geoJson) return [];
     const bounds = getBounds(geoJson.features);
-    if (!bounds) {
-      return [];
-    }
-
+    if (!bounds) return [];
     const project = createProjector(bounds, SVG_WIDTH, SVG_HEIGHT, MAP_PADDING);
 
     return geoJson.features
       .map((feature) => {
         const codigo = feature.properties.codarea ?? "";
-        const municipio = municipiosByCode.get(codigo);
-        const valor = valoresPorCodigo.get(codigo) ?? null;
-        const t = valor === null ? null : max === min ? 0.5 : (valor - min) / (max - min);
-
         return {
           codigo,
-          nome: municipio?.nome ?? codigo,
+          nome: municipiosByCode.get(codigo)?.nome ?? codigo,
           path: geometryToPath(feature.geometry, project),
-          valor,
-          fill: t === null ? COR_SEM_DADO : corSequencial(t)
+          classe: classeDoValor(dados.get(codigo)?.valor ?? null, tipoEscala(metrica), quebras, sentidoIndicador === "menor_melhor")
         };
       })
       .filter((feature) => feature.codigo && feature.path);
-  }, [geoJson, municipiosByCode, valoresPorCodigo, min, max]);
+  }, [geoJson, municipiosByCode, dados, quebras, metrica, sentidoIndicador]);
 
-  function navigateToMunicipio(code: string) {
-    if (code) {
-      router.push(`/municipios/${code}`);
-    }
-  }
+  const selectedPath = paths.find((item) => item.codigo === selectedCode) ?? null;
 
   function ajustarZoom(fator: number) {
     setScale((atual) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, atual * fator)));
@@ -297,10 +237,7 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
   const vbY = (SVG_HEIGHT - vbH) / 2 + panY;
 
   function codigoDoAlvo(target: EventTarget | null): string | null {
-    if (target instanceof SVGPathElement) {
-      return target.dataset.codigo ?? null;
-    }
-    return null;
+    return target instanceof SVGPathElement ? (target.dataset.codigo ?? null) : null;
   }
 
   function handlePointerDown(event: React.PointerEvent<SVGSVGElement>) {
@@ -309,25 +246,17 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
 
   function handlePointerMove(event: React.PointerEvent<SVGSVGElement>) {
     const drag = dragState.current;
-    const svg = event.currentTarget;
-    const rect = svg.getBoundingClientRect();
+    const rect = event.currentTarget.getBoundingClientRect();
 
-    // Em zoom 1x não há para onde arrastar (maxPanX/Y = 0): tratar qualquer
-    // deslocamento pequeno como pan cancelava cliques por tremor de mão ou
-    // trackpad, mesmo sem nenhum movimento visível no mapa. Só engata o
-    // gesto de arraste quando o zoom realmente permite mover a viewBox.
+    // Em zoom 1x não há para onde arrastar: tremores de mão não podem cancelar o clique.
     const podeArrastar = maxPanX > 0 || maxPanY > 0;
 
     if (drag && event.buttons === 1 && podeArrastar) {
       const deltaXpx = event.clientX - drag.lastX;
       const deltaYpx = event.clientY - drag.lastY;
-      const distFromStart = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY);
-      if (distFromStart > 4) {
+      if (Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 4) {
         drag.moved = true;
-        setPan((atual) => ({
-          x: atual.x - deltaXpx * (vbW / rect.width),
-          y: atual.y - deltaYpx * (vbH / rect.height)
-        }));
+        setPan((atual) => ({ x: atual.x - deltaXpx * (vbW / rect.width), y: atual.y - deltaYpx * (vbH / rect.height) }));
       }
       drag.lastX = event.clientX;
       drag.lastY = event.clientY;
@@ -335,29 +264,15 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
     }
 
     const codigo = codigoDoAlvo(event.target);
-    if (codigo) {
-      setHoverCode(codigo);
-      setTooltip({ codigo, x: event.clientX - rect.left, y: event.clientY - rect.top });
-    } else {
-      setHoverCode(null);
-      setTooltip(null);
-    }
+    setTooltip(codigo ? { codigo, x: event.clientX - rect.left, y: event.clientY - rect.top } : null);
   }
 
   function handlePointerUp(event: React.PointerEvent<SVGSVGElement>) {
     const drag = dragState.current;
     if (drag && !drag.moved) {
       const codigo = codigoDoAlvo(event.target);
-      if (codigo) {
-        navigateToMunicipio(codigo);
-      }
+      if (codigo) setChosenCode(codigo);
     }
-    dragState.current = null;
-  }
-
-  function handlePointerLeave() {
-    setHoverCode(null);
-    setTooltip(null);
     dragState.current = null;
   }
 
@@ -366,29 +281,56 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
     ajustarZoom(event.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP);
   }
 
-  const tooltipMunicipio = tooltip ? paths.find((item) => item.codigo === tooltip.codigo) : null;
+  const tooltipPath = tooltip ? paths.find((item) => item.codigo === tooltip.codigo) : null;
+  const tooltipDado = tooltip ? dados.get(tooltip.codigo) : undefined;
+
+  const legenda: { rotulo: string; classe: ClasseEscala }[] = ehNota
+    ? [
+        { rotulo: `0–${LIMITES_NOTA[0]}`, classe: 1 },
+        { rotulo: `${LIMITES_NOTA[0]}–${LIMITES_NOTA[1]}`, classe: 2 },
+        { rotulo: `${LIMITES_NOTA[1]}–${LIMITES_NOTA[2]}`, classe: 3 },
+        { rotulo: `${LIMITES_NOTA[2]}–${LIMITES_NOTA[3]}`, classe: 4 },
+        { rotulo: `${LIMITES_NOTA[3]}–100`, classe: 5 }
+      ]
+    : ehBinaria
+      ? [
+          { rotulo: "Não", classe: 1 },
+          { rotulo: "Sim", classe: 4 }
+        ]
+      : quebras.length === 4
+        ? [0, 1, 2, 3, 4].map((indice) => {
+            const inicio = indice === 0 ? "até" : formatarLimite(quebras[indice - 1], metricaAtual.unidade);
+            const fim = indice === 4 ? "ou mais" : formatarLimite(quebras[indice], metricaAtual.unidade);
+            const rotulo = indice === 0 ? `${inicio} ${fim}` : indice === 4 ? `${inicio} ${fim}` : `${inicio}–${fim}`;
+            const classe = (menorMelhor ? 5 - indice : indice + 1) as ClasseEscala;
+            return { rotulo, classe };
+          })
+        : [];
 
   if (municipios.length === 0) {
-    return (
-      <div className="mt-8 rounded-md border border-ms-line bg-white p-5 text-sm text-slate-600">
-        {TEXT.noData}
-      </div>
-    );
+    return <div className="rounded-md border border-ms-line bg-ms-surface p-5 text-sm text-ms-muted">Nenhum município encontrado na API.</div>;
   }
 
   return (
-    <div className="overflow-hidden rounded-md border border-ms-line bg-white shadow-soft">
-      <div className="grid lg:grid-cols-[20rem_1fr]">
-        <aside className="border-b border-white/15 bg-ms-navy p-5 text-white lg:border-b-0 lg:border-r">
-          <label className="block text-sm font-semibold" htmlFor="municipio-map-select">
-            {TEXT.select}
-          </label>
-          <div className="relative mt-3">
+    <div className="overflow-hidden rounded-md border border-ms-line bg-ms-surface">
+      <div className="grid lg:grid-cols-[20rem_minmax(0,1fr)]">
+        <aside className="grid content-start gap-5 border-b border-ms-line p-5 lg:border-b-0 lg:border-r">
+          <Field label="Colorir mapa por" htmlFor="metrica-mapa-select" hint={`Referência ${anoMetrica}${menorMelhor && !ehNota ? " · menor é melhor" : ""}`}>
+            <select id="metrica-mapa-select" value={metrica} onChange={(event) => setMetrica(event.target.value)} className={campoClasses}>
+              {METRICAS.map((item) => (
+                <option key={item.codigo} value={item.codigo}>
+                  {item.nome}
+                </option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="Município" htmlFor="municipio-map-select">
             <select
               id="municipio-map-select"
               value={selectedCode ?? ""}
               onChange={(event) => setChosenCode(event.target.value)}
-              className="h-11 w-full appearance-none rounded-md border border-white/20 bg-white px-3 pr-10 text-base font-medium text-ms-ink outline-none ring-white/20 focus:ring-4 md:text-sm"
+              className={campoClasses}
             >
               {municipiosOrdenados.map((municipio) => (
                 <option key={municipio.codigo_ibge} value={municipio.codigo_ibge}>
@@ -396,189 +338,197 @@ export function MapaMunicipiosMS({ municipios, notaSaneamento }: Props) {
                 </option>
               ))}
             </select>
-            <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-          </div>
-
-          <div className="mt-5 rounded-md border border-white/15 bg-white/10 p-4">
-            <div className="flex items-center gap-2 text-sm text-white/80">
-              <MapPinned className="h-4 w-4" />
-              <span>{TEXT.selected}</span>
-            </div>
-            <p className="mt-3 text-xl font-semibold">{selectedMunicipio?.nome ?? "-"}</p>
-            <p className="mt-1 text-sm text-white/75">
-              {TEXT.code}: {selectedMunicipio?.codigo_ibge ?? "-"}
-            </p>
-            {selectedCode && valoresPorCodigo.has(selectedCode) ? (
-              <p className="mt-2 text-sm text-white/90">
-                {metricaAtual.nome} ({anoMetrica}):{" "}
-                <span className="font-semibold">
-                  {formatarValor(valoresPorCodigo.get(selectedCode) as number, metricaAtual.unidade)}
-                </span>
-              </p>
-            ) : (
-              <p className="mt-2 text-xs text-white/60">Sem dado para {metricaAtual.nome.toLowerCase()}.</p>
-            )}
-          </div>
+          </Field>
 
           {selectedMunicipio ? (
-            <Link
-              href={`/municipios/${selectedMunicipio.codigo_ibge}`}
-              className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-ms-green px-4 text-sm font-semibold text-white hover:bg-[#125f48]"
-            >
-              {TEXT.open}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          ) : null}
+            <div className="grid gap-4 border-t border-ms-line pt-5" aria-live="polite">
+              <div>
+                <p className="t-h3 text-ms-ink">{selectedMunicipio.nome}</p>
+                <p className="mt-0.5 text-sm text-ms-muted">
+                  Código IBGE <span className="font-data">{selectedMunicipio.codigo_ibge}</span>
+                  {selectedMunicipio.populacao ? (
+                    <>
+                      {" · "}
+                      <span className="font-data">{formatarPopulacao(selectedMunicipio.populacao)}</span> hab.
+                    </>
+                  ) : null}
+                </p>
+              </div>
 
-          <div className="mt-6 border-t border-white/15 pt-5">
-            <label className="block text-sm font-semibold" htmlFor="metrica-mapa-select">
-              Colorir mapa por
-            </label>
-            <select
-              id="metrica-mapa-select"
-              value={metrica}
-              onChange={(event) => setMetrica(event.target.value)}
-              className="mt-3 h-11 w-full appearance-none rounded-md border border-white/20 bg-white px-3 text-base font-medium text-ms-ink outline-none ring-white/20 focus:ring-4 md:text-sm"
-            >
-              {METRICAS.map((item) => (
-                <option key={item.codigo} value={item.codigo}>
-                  {item.nome}
-                </option>
-              ))}
-            </select>
-            {menorMelhor ? <p className="mt-2 text-xs text-white/60">Quanto menor, melhor.</p> : null}
-          </div>
+              {selectedNota ? (
+                <div>
+                  <p className="flex items-baseline gap-2">
+                    <span className="t-data-lg text-ms-ink">{formatarNota(selectedNota.nota)}</span>
+                    <span className="text-sm text-ms-muted">
+                      nota geral {selectedNota.ano} · {selectedNota.posicao}º de {notaSaneamento.length}
+                    </span>
+                  </p>
+                  <ul className="mt-3 grid gap-2">
+                    {TEMA_ORDEM.map((tema) => {
+                      const config = temaConfig(tema);
+                      const Icon = config.icon;
+                      const nota = notaDoModulo(selectedNota, tema);
+                      return (
+                        <li key={tema} className="grid grid-cols-[1.25rem_5.5rem_1fr_2.75rem] items-center gap-2 text-sm">
+                          <Icon className={`h-4 w-4 ${config.textClass}`} strokeWidth={1.75} aria-hidden="true" />
+                          <span className="text-ms-ink">{config.nomeCurto}</span>
+                          <ScoreBar valor={nota} cor={config.cor} className="w-full" />
+                          <span className="font-data text-right text-ms-ink">{formatarNota(nota)}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ) : (
+                <p className="text-sm text-ms-muted">Sem nota geral oficial em {anoNota}.</p>
+              )}
+
+              {!ehNota ? (
+                <p className="text-sm text-ms-muted">
+                  {metricaAtual.nome} ({anoMetrica}):{" "}
+                  <span className="font-semibold text-ms-ink">
+                    {selectedDado ? textoValor(selectedDado.valor, metricaAtual) : "sem dado oficial"}
+                  </span>
+                </p>
+              ) : null}
+
+              <ButtonLink href={`/municipios/${selectedMunicipio.codigo_ibge}`} variante="primary" className="w-full">
+                Abrir ficha de {selectedMunicipio.nome}
+                <ArrowRight className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
+              </ButtonLink>
+            </div>
+          ) : null}
         </aside>
 
-        <div className="bg-[#0d3769] p-4 text-white md:p-6">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <h3 className="text-base font-semibold md:text-lg">{TEXT.title}</h3>
-            <span className="text-sm text-white/75">
-              {municipios.length} {TEXT.listed}
-            </span>
-          </div>
-
-          <div
-            ref={containerRef}
-            className="relative mt-4 min-h-[27rem] overflow-hidden rounded-md border border-white/15 bg-[#082d59]"
-          >
+        <div className="min-w-0 bg-ms-surface-muted p-4 md:p-5">
+          <div className="relative overflow-hidden rounded-md">
             {mapError ? (
-              <p className="flex min-h-[26rem] items-center justify-center px-4 text-sm text-white/80">{TEXT.error}</p>
+              <p className="flex min-h-[20rem] items-center justify-center px-4 text-sm text-ms-muted">Não foi possível carregar o mapa.</p>
             ) : paths.length === 0 ? (
-              <p className="flex min-h-[26rem] items-center justify-center px-4 text-sm text-white/80">{TEXT.loading}</p>
+              <p className="flex min-h-[20rem] items-center justify-center px-4 text-sm text-ms-muted" role="status">
+                Carregando mapa de MS…
+              </p>
             ) : (
               <>
                 <svg
-                  aria-label="Mapa interativo dos municípios de Mato Grosso do Sul, colorido pela métrica selecionada"
+                  role="img"
+                  aria-label={`Mapa dos municípios de Mato Grosso do Sul colorido por ${metricaAtual.nome.toLocaleLowerCase("pt-BR")}, ${anoMetrica}. Use o seletor de município para escolher pelo teclado.`}
                   viewBox={`${vbX} ${vbY} ${vbW} ${vbH}`}
-                  className="h-full min-h-[26rem] w-full touch-none"
+                  className="block h-auto max-h-[34rem] w-full touch-none"
                   preserveAspectRatio="xMidYMid meet"
                   onWheel={handleWheel}
                   onPointerDown={handlePointerDown}
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
-                  onPointerLeave={handlePointerLeave}
+                  onPointerLeave={() => {
+                    setTooltip(null);
+                    dragState.current = null;
+                  }}
                 >
-                  {paths.map((mapPath) => {
-                    const isActive = highlightCode === mapPath.codigo;
-
-                    return (
-                      <path
-                        key={mapPath.codigo}
-                        data-codigo={mapPath.codigo}
-                        d={mapPath.path}
-                        fill={mapPath.fill}
-                        stroke={isActive ? "#7dd3fc" : "#ffffff"}
-                        strokeLinejoin="round"
-                        strokeWidth={isActive ? 2.6 : 1.05}
-                        role="button"
-                        tabIndex={0}
-                        aria-label={`${mapPath.nome}${
-                          mapPath.valor !== null ? `, ${formatarValor(mapPath.valor, metricaAtual.unidade)}` : ", sem dado"
-                        }`}
-                        onFocus={() => setHoverCode(mapPath.codigo)}
-                        onBlur={() => setHoverCode(null)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            navigateToMunicipio(mapPath.codigo);
-                          }
-                        }}
-                        className="cursor-pointer transition-colors duration-150 focus-visible:outline-none"
-                      />
-                    );
-                  })}
+                  <defs>
+                    <pattern id="mapa-hachura" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                      <rect width="6" height="6" fill="var(--seq-nodata-bg)" />
+                      <line x1="0" y1="0" x2="0" y2="6" stroke="var(--seq-nodata-line)" strokeWidth="1.6" />
+                    </pattern>
+                  </defs>
+                  {paths.map((mapPath) => (
+                    <path
+                      key={mapPath.codigo}
+                      data-codigo={mapPath.codigo}
+                      d={mapPath.path}
+                      fill={mapPath.classe ? COR_CLASSE[mapPath.classe] : "url(#mapa-hachura)"}
+                      stroke="var(--color-surface)"
+                      strokeWidth={0.8}
+                      strokeLinejoin="round"
+                      tabIndex={-1}
+                      className="cursor-pointer"
+                    />
+                  ))}
+                  {selectedPath ? (
+                    <path
+                      d={selectedPath.path}
+                      fill="none"
+                      stroke="var(--color-ink)"
+                      strokeWidth={2}
+                      vectorEffect="non-scaling-stroke"
+                      strokeLinejoin="round"
+                      pointerEvents="none"
+                    />
+                  ) : null}
                 </svg>
 
-                {tooltip && tooltipMunicipio ? (
+                {tooltip && tooltipPath ? (
                   <div
-                    className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-md bg-white px-3 py-2 text-xs text-ms-ink shadow-soft"
-                    style={{ left: tooltip.x, top: tooltip.y - 10 }}
+                    className="pointer-events-none absolute z-10 min-w-44 -translate-x-1/2 -translate-y-full rounded-md border border-ms-line-strong bg-ms-surface px-3 py-2 text-xs text-ms-ink shadow-e2"
+                    style={{ left: tooltip.x, top: tooltip.y - 12 }}
                   >
-                    <p className="font-semibold">{tooltipMunicipio.nome}</p>
+                    <p className="text-[13px] font-semibold">{tooltipPath.nome}</p>
                     <p className="mt-0.5 text-ms-muted">
-                      {tooltipMunicipio.valor !== null
-                        ? `${metricaAtual.nome}: ${formatarValor(tooltipMunicipio.valor, metricaAtual.unidade)}`
-                        : "Sem dado disponível"}
+                      {metricaAtual.nome} · {anoMetrica}
                     </p>
+                    {tooltipDado ? (
+                      <p className="mt-1">
+                        <span className="font-data text-sm font-medium">{textoValor(tooltipDado.valor, metricaAtual)}</span>
+                        {tooltipDado.posicao ? <span className="ml-2 text-ms-muted">{tooltipDado.posicao}º de {dados.size}</span> : null}
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-ms-muted">Sem dado oficial</p>
+                    )}
                   </div>
                 ) : null}
 
-                <div className="absolute right-3 top-3 flex flex-col gap-2 sm:gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => ajustarZoom(ZOOM_STEP)}
-                    aria-label="Aumentar zoom"
-                    className="flex h-10 w-10 items-center justify-center rounded-md border border-white/20 bg-white/10 text-white hover:bg-white/20 sm:h-8 sm:w-8"
-                  >
-                    <Plus className="h-4 w-4" />
+                <div className="absolute right-2 top-2 flex flex-col gap-1.5">
+                  <button type="button" onClick={() => ajustarZoom(ZOOM_STEP)} aria-label="Aumentar zoom" className="flex h-10 w-10 items-center justify-center rounded-md border border-ms-line-strong bg-ms-surface text-ms-ink hover:border-ms-blue hover:text-ms-blue">
+                    <Plus className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => ajustarZoom(1 / ZOOM_STEP)}
-                    aria-label="Diminuir zoom"
-                    className="flex h-10 w-10 items-center justify-center rounded-md border border-white/20 bg-white/10 text-white hover:bg-white/20 sm:h-8 sm:w-8"
-                  >
-                    <Minus className="h-4 w-4" />
+                  <button type="button" onClick={() => ajustarZoom(1 / ZOOM_STEP)} aria-label="Diminuir zoom" className="flex h-10 w-10 items-center justify-center rounded-md border border-ms-line-strong bg-ms-surface text-ms-ink hover:border-ms-blue hover:text-ms-blue">
+                    <Minus className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
                   </button>
-                  <button
-                    type="button"
-                    onClick={resetarZoom}
-                    aria-label="Redefinir zoom"
-                    className="flex h-10 w-10 items-center justify-center rounded-md border border-white/20 bg-white/10 text-white hover:bg-white/20 sm:h-8 sm:w-8"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" />
+                  <button type="button" onClick={resetarZoom} aria-label="Redefinir zoom" className="flex h-10 w-10 items-center justify-center rounded-md border border-ms-line-strong bg-ms-surface text-ms-ink hover:border-ms-blue hover:text-ms-blue">
+                    <RotateCcw className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
                   </button>
                 </div>
 
                 {carregandoMetrica ? (
-                  <div className="absolute inset-0 flex items-center justify-center bg-[#082d59]/60 text-sm text-white">
-                    Carregando indicador...
+                  <div className="absolute inset-0 flex items-center justify-center bg-ms-surface-muted/70 text-sm text-ms-ink" role="status">
+                    Carregando indicador…
                   </div>
                 ) : null}
               </>
             )}
           </div>
 
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 sm:justify-start">
-              <span className="shrink-0 text-xs text-white/75">{formatarValor(min, metricaAtual.unidade)}</span>
-              <div className="flex shrink-0 flex-col items-center gap-1">
-                <div
-                  className="h-2.5 w-28 rounded-full sm:w-40"
-                  style={{ background: `linear-gradient(90deg, ${RAMPA_SEQUENCIAL.join(", ")})` }}
-                  aria-hidden="true"
-                />
-                <span className="max-w-[9rem] text-center text-[0.65rem] font-semibold uppercase tracking-wide text-white/70 sm:max-w-none">
-                  {menorMelhor ? "Claro = melhor · Escuro = pior" : "Claro = pior · Escuro = melhor"}
-                </span>
-              </div>
-              <span className="shrink-0 text-xs text-white/75">{formatarValor(max, metricaAtual.unidade)}</span>
+          <div className="mt-4 grid gap-2">
+            <p className="text-xs font-semibold text-ms-ink">
+              {metricaAtual.nome} {anoMetrica}
+              {ehNota ? " (0–100)" : metricaAtual.unidade && !ehBinaria ? ` (${metricaAtual.unidade})` : ""}
+              {!ehNota && !ehBinaria && legenda.length > 0 ? " · classes por quintis" : ""}
+            </p>
+            <div className="flex flex-wrap items-end gap-x-5 gap-y-3 text-xs text-ms-muted">
+              {legenda.length > 0 ? (
+                <ul className="flex" aria-label="Legenda das classes">
+                  {legenda.map((item) => (
+                    <li key={item.rotulo} className="grid min-w-14 gap-1 text-center">
+                      <span className="block h-3" style={{ background: COR_CLASSE[item.classe] }} aria-hidden="true" />
+                      <span className="font-data whitespace-nowrap px-1 text-[11px]">{item.rotulo}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              <span className="inline-flex items-center gap-1.5">
+                <svg width="14" height="14" aria-hidden="true">
+                  <rect width="14" height="14" fill="url(#mapa-hachura)" stroke="var(--seq-nodata-line)" strokeWidth="1" />
+                </svg>
+                Sem dado oficial
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="block h-3.5 w-3.5 border-2 border-ms-ink" aria-hidden="true" />
+                Selecionado
+              </span>
             </div>
-            <div className="flex items-center justify-center gap-2 text-xs text-white/60">
-              <span className="h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: COR_SEM_DADO }} aria-hidden="true" />
-              Sem dado disponível
-            </div>
+            {menorMelhor && !ehNota && !ehBinaria ? (
+              <p className="text-xs text-ms-muted">Escala invertida: a classe mais escura corresponde aos menores valores (melhor desempenho).</p>
+            ) : null}
           </div>
         </div>
       </div>
