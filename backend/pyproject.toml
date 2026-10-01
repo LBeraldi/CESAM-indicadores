@@ -5,11 +5,11 @@ description = "API de indicadores municipais de saneamento de Mato Grosso do Sul
 requires-python = ">=3.12"
 dependencies = [
     "fastapi==0.141.1",
-    "uvicorn[standard]==0.52.4",
-    "SQLAlchemy==2.0.52",
-    "psycopg[binary]==3.3.4",
-    "alembic==1.19.1",
-    "pandas==3.0.5",
+    "uvicorn[standard]==0.54.0",
+    "SQLAlchemy==2.1.1",
+    "psycopg[binary]==3.3.6",
+    "alembic==1.20.0",
+    "pandas==3.0.6",
     "openpyxl==3.1.5",
     "xlrd==2.0.2",
     "python-dotenv==1.2.3",
