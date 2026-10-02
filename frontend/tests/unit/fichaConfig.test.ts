@@ -33,6 +33,10 @@ describe("regras da ficha municipal", () => {
     expect(calcularScore(valores)).toBe(80);
   });
 
+  it("trata Percentual como unidade percentual no score", () => {
+    expect(calcularScore([valor("atendimento", "Água", 80, "Percentual")])).toBe(80);
+  });
+
   it("ignora nulos e neutros no score e exige fonte oficial na cobertura", () => {
     const valores = [
       valor("nulo", "Água", null),

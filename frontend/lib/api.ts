@@ -91,10 +91,20 @@ export type RankingItem = {
 
 export type RankingSaneamentoValor = Omit<RankingItem, "posicao">;
 
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
 export async function fetchApi<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, { next: { revalidate: 3600 } });
   if (!response.ok) {
-    throw new Error(`Falha ao consultar ${path}: ${response.status}`);
+    throw new ApiError(`Falha ao consultar ${path}: ${response.status}`, response.status);
   }
   return response.json() as Promise<T>;
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { rotuloFonteCurto } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 export type BadgeVariante = "official" | "historical" | "inverse" | "missing" | "warning" | "neutral";
@@ -49,6 +50,22 @@ export function varianteFonte(fonte: string | null | undefined, status?: string 
   return "neutral";
 }
 
-export function BadgeFonte({ fonte, ano, status }: { fonte: string | null | undefined; ano: number; status?: string | null }) {
-  return <Badge variante={varianteFonte(fonte, status)}>{rotuloFonte(fonte, ano)}</Badge>;
+export function BadgeFonte({
+  fonte,
+  ano,
+  status,
+  curto = false
+}: {
+  fonte: string | null | undefined;
+  ano: number;
+  status?: string | null;
+  /** PG-03.9: selo curto ("SNIS 2021"), com a fonte completa no title. */
+  curto?: boolean;
+}) {
+  const completo = rotuloFonte(fonte, ano);
+  return (
+    <span title={curto ? completo : undefined}>
+      <Badge variante={varianteFonte(fonte, status)}>{curto ? rotuloFonteCurto(fonte, ano) : completo}</Badge>
+    </span>
+  );
 }

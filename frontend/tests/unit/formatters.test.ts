@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { Indicador, ValorIndicador } from "@/lib/api";
-import { formatValorIndicador, formatarNota, formatarValor, formatarVariacao, valorParaPlanilha } from "@/lib/formatters";
+import {
+  ehPercentual,
+  formatValorIndicador,
+  formatarNota,
+  formatarValor,
+  formatarVariacao,
+  rotuloFonteCurto,
+  valorParaPlanilha,
+} from "@/lib/formatters";
 
 function valor(valorAtual: number | null, unidade: string | null = "%"): ValorIndicador {
   const indicador: Indicador = {
@@ -60,5 +68,24 @@ describe("formatadores de indicadores", () => {
   it("mantém o valor bruto no CSV mesmo com a nova formatação de tela", () => {
     expect(valorParaPlanilha(valor(89.94))).toBe("89,94");
     expect(formatValorIndicador(valor(89.94))).toBe("89,9 %");
+  });
+
+  it("exibe \"Percentual\" como % com as casas de DS-07 (PG-03.9)", () => {
+    expect(formatarValor(88.91, "Percentual")).toEqual({ numero: "88,9", unidade: "%" });
+    expect(formatarValor(62.4, " percentual ")).toEqual({ numero: "62,4", unidade: "%" });
+    expect(formatarVariacao(1.5, "Percentual")).toEqual({ numero: "+1,5", unidade: "p.p." });
+    expect(ehPercentual("Percentual")).toBe(true);
+    expect(ehPercentual("km")).toBe(false);
+  });
+
+  it("mantém o valor bruto no CSV para unidade \"Percentual\"", () => {
+    expect(valorParaPlanilha(valor(88.91, "Percentual"))).toBe("88,91");
+  });
+
+  it("usa selo curto de fonte por ano (PG-03.9)", () => {
+    expect(rotuloFonteCurto("SNIS Serie Historica 1995-2022", 2021)).toBe("SNIS 2021");
+    expect(rotuloFonteCurto("SINISA 2024", 2024)).toBe("SINISA 2024");
+    expect(rotuloFonteCurto("IBGE", 2022)).toBe("IBGE 2022");
+    expect(rotuloFonteCurto(null, 2022)).toBe("Fonte não informada");
   });
 });

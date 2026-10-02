@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { COR_CLASSE, classeDaNota } from "@/lib/escalaMapa";
 import {
   createProjector,
   featureCoordinates,
@@ -14,22 +15,44 @@ const WIDTH = 360;
 const HEIGHT = 270;
 const PADDING = 16;
 
-export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: string; municipio: string }) {
+type Props = {
+  codigoIbge: string;
+  municipio: string;
+  /** Nota geral por código IBGE: pinta os municípios pela classe DS-05 (PG-03.12). */
+  notas?: Record<string, number>;
+  className?: string;
+};
+
+type EstadoMapa = "loading" | "ready" | "error";
+
+function corDoMunicipio(codigo: string, notas: Record<string, number> | undefined): string {
+  if (!notas) return "var(--color-line)";
+  const classe = classeDaNota(notas[codigo]);
+  return classe ? COR_CLASSE[classe] : "var(--seq-nodata-bg)";
+}
+
+export function MiniMapaMunicipio({ codigoIbge, municipio, notas, className }: Props) {
   const [features, setFeatures] = useState<GeoJsonFeature[]>([]);
+  const [estado, setEstado] = useState<EstadoMapa>("loading");
 
   useEffect(() => {
-    let ativo = true;
-    fetch("/data/ms-municipios.geojson")
-      .then((response) => (response.ok ? (response.json() as Promise<GeoJsonCollection>) : Promise.reject()))
-      .then((collection) => {
-        if (ativo) setFeatures(collection.features);
+    const controller = new AbortController();
+
+    fetch("/data/ms-municipios.geojson", { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Falha ao carregar mapa: ${response.status}`);
+        return response.json() as Promise<GeoJsonCollection>;
       })
-      .catch(() => {
-        if (ativo) setFeatures([]);
+      .then((collection) => {
+        setFeatures(collection.features);
+        setEstado("ready");
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setEstado("error");
       });
-    return () => {
-      ativo = false;
-    };
+
+    return () => controller.abort();
   }, []);
 
   const desenho = useMemo(() => {
@@ -49,35 +72,38 @@ export function MiniMapaMunicipio({ codigoIbge, municipio }: { codigoIbge: strin
 
   const selecionado = desenho?.paths.find((path) => path.codigo === codigoIbge) ?? null;
 
-  return (
-    <div className="overflow-hidden rounded-md border border-ms-line bg-ms-surface">
-      <div className="border-b border-ms-line px-4 py-3">
-        <p className="t-label text-ms-muted">Localização no estado</p>
-        <p className="mt-0.5 text-sm font-semibold text-ms-ink">{municipio}, Mato Grosso do Sul</p>
+  if (estado === "error") {
+    return (
+      <div className={className ?? "flex h-28 w-full items-center justify-center text-sm text-ms-muted"} role="status">
+        <span className="text-xs text-ms-muted">Mapa indisponível.</span>
       </div>
-      <div className="bg-ms-surface-muted p-2">
-        {desenho ? (
-          <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="mx-auto block h-36 w-full" role="img" aria-label={`Mapa de Mato Grosso do Sul com ${municipio} destacado`}>
-            {desenho.paths.map((path) => (
-              <path
-                key={path.codigo}
-                d={path.d}
-                fill={path.codigo === codigoIbge ? "var(--seq-4)" : "var(--color-line)"}
-                stroke="var(--color-surface)"
-                strokeWidth={0.8}
-                vectorEffect="non-scaling-stroke"
-              />
-            ))}
-            {selecionado ? (
-              <path d={selecionado.d} fill="none" stroke="var(--color-ink)" strokeWidth={2} vectorEffect="non-scaling-stroke" />
-            ) : null}
-          </svg>
-        ) : (
-          <div className="flex h-36 w-full items-center justify-center text-sm text-ms-muted" role="status">
-            Carregando localização…
-          </div>
-        )}
-      </div>
+    );
+  }
+
+  return desenho ? (
+    <svg
+      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+      className={className ?? "block h-28 w-full"}
+      role="img"
+      aria-label={`Mapa de Mato Grosso do Sul com ${municipio} destacado`}
+    >
+      {desenho.paths.map((path) => (
+        <path
+          key={path.codigo}
+          d={path.d}
+          fill={notas ? corDoMunicipio(path.codigo, notas) : path.codigo === codigoIbge ? "var(--seq-4)" : "var(--color-line)"}
+          stroke="var(--color-surface)"
+          strokeWidth={0.6}
+          vectorEffect="non-scaling-stroke"
+        />
+      ))}
+      {selecionado ? (
+        <path d={selecionado.d} fill="none" stroke="var(--color-ink)" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+      ) : null}
+    </svg>
+  ) : (
+    <div className={className ?? "flex h-28 w-full items-center justify-center text-sm text-ms-muted"} role="status">
+      <span className="text-xs text-ms-muted">Carregando mapa…</span>
     </div>
   );
 }
