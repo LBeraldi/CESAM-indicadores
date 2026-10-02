@@ -2,6 +2,8 @@ import { CloudRain, Droplets, Leaf, ShieldCheck, Trash2, Waves, type LucideIcon 
 
 import type { ValorIndicador } from "@/lib/api";
 import type { RankingSaneamentoItem } from "@/lib/rankingSaneamento";
+import { ehPercentual } from "@/lib/formatters";
+import { ehStatusOficial } from "@/lib/statusValidacao";
 
 type ChaveModulo = "agua" | "esgoto" | "residuos" | "aguasPluviais" | "gestao";
 
@@ -110,7 +112,7 @@ export type CoberturaTema = {
 export function calcularCobertura(indicadores: ValorIndicador[]): CoberturaTema[] {
   const temasComDadoOficial = new Set(
     indicadores
-      .filter((valor) => valor.valor !== null && valor.status_validacao.includes("oficial"))
+      .filter((valor) => valor.valor !== null && ehStatusOficial(valor.status_validacao))
       .map((valor) => valor.indicador.tema),
   );
 
@@ -125,7 +127,7 @@ export function calcularScore(valores: ValorIndicador[]): number | null {
   const percentuais = valores
     .filter(
       (valor) =>
-        valor.valor !== null && valor.indicador.unidade?.trim() === "%" && valor.indicador.sentido !== "neutro",
+        valor.valor !== null && ehPercentual(valor.indicador.unidade) && valor.indicador.sentido !== "neutro",
     )
     .map((valor) => {
       const numero = Number(valor.valor);

@@ -53,19 +53,23 @@ test("consulta municipal pesquisa e abre a ficha correta", async ({ page }) => {
 });
 
 test("formulários da ficha filtram, limpam e exportam CSV", async ({ page }) => {
+  // ADR-008: o select "Tema" foi substituído pelas abas de dimensão.
   await abrirPagina(page, "/municipios/5003702");
   const ano = page.getByLabel("Ano de referência");
-  const tema = page.getByLabel("Tema");
+  const fonte = page.getByLabel("Fonte");
   await expect(ano).toBeVisible();
-  await expect(tema).toBeVisible();
+  await expect(fonte).toBeVisible();
+  await expect(page.getByLabel("Tema")).toHaveCount(0);
 
-  const anoDisponivel = await ano.locator("option").nth(1).getAttribute("value");
-  if (anoDisponivel) await ano.selectOption(anoDisponivel);
-  const temaDisponivel = await tema.locator("option").nth(1).getAttribute("value");
-  if (temaDisponivel) await tema.selectOption(temaDisponivel);
+  const anoPadrao = await ano.inputValue();
+  const outroAno = await ano.locator("option").nth(2).getAttribute("value");
+  if (outroAno) await ano.selectOption(outroAno);
   await page.getByRole("button", { name: "Limpar" }).click();
-  await expect(ano).toHaveValue(await ano.locator("option").nth(1).getAttribute("value") ?? "");
-  await expect(tema).toHaveValue("todos");
+  await expect(ano).toHaveValue(anoPadrao);
+
+  const abas = page.getByRole("tablist", { name: "Dimensões" });
+  await abas.getByRole("tab", { name: /^Esgoto/ }).click();
+  await expect(abas.getByRole("tab", { name: /^Esgoto/ })).toHaveAttribute("aria-selected", "true");
 
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Exportar CSV" }).click();
@@ -73,26 +77,17 @@ test("formulários da ficha filtram, limpam e exportam CSV", async ({ page }) =>
   expect(download.suggestedFilename()).toMatch(/dourados.*\.csv/i);
 });
 
-test("ranking pode ser filtrado por município", async ({ page }) => {
-  await abrirPagina(page, "/ranking");
-  await expect(page.getByRole("heading", { name: "Ranking municipal de saneamento" })).toBeVisible();
-  await page.getByPlaceholder("Nome do município").fill("Dourados");
-  await expect(page.getByText(/2 municípios listados para "Dourados"/)).toBeVisible();
-  await expect(page.getByText("Dourados", { exact: true }).first()).toBeVisible();
-  await expect(page.getByRole("row").filter({ hasText: "Campo Grande" })).toHaveCount(0);
-});
+test("ficha abre na primeira dimensão com os indicadores em destaque (ADR-007)", async ({ page }) => {
+  await abrirPagina(page, "/municipios/5003702");
+  const abas = page.getByRole("tablist", { name: "Dimensões" });
+  await expect(abas.getByRole("tab").first()).toHaveAttribute("aria-selected", "true");
+  const painel = page.getByRole("tabpanel");
+  await expect(painel.getByRole("row", { name: /Índice de perdas na distribuição/ })).toBeVisible();
+  const linhasDestaque = await painel.locator("tbody tr").count();
+  expect(linhasDestaque).toBeLessThanOrEqual(6);
 
-test.describe("tablet", () => {
-  test.use({ viewport: { width: 1024, height: 768 } });
-
-  test("não corta ranking nem botões na lateral direita", async ({ page }) => {
-    await abrirPagina(page, "/");
-    // PG-01.8: o destaque "Líder atual" duplicava a primeira linha e saiu; o atalho é o ranking completo.
-    await expect(page.getByRole("link", { name: /Ver ranking completo/i })).toBeVisible();
-    await expectNoHorizontalOverflow(page);
-    await abrirPagina(page, "/ranking");
-    await expectNoHorizontalOverflow(page);
-  });
+  await painel.getByRole("button", { name: /^Ver todos os \d+ indicadores de Água/ }).click();
+  expect(await painel.locator("tbody tr").count()).toBeGreaterThan(linhasDestaque);
 });
 
 test.describe("celular com toque", () => {

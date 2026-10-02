@@ -22,7 +22,19 @@ const REGRAS_UNIDADE: Record<string, RegraUnidade> = {
 };
 
 function normalizarUnidade(unidade: string | null | undefined): string {
-  return unidade?.trim().toLocaleLowerCase("pt-BR") ?? "";
+  const normalizada = unidade?.trim().toLocaleLowerCase("pt-BR") ?? "";
+  // PG-03.9: as fontes usam "%" e "Percentual" para a mesma unidade.
+  return normalizada === "percentual" ? "%" : normalizada;
+}
+
+/** Unidade como deve aparecer na tela ("Percentual" vira "%"). */
+export function unidadeExibicao(unidade: string | null | undefined): string | null {
+  const limpa = unidade?.trim() || null;
+  return limpa && normalizarUnidade(limpa) === "%" ? "%" : limpa;
+}
+
+export function ehPercentual(unidade: string | null | undefined): boolean {
+  return normalizarUnidade(unidade) === "%";
 }
 
 export function ehUnidadeBinaria(unidade: string | null | undefined): boolean {
@@ -56,7 +68,7 @@ export function formatarValor(valor: number | null | undefined, unidade: string 
 
   const regra = REGRAS_UNIDADE[normalizarUnidade(unidade)];
   const numero = regra ? formatarNumero(valor, regra.casas, regra.fixas) : formatarNumero(valor, 2, false);
-  const unidadeLimpa = unidade?.trim() || null;
+  const unidadeLimpa = unidadeExibicao(unidade);
 
   return { numero, unidade: unidadeLimpa };
 }
@@ -87,7 +99,7 @@ export function formatarVariacao(variacao: number, unidade: string | null | unde
 
   return {
     numero: `${sinal}${absoluto}`,
-    unidade: normalizada === "%" ? "p.p." : unidade?.trim() || null
+    unidade: normalizada === "%" ? "p.p." : unidadeExibicao(unidade)
   };
 }
 
@@ -106,4 +118,13 @@ export function valorParaPlanilha(valor: ValorIndicador): string {
   }
 
   return String(valor.valor).replace(".", ",");
+}
+
+/** Selo curto de fonte por ano (PG-03.9): "SNIS Serie Historica 1995-2022" em 2021 → "SNIS 2021". */
+export function rotuloFonteCurto(fonte: string | null | undefined, ano: number): string {
+  const texto = fonte?.trim();
+  if (!texto) return "Fonte não informada";
+  const sistema = /\bSINISA\b/i.test(texto) ? "SINISA" : /\bSNIS\b/i.test(texto) ? "SNIS" : null;
+  if (sistema) return `${sistema} ${ano}`;
+  return /\b(19|20)\d{2}\b/.test(texto) ? texto : `${texto} ${ano}`;
 }

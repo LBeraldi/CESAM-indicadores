@@ -1,14 +1,13 @@
 "use client";
 
-import { X } from "lucide-react";
-import { useEffect, useId, useRef } from "react";
+import { Info, X } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
 import { temaConfig } from "@/components/municipio/fichaConfig";
-import { Alert } from "@/components/ui/Alert";
-import { Badge, BadgeFonte } from "@/components/ui/Badge";
+import { BadgeFonte } from "@/components/ui/Badge";
 import { Delta } from "@/components/ui/Delta";
 import { Valor } from "@/components/ui/Valor";
 import type { Indicador } from "@/lib/api";
-import { formatarNumero, formatarValor } from "@/lib/formatters";
+import { ehPercentual, formatarNumero, formatarValor, unidadeExibicao } from "@/lib/formatters";
 
 export type PontoHistorico = { ano: number; valor: number; fonte: string | null };
 
@@ -39,7 +38,7 @@ export function escalaEixo(valores: number[], unidade: string | null | undefined
   const maximo = Math.max(...valores);
   const minimo = Math.min(...valores);
 
-  if (unidade?.trim() === "%") {
+  if (ehPercentual(unidade)) {
     const topo = Math.min(100, Math.max(10, Math.ceil(maximo / 10) * 10));
     const passo = passoRedondo(topo);
     const ticks = [];
@@ -72,7 +71,7 @@ function GraficoSerie({ pontos, indicador, cor }: { pontos: PontoHistorico[]; in
   const intervaloAno = Math.max(1, Math.ceil(pontos.length / 6));
   const troca = anoTrocaDeFonte(pontos);
   const indiceTroca = troca === null ? -1 : pontos.findIndex((ponto) => ponto.ano === troca);
-  const casas = indicador.unidade?.trim() === "%" ? 0 : 1;
+  const casas = ehPercentual(indicador.unidade) ? 0 : 1;
   const primeiro = pontos[0];
   const ultimo = pontos[pontos.length - 1];
   const texto = (valor: number) => {
@@ -98,24 +97,29 @@ function GraficoSerie({ pontos, indicador, cor }: { pontos: PontoHistorico[]; in
           </text>
         </g>
       ))}
-      {indiceTroca > 0 ? (
-        <g>
-          <line
-            x1={(x(indiceTroca) + x(indiceTroca - 1)) / 2}
-            x2={(x(indiceTroca) + x(indiceTroca - 1)) / 2}
-            y1={margem.top - 6}
-            y2={margem.top + areaA}
-            stroke="var(--color-muted)"
-            strokeDasharray="3 3"
-          />
-          <text x={(x(indiceTroca) + x(indiceTroca - 1)) / 2 - 4} y={margem.top - 8} textAnchor="end" className="fill-ms-muted text-[9px]">
-            SNIS
-          </text>
-          <text x={(x(indiceTroca) + x(indiceTroca - 1)) / 2 + 4} y={margem.top - 8} className="fill-ms-muted text-[9px]">
-            SINISA
-          </text>
-        </g>
-      ) : null}
+      {indiceTroca > 0
+        ? (() => {
+            const xTroca = (x(indiceTroca) + x(indiceTroca - 1)) / 2;
+            // Perto da borda direita, "SINISA" sobe uma linha e se alinha à borda para não ser cortado.
+            const pertoDaBorda = xTroca + 36 > largura;
+            return (
+              <g>
+                <line x1={xTroca} x2={xTroca} y1={margem.top - 6} y2={margem.top + areaA} stroke="var(--color-muted)" strokeDasharray="3 3" />
+                <text x={xTroca - 4} y={margem.top - 8} textAnchor="end" className="fill-ms-muted text-[9px]">
+                  SNIS
+                </text>
+                <text
+                  x={pertoDaBorda ? largura - 1 : xTroca + 4}
+                  y={pertoDaBorda ? margem.top - 18 : margem.top - 8}
+                  textAnchor={pertoDaBorda ? "end" : "start"}
+                  className="fill-ms-muted text-[9px]"
+                >
+                  SINISA
+                </text>
+              </g>
+            );
+          })()
+        : null}
       <path d={linha} fill="none" stroke={cor} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
       {pontos.map((ponto, indice) => (
         <g key={ponto.ano}>
@@ -138,21 +142,40 @@ type Props = {
   onFechar: () => void;
 };
 
-/** CP-10: painel lateral (desktop 420px) ou tela cheia (celular), aberto por clique. */
+const CONSULTA_LADO_A_LADO = "(min-width: 1280px)";
+
+/** Verdadeiro quando a série cabe ao lado da tabela (PG-03.11). */
+function useLadoALado(): boolean {
+  const [ladoALado, setLadoALado] = useState(() => typeof window !== "undefined" && window.matchMedia(CONSULTA_LADO_A_LADO).matches);
+  useEffect(() => {
+    const consulta = window.matchMedia(CONSULTA_LADO_A_LADO);
+    const aoMudar = () => setLadoALado(consulta.matches);
+    consulta.addEventListener("change", aoMudar);
+    return () => consulta.removeEventListener("change", aoMudar);
+  }, []);
+  return ladoALado;
+}
+
+/**
+ * CP-10 / PG-03.11: card ao lado da tabela no desktop largo (sem fundo escurecido, fixo ao rolar);
+ * abaixo de 1280 px, painel modal (lateral no tablet, tela cheia no celular).
+ */
 export function SeriePainel({ indicador, municipio, pontos, onFechar }: Props) {
   const tituloId = useId();
   const painelRef = useRef<HTMLDivElement>(null);
+  const ladoALado = useLadoALado();
   const config = temaConfig(indicador.tema);
   const Icone = config.icon;
   const primeiro = pontos[0];
   const ultimo = pontos[pontos.length - 1];
   const troca = anoTrocaDeFonte(pontos);
+  const unidade = unidadeExibicao(indicador.unidade);
 
   useEffect(() => {
     const anterior = document.activeElement as HTMLElement | null;
-    painelRef.current?.focus();
+    painelRef.current?.focus({ preventScroll: ladoALado });
     const overflowAnterior = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    if (!ladoALado) document.body.style.overflow = "hidden";
 
     function aoTeclar(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -160,7 +183,8 @@ export function SeriePainel({ indicador, municipio, pontos, onFechar }: Props) {
         onFechar();
         return;
       }
-      if (event.key !== "Tab" || !painelRef.current) return;
+      // Modal prende o foco; o card ao lado da tabela não (não é modal).
+      if (ladoALado || event.key !== "Tab" || !painelRef.current) return;
       const focaveis = painelRef.current.querySelectorAll<HTMLElement>("button, a[href], [tabindex]:not([tabindex='-1'])");
       if (focaveis.length === 0) return;
       const primeiroFocavel = focaveis[0];
@@ -178,110 +202,114 @@ export function SeriePainel({ indicador, municipio, pontos, onFechar }: Props) {
     return () => {
       document.removeEventListener("keydown", aoTeclar);
       document.body.style.overflow = overflowAnterior;
-      anterior?.focus();
+      anterior?.focus({ preventScroll: true });
     };
-  }, [onFechar]);
+  }, [onFechar, ladoALado]);
 
   return (
-    <div className="no-print fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-ms-ink/30" aria-hidden="true" onClick={onFechar} />
+    <>
+      {!ladoALado ? <div className="no-print fixed inset-0 z-50 bg-ms-ink/30" aria-hidden="true" onClick={onFechar} /> : null}
       <div
         ref={painelRef}
         role="dialog"
-        aria-modal="true"
+        aria-modal={!ladoALado}
         aria-labelledby={tituloId}
         tabIndex={-1}
-        className="painel-lateral absolute inset-0 flex flex-col overflow-y-auto bg-ms-surface shadow-e2 outline-none sm:left-auto sm:w-[420px] sm:border-l sm:border-ms-line"
+        className={
+          ladoALado
+            ? "no-print sticky top-[calc(var(--header-h)+5.5rem)] flex max-h-[calc(100vh-var(--header-h)-7rem)] flex-col overflow-y-auto rounded-md border border-ms-line bg-ms-surface shadow-e2 outline-none"
+            : "painel-lateral no-print fixed inset-0 z-50 flex flex-col overflow-y-auto bg-ms-surface shadow-e2 outline-none sm:left-auto sm:w-[420px] sm:border-l sm:border-ms-line"
+        }
       >
-        <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-ms-line bg-ms-surface px-5 py-4">
+        <div className="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-ms-line bg-ms-surface px-4 py-3">
           <div className="min-w-0">
-            <p className="t-label inline-flex items-center gap-1.5 text-ms-muted">
-              <Icone className={`h-4 w-4 ${config.textClass}`} strokeWidth={1.75} aria-hidden="true" />
+            <p className="eyebrow inline-flex items-center gap-1.5">
+              <Icone className={`h-3.5 w-3.5 ${config.textClass}`} strokeWidth={1.75} aria-hidden="true" />
               Série histórica · {indicador.tema}
             </p>
-            <h2 id={tituloId} className="t-h3 mt-1 text-ms-ink">
+            <h2 id={tituloId} className="mt-1 text-base font-semibold leading-snug text-ms-ink">
               {indicador.nome}
             </h2>
-            <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-ms-muted">
-              <span>
-                {municipio} · {primeiro.ano}–{ultimo.ano}
-                {indicador.unidade ? ` · ${indicador.unidade}` : ""}
-              </span>
-              {indicador.sentido === "menor_melhor" ? <Badge variante="inverse">menor é melhor</Badge> : null}
+            <p className="mt-0.5 text-xs text-ms-muted">
+              {municipio} · {primeiro.ano}–{ultimo.ano}
+              {unidade ? ` · ${unidade}` : ""}
+              {indicador.sentido === "menor_melhor" ? " · menor é melhor" : ""}
             </p>
           </div>
           <button
             type="button"
             onClick={onFechar}
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-ms-line text-ms-ink hover:border-ms-blue hover:text-ms-blue"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-ms-line text-ms-ink hover:border-ms-blue hover:text-ms-blue"
           >
             <X className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
             <span className="sr-only">Fechar série histórica</span>
           </button>
         </div>
 
-        <div className="grid gap-5 px-5 py-5">
-          <dl className="grid grid-cols-3 divide-x divide-ms-line rounded-md border border-ms-line">
-            <div className="grid gap-1 p-3">
-              <dt className="t-label text-ms-muted">{primeiro.ano}</dt>
-              <dd>
-                <Valor valor={primeiro.valor} unidade={indicador.unidade} numeroClassName="text-base font-medium" />
-              </dd>
-            </div>
-            <div className="grid gap-1 p-3">
-              <dt className="t-label text-ms-muted">{ultimo.ano}</dt>
-              <dd>
-                <Valor valor={ultimo.valor} unidade={indicador.unidade} numeroClassName="text-base font-medium" />
-              </dd>
-            </div>
-            <div className="grid gap-1 p-3">
-              <dt className="t-label text-ms-muted">Variação</dt>
-              <dd>
-                <Delta
-                  variacao={ultimo.valor - primeiro.valor}
-                  sentido={indicador.sentido}
-                  unidade={indicador.unidade}
-                  desde={primeiro.ano}
-                  mostrarAvaliacao
-                />
-              </dd>
-            </div>
-          </dl>
+        <dl className="grid grid-cols-3 divide-x divide-ms-line border-b border-ms-line">
+          <div className="grid gap-1 px-4 py-3">
+            <dt className="text-xs text-ms-muted">{primeiro.ano}</dt>
+            <dd>
+              <Valor valor={primeiro.valor} unidade={indicador.unidade} numeroClassName="text-base font-medium" />
+            </dd>
+          </div>
+          <div className="grid gap-1 px-4 py-3">
+            <dt className="text-xs text-ms-muted">{ultimo.ano}</dt>
+            <dd>
+              <Valor valor={ultimo.valor} unidade={indicador.unidade} numeroClassName="text-base font-medium" />
+            </dd>
+          </div>
+          <div className="grid gap-1 px-4 py-3">
+            <dt className="text-xs text-ms-muted">Variação</dt>
+            <dd>
+              <Delta
+                variacao={ultimo.valor - primeiro.valor}
+                sentido={indicador.sentido}
+                unidade={indicador.unidade}
+                desde={primeiro.ano}
+                mostrarAvaliacao
+                className="flex-wrap whitespace-normal"
+              />
+            </dd>
+          </div>
+        </dl>
 
+        <div className="grid gap-2 border-b border-ms-line px-4 py-3">
           <GraficoSerie pontos={pontos} indicador={indicador} cor={config.cor} />
-
           {troca ? (
-            <Alert variante="info" titulo={`Mudança de fonte em ${troca}`}>
-              A partir de {troca}, os dados vêm do SINISA; anos anteriores, do SNIS Série Histórica. A metodologia pode
-              mudar entre as fontes.
-            </Alert>
+            <p className="flex items-start gap-1.5 text-xs text-ms-muted">
+              <Info className="mt-px h-3.5 w-3.5 shrink-0 text-sem-info" strokeWidth={1.75} aria-hidden="true" />
+              <span>
+                SNIS até {troca - 1}, SINISA a partir de {troca}. A metodologia pode mudar entre as fontes.
+              </span>
+            </p>
           ) : null}
-
-          <table className="w-full text-sm">
-            <caption className="sr-only">Valores por ano de {indicador.nome}</caption>
-            <thead className="border-b border-ms-line bg-ms-surface-muted text-left">
-              <tr>
-                <th scope="col" className="t-label px-3 py-2 text-ms-muted">Ano</th>
-                <th scope="col" className="t-label px-3 py-2 text-right text-ms-muted">Valor</th>
-                <th scope="col" className="t-label px-3 py-2 text-ms-muted">Fonte</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[...pontos].reverse().map((ponto) => (
-                <tr key={ponto.ano} className="border-b border-ms-line last:border-b-0">
-                  <td className="font-data px-3 py-2 text-ms-ink">{ponto.ano}</td>
-                  <td className="px-3 py-2 text-right text-ms-ink">
-                    <Valor valor={ponto.valor} unidade={indicador.unidade} />
-                  </td>
-                  <td className="px-3 py-2">
-                    <BadgeFonte fonte={ponto.fonte} ano={ponto.ano} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
+
+        <table className="w-full text-sm">
+          <caption className="sr-only">Valores por ano de {indicador.nome}</caption>
+          <thead className="border-b border-ms-line bg-ms-surface-muted text-left">
+            <tr>
+              <th scope="col" className="t-label px-4 py-2 text-ms-muted">Ano</th>
+              <th scope="col" className="t-label px-3 py-2 text-right text-ms-muted">Valor</th>
+              <th scope="col" className="t-label px-4 py-2 text-ms-muted">Fonte</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[...pontos].reverse().map((ponto) => (
+              <tr key={ponto.ano} className="border-b border-ms-line last:border-b-0">
+                <td className="font-data px-4 py-2 text-ms-ink">{ponto.ano}</td>
+                <td className="px-3 py-2 text-right text-ms-ink">
+                  <Valor valor={ponto.valor} unidade={indicador.unidade} />
+                </td>
+                <td className="px-4 py-2">
+                  <BadgeFonte fonte={ponto.fonte} ano={ponto.ano} curto />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-    </div>
+    </>
   );
 }
